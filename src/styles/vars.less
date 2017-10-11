@@ -1,0 +1,55 @@
+@import "./colors.less";
+
+// primary and accent
+@primaryColor: #008EE8;
+@lighterPrimaryColor: @grey400;
+@darkerAccentColor: @grey100;
+
+@accentColor: @pinkA200;
+
+@successColor: #32B846;
+@dangerColor: #D0021B;
+
+// textColor or borderColor
+@textColor: #F1F2F3;
+@secondaryTextColor: fade(@textColor, 20%);
+
+@alternateTextColor: #14191E;
+
+  // settings
+@labelColor: fade(@textColor, 50%);
+@descColor: fade(@textColor, 20%);
+
+@lightBorderColor: #F1F2F3;
+@darkBorderColor: #14191E;
+@layoutBorderColor: fade(@lightBorderColor, 10%);
+@blockBorderColor: fade(@darkBorderColor, 40%);
+@blockDividerColor: fade(@fullBlack, 10%);
+@textFieldBorderColor: fade(@fullBlack, 20%);
+
+@hoverColor: @primaryColor;
+@activeColor: fade(@textColor, 40%);
+@disabledColor: fade(@textColor, 10%);
+
+// background
+@backgroundColor: #20252F;
+@blockBackgroundColor: fade(#14191E, 60%);
+@textFieldBackgroundColor: fade(@fullBlack, 20%);
+@dialogBackgroundColor: fade(@fullWhite, 95%);
+@darkDialogBackgroundColor: fade(rgb(22, 25, 33), 96%);
+
+// shadow
+@textShadow: 0 0 4px rgba(0, 0, 0, 0.2);
+
+// spaceing
+@iconSize: 16px;
+
+// animate
+@easeOutFunction: cubic-bezier(0.23, 1, 0.32, 1);
+@easeInOutFunction: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+
+.common-transition {
+  transition-duration: 300ms;
+  transition-timing-function: @easeOutFunction;
+  transform: translate3d(0, 0, 0);
+}

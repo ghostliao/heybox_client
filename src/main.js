@@ -1,0 +1,128 @@
+// The Vue build version to load with the `import` command
+// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
+import Vue from 'vue'
+import App from '@/App'
+import router from '@/router'
+import store from '@/vuex/store'
+import './assets/fonts/iconfont.css'
+import VueVideoPlayer from 'vue-video-player'
+import 'video.js/dist/video-js.css'
+import 'vue-video-player/src/custom-theme.css'
+Vue.use(VueVideoPlayer)
+import VueLazyload from 'vue-lazyload'
+//Vue.use(VueLazyload)
+Vue.use(VueLazyload, {
+  preLoad: 1,
+  error: '',
+  loading: '',
+  attempt: 1
+})
+
+import lazy from '@/components/lazy'
+Vue.component(lazy.name, lazy)
+import button from '@/components/button'
+Vue.component(button.name, button)
+import icon from '@/components/icon'
+Vue.component(icon.name, icon)
+import iconButton from '@/components/iconButton'
+Vue.component(iconButton.name, iconButton)
+
+Vue.config.productionTip = false
+
+Vue.prototype.getParameterByName = function (name, url) {
+  if (!url) url = window.location.href;
+  name = name.replace(/[\[\]]/g, "\\$&");
+  var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+      results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+Vue.filter('fileSize', (t) => (t / 1024 /1024).toFixed(1) + 'M')
+Vue.filter('fileName', (t) => {
+  const array = t.split('/')
+  const fileName = array[array.length - 1]
+  return fileName
+})
+Vue.filter('duration', (t) => {
+  let timeStr, mid, h = 0, m = 0, s = 0
+  if (t >= 3600) {
+    h = parseInt(t / 3600)
+    t -= h * 3600
+
+    m = parseInt(t / 60)
+    t -= m * 60
+
+    s = t
+  } else if (t >= 60) {
+    m = parseInt(t / 60)
+    t -= m * 60
+  } else {
+    s = t
+  }
+
+  h = h < 10 ? `0${h}` : h
+  m = m < 10 ? `0${m}` : m
+  s = s < 10 ? `0${s}` : s
+
+  timeStr = `${h}:${m}:${s}`
+  return timeStr
+})
+Vue.filter('formDate', function (t, type = 1) {
+  // filter type
+  // 1 日期带时分秒
+  // 2 距离现在过去多久
+  // 3 24小时显示内距离现在过去多久,24小时以上显示日期不带时分秒
+
+  const timeSpan = t * 1000
+  const dateTime = new Date(parseInt(timeSpan))
+
+  const year = dateTime.getFullYear()
+  const month = dateTime.getMonth() + 1
+  const day = dateTime.getDate()
+  const hour = dateTime.getHours()
+  let minute = dateTime.getMinutes()
+  minute === 0 && (minute = "00")
+  // const second = dateTime.getSeconds()
+
+  if (type === 1) {
+    return year + '-' + month + '-' + day + ' ' + hour + ':' + minute
+  } else {
+    const now = new Date()
+    const nowNew = Date.parse(now)
+
+    const ms = nowNew - timeSpan
+    let timeSpanStr
+
+    if (ms <= 1000 * 60 * 1) {
+      timeSpanStr = '刚刚'
+    } else if (1000 * 60 * 1 < ms && ms <= 1000 * 60 * 60) {
+      timeSpanStr = Math.round((ms / (1000 * 60))) + '分钟前'
+    } else if (1000 * 60 * 60 * 1 < ms && ms <= 1000 * 60 * 60 * 24) {
+      timeSpanStr = Math.round(ms / (1000 * 60 * 60)) + '小时前'
+    } else {
+      if (type === 2) {
+        if (1000 * 60 * 60 * 24 < ms && ms <= 1000 * 60 * 60 * 24 * 30) {
+          timeSpanStr = Math.round(ms / (1000 * 60 * 60 * 24)) + '天前'
+        } else if (1000 * 60 * 60 * 24 * 30 < ms && ms <= 1000 * 60 * 60 * 24 * 365) {
+          timeSpanStr = Math.round(ms / (1000 * 60 * 60 * 24 * 30)) + '月前'
+        } else {
+          timeSpanStr = Math.round(ms / (1000 * 60 * 60 * 24 * 365)) + '年前'
+        }
+      } else if (type === 3) {
+        timeSpanStr = year + '-' + month + '-' + day
+      }
+    }
+    return timeSpanStr
+  }
+})
+
+/* eslint-disable no-new */
+window.v = new Vue({
+  el: '#app',
+  router,
+  store,
+  template: '<App/>',
+  components: { App }
+})

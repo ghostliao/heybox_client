@@ -1,0 +1,87 @@
+html, body {
+  height: 100%;
+  color: @textColor;
+  font-size: 14px;
+  font-weight: 300;
+  font-family: "PingFang SC", "Helvetica Neue", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  -webkit-font-smoothing: auto;
+  background: @backgroundColor url(../assets/background_texture.png);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 2px;
+}
+::-webkit-scrollbar-thumb {
+  background: fade(#f1f2f3, 10%);
+  min-height: 150px;
+  min-width: 150px;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: fade(#f1f2f3, 20%);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+@keyframes thumbnailFadeIn {
+  from {
+   opacity: 0;
+  }
+  to {
+   opacity: 1;
+  }
+}
+img[lazy=loading] {
+  opacity: 0;
+}
+img[lazy=error], img[lazy=loaded] {
+  // animation-duration: .6s;
+  // animation-fill-mode: forwards;
+  // animation-name: thumbnailFadeIn;
+  opacity: 1;
+  transition: opacity .5s @easeOutFunction;
+}
+
+@font-face {
+  font-family: 'DIN';
+  font-style: normal;
+  font-weight: 400;
+  // src: url('../assets/fonts/Futura-CondensedMedium.ttf') format('truetype');
+  src: url('../assets/fonts/dincondensedc.ttf') format('truetype');
+}
+.wf-din {
+  font-family: 'Din'
+}
+.wc-primary {
+  color: @primaryColor;
+  &.grd {
+    background-image: linear-gradient(to bottom, #00bbff, #0088ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+.wc-success {
+  color: @successColor;
+  &.grd {
+    background-image: linear-gradient(to bottom, #42d859, #2bad3e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+.wc-danger {
+  color: @dangerColor;
+  &.grd {
+    background-image: linear-gradient(to bottom, #f10c28, #a40215);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
