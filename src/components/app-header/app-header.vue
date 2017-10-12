@@ -16,15 +16,17 @@
 
       <div class="navigation">
         <div class="tab-btn">
-          <cpt-icon-button icon="previous-thin" @click="$router.go(-1)"></cpt-icon-button>
+          <cpt-icon-button icon="previous-thin" :iconSize="20" @click="$router.go(-1)"></cpt-icon-button>
         </div>
         <div class="tab-btn">
-          <cpt-icon-button icon="reload-thin" @click="routeReload"></cpt-icon-button>
+          <cpt-icon-button icon="reload-thin" :iconSize="20" @click="routeReload"></cpt-icon-button>
         </div>
         <div class="tabs-wrap">
           <ul class="tabs">
-            <router-link v-for="i in navTabs" :to="{ name: i.name }" tag="li" :key="i.name">{{i.label}}</router-link>
-            <span class="tab-link-highlight" ref="highlight"></span>        
+            <router-link v-for="(i, index) in navTabs" :to="{ name: i.name }" tag="li" :key="i.name">
+              <span :ref="`tab${index}`">{{i.label}}</span>
+            </router-link>
+            <span class="tab-link-highlight" ref="highlight"></span>
           </ul>
         </div>
         <div class="account">
@@ -141,11 +143,25 @@ export default {
     },
     setTabLightStyle () {
       // console.log('set tab:' + this.getActiveIndex())
-      const x = this.getActiveIndex() * 100
-      const len = this.navTabs.length
+      // console.log(this.$refs.tab2)
+      
+      // const x = this.getActiveIndex() * 100
+      // const len = this.navTabs.length
+      const index = this.getActiveIndex()
       const el = this.$refs.highlight
-      el.style.width = len > 0 ? (100 / len).toFixed(4) + '%' : '100%'
-      el.style.transform = 'translate3d(' + x + '%, 0, 0)'
+      if (index === -4) {
+        el.style.left = '-100px'
+        el.style.width = 0
+        el.style.opacity = 0
+      } else {
+        const tab = this.$refs['tab' + index]
+        // el.style.width = len > 0 ? (100 / len).toFixed(4) + '%' : '100%'
+        // el.style.transform = 'translate3d(' + x + '%, 0, 0)'
+        el.style.left = tab[0].offsetParent.offsetLeft + tab[0].offsetLeft + 'px'
+        el.style.width = tab[0].clientWidth + 'px'
+        el.style.opacity = 1        
+      }
+      
     },
     showDock () {
       maxjia.store.showDock()
@@ -222,17 +238,24 @@ export default {
         .tabs {
           position: relative;
           display: flex;
-          width: 300px;
+          // width: 300px;
           > li {
-            flex: 1;
+            // flex: 1;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            padding: 0 16px;
             color: fade(@textColor, 60%);
             cursor: pointer;
             .common-transition;
             &.active {
               color: @textColor;
+            }
+            span {
+              flex: 1;
+              display: flex;
+              align-items: center;
             }
           }
           .tab-link-highlight {
@@ -241,7 +264,8 @@ export default {
             bottom: -1px;
             height: 2px;
             background-color: @primaryColor;
-            transition: transform .3s;
+            transition: all .3s;
+            transform: translate3d(0, 0, 0);
             backface-visibility: hidden;
           }
         }
