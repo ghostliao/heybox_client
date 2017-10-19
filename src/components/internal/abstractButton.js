@@ -71,6 +71,10 @@ export default {
     keyboardFocused: {
       type: Boolean,
       default: false
+    },
+    danger: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -82,6 +86,7 @@ export default {
   computed: {
     buttonClass () {
       let classNames = []
+      if (this.danger) classNames.push('danger')
       if (this.disabled) classNames.push('disabled')
       if (!this.disabled && (this.hover || this.isKeyboardFocused)) classNames.push('hover')
       return classNames.join(' ')

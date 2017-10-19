@@ -16,6 +16,8 @@
 
 @alternateTextColor: #14191E;
 
+@lightIconColor: #888888;
+
   // settings
 @labelColor: fade(@textColor, 50%);
 @descColor: fade(@textColor, 20%);
@@ -28,15 +30,23 @@
 @textFieldBorderColor: fade(@fullBlack, 20%);
 
 @hoverColor: @primaryColor;
-@activeColor: fade(@textColor, 40%);
+@activeColor: fade(@primaryColor, 40%);
+@dangerHoverColor: @dangerColor;
+@dangerActiveColor: fade(@dangerColor, 40%);
 @disabledColor: fade(@textColor, 10%);
 
 // background
 @backgroundColor: #20252F;
 @blockBackgroundColor: fade(#14191E, 60%);
 @textFieldBackgroundColor: fade(@fullBlack, 20%);
-@dialogBackgroundColor: fade(@fullWhite, 95%);
-@darkDialogBackgroundColor: fade(rgb(22, 25, 33), 96%);
+@dialogBackgroundColor: fade(@textColor, 95%);
+@dialogHoverBackgroundColor: fade(@fullWhite, 50%);
+@dialogActiveBackgroundColor: fade(#14191E, 4%);
+@darkDialogBackgroundColor: fade(#14191E, 96%);
+
+.primary-linear-gradient {
+  background-image: linear-gradient(to right, #36b0fa, #a1dbff);
+}
 
 // shadow
 @textShadow: 0 0 4px rgba(0, 0, 0, 0.2);
@@ -53,3 +63,5 @@
   transition-timing-function: @easeOutFunction;
   transform: translate3d(0, 0, 0);
 }
+
+@navHeight: 60px;
