@@ -50,6 +50,7 @@ export default {
 	  border-radius: 2px;
     text-align: left;
     padding: 4px 6px;
+    user-select: text;
     .iconfont {
       position: absolute;
       left: 6px;

@@ -8,7 +8,7 @@
 
 <script>
 export default {
-  name: 'mu-tooltip',
+  name: 'cpt-tooltip',
   props: {
     label: {
       type: String
@@ -100,10 +100,11 @@ export default {
 .mu-tooltip{
   position: absolute;
   font-size: 10px;
-  line-height: 22px;
+  line-height: 24px;
   padding: 0 8px;
   z-index: 300;
-  color: @alternateTextColor;
+  // color: @alternateTextColor;
+  color: fade(@textColor, 60%);
   overflow: hidden;
   top: -1000px;
   border-radius: 2px;
@@ -130,7 +131,8 @@ export default {
   background-color: transparent;
   transition: width 0ms @easeOutFunction 450ms, height 0ms @easeOutFunction 450ms, background-color 450ms @easeOutFunction 0ms;
   &.when-shown {
-    background-color: @grey700;
+    background-color: @tooltipBackgroundColor;
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
     transition: width 450ms @easeOutFunction 0ms, height 450ms @easeOutFunction 0ms, background-color 450ms @easeOutFunction 0ms;
   }
 }

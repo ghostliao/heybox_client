@@ -47,6 +47,10 @@ export default {
       type: Boolean,
       default: false
     },
+    success: {
+      type: Boolean,
+      default: false
+    },
     small: {
       type: Boolean,
       default: false
@@ -59,8 +63,9 @@ export default {
   computed: {
     buttonClass () {
       return {
-        'cpt-button-primary': this.primary,
-        'cpt-button-secondary': this.secondary,
+        'primary': this.primary,
+        'secondary': this.secondary,
+        'success': this.success,
         'small': this.small
       }
     }
@@ -91,7 +96,7 @@ export default {
     background: transparent;
     font-size: 14px;
     font-weight: 400;
-    border: 1px solid fade(@textColor, 60%);
+    border: 1px solid fade(@textColor, 80%);
     border-radius: 2px;
     // transition-duration: 300ms;
     // transition-timing-function: @easeOutFunction;
@@ -99,13 +104,13 @@ export default {
     cursor: pointer;
     &:hover, &:active {
       color: @alternateTextColor;
-      background: fade(@textColor, 60%);
+      background: fade(@textColor, 80%);
       border-color: transparent;
     }
     &:active {
       opacity: .4;
     }
-    &.cpt-button-primary {
+    &.primary {
       color: @textColor;      
       background: fade(@primaryColor, 80%);
       border-color: transparent;
@@ -117,13 +122,25 @@ export default {
         opacity: .4;
       }
     }
-    &.cpt-button-secondary {
+    &.secondary {
       color: fade(@textColor, 40%);
       background: fade(@textColor, 10%);
       border-color: transparent;
       &:hover {
         color: fade(@textColor, 40%);
         background: fade(@textColor, 20%);
+      }
+      &:active {
+        opacity: .4;
+      }
+    }
+    &.success {
+      color: @textColor;      
+      background: fade(@successColor, 80%);
+      border-color: transparent;
+      &:hover {
+        color: @textColor;
+        background: fade(@successColor, 100%);
       }
       &:active {
         opacity: .4;

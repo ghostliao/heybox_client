@@ -37,13 +37,13 @@ export default {
 <style lang="less">
 @import "../styles/import.less";
 @sideBarWidth: 160px;
-@sideBarOffset: 1px;
+@sideBarOffset: 0;
 .view-settings {
   display: flex;
   height: 100%;
   .sidebar {
     position: fixed;
-    top: 56px;
+    top: @navHeight + 1px;
     left: @sideBarOffset;
     width: @sideBarWidth;
     height: 100%;

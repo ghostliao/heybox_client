@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="text-field-wrap">
-      <input type="text" class="text-field" ref="input" v-model="comb" @keydown="handleKeydown" @keyup="handleKeyup" onkeydown="return false;">
+      <input type="text" class="text-field" ref="input" v-model="comb" @keydown="handleKeydown" @keyup="handleKeyup" onkeydown="return false;" spellcheck="false">
     </div>
   </div>
 </template>
@@ -35,6 +35,10 @@ export default {
     app: {
       type: String,
       default: 'app'
+    },
+    hotkeyKey: {
+      type: String,
+      default: 'key'
     }
   },
   data () {
@@ -145,7 +149,8 @@ export default {
           modifiers += i.e ? i.v : 0
         }
         this.displayHotKey(modifiers, this.virtualKey.v)
-        this.setHotkey(modifiers, keycode(key), function () {
+        this.setHotkey(modifiers, keycode(key), () => {
+          this.$store.state.hotkeys[this.hotkeyKey] = this.comb
           console.log('Set hotkey: ' + this.name + ' ' + this.comb)
         })
       }
@@ -212,13 +217,21 @@ export default {
       height: 30px;
       line-height: 18px;
       font-size: 12px;
-      color: fade(@textColor, 50%);
+      color: transparent;
+      text-shadow: 0 0 0 fade(@textColor, 50%);
       background-color: @textFieldBackgroundColor;
       border: solid 1px @textFieldBorderColor;
       border-radius: 2px;
       text-align: center;
       padding: 5px 6px;
       box-sizing: border-box;
+      // caret-color: transparent;
+      .common-transition;
+
+      &:focus {
+        border-color: @primaryColor;
+        // box-shadow: 0 0 3px 0 @primaryColor;
+      }
     }
   }
 }

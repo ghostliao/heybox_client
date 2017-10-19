@@ -16,13 +16,13 @@
           </div>
         </cpt-set-block>
         <cpt-set-block title="热键设置">
-          <cpt-set-shortcut label="开始/停止视频录制" name="Video.CaptureVideo" app="Video"></cpt-set-shortcut>
-          <cpt-set-shortcut label="保存精彩时刻" name="Video.Save30Moment" app="Video"></cpt-set-shortcut>
-          <cpt-set-shortcut label="截屏" name="Video.CaptureImage" app="Video"></cpt-set-shortcut>
-          <cpt-set-shortcut label="Dock显示/隐藏" name="Dock.Show" app="Dock">
+          <cpt-set-shortcut label="开始/停止视频录制" name="Video.CaptureVideo" app="Video" hotkeyKey="captureVideo"></cpt-set-shortcut>
+          <cpt-set-shortcut label="保存精彩时刻" name="Video.Save30Moment" app="Video" hotkeyKey="save30Moment"></cpt-set-shortcut>
+          <cpt-set-shortcut label="截屏" name="Video.CaptureImage" app="Video" hotkeyKey="captureImage"></cpt-set-shortcut>
+          <cpt-set-shortcut label="Dock显示/隐藏" name="Dock.Show" app="Dock" hotkeyKey="dockShow">
             <span slot="desc">是否在打开任何游戏时都启动精彩时刻？</span>
           </cpt-set-shortcut>
-          <cpt-set-shortcut label="Overlay显示/隐藏" name="Overlay.ShowHide" app="Overlay"></cpt-set-shortcut>
+          <cpt-set-shortcut label="Overlay显示/隐藏" name="Overlay.ShowHide" app="Overlay" hotkeyKey="overlayShowHide"></cpt-set-shortcut>
         </cpt-set-block>    
         <cpt-set-block title="启动设置">
           <!-- <cpt-set-switch label="录制精彩镜头" :switch="isVideoCaptureForMoment" @input="setIsVideoCaptureForMoment">

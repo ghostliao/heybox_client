@@ -26,6 +26,10 @@ import icon from '@/components/icon'
 Vue.component(icon.name, icon)
 import iconButton from '@/components/iconButton'
 Vue.component(iconButton.name, iconButton)
+import tooltip from '@/components/tooltip'
+Vue.component(tooltip.name, tooltip)
+import mark from '@/components/mark'
+Vue.component(mark.name, mark)
 
 Vue.config.productionTip = false
 
@@ -58,6 +62,8 @@ Vue.filter('duration', (t) => {
   } else if (t >= 60) {
     m = parseInt(t / 60)
     t -= m * 60
+    
+    s = t
   } else {
     s = t
   }
@@ -83,7 +89,7 @@ Vue.filter('formDate', function (t, type = 1) {
   const day = dateTime.getDate()
   const hour = dateTime.getHours()
   let minute = dateTime.getMinutes()
-  minute === 0 && (minute = "00")
+  minute < 10 && (minute = "0" + minute)
   // const second = dateTime.getSeconds()
 
   if (type === 1) {
@@ -118,6 +124,13 @@ Vue.filter('formDate', function (t, type = 1) {
   }
 })
 
+// router.beforeEach((to, from, next) => { 
+//   clearInterval(window.hardwarePerfInfoTimer)
+//   clearInterval(window.hardwareHeatbeatTimer)
+//   console.log(`clear interval`)
+//   next()
+// })
+
 /* eslint-disable no-new */
 window.v = new Vue({
   el: '#app',
@@ -126,3 +139,4 @@ window.v = new Vue({
   template: '<App/>',
   components: { App }
 })
+

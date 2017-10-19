@@ -6,6 +6,7 @@ html, body {
   font-family: "PingFang SC", "Helvetica Neue", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   -webkit-font-smoothing: auto;
   background: @backgroundColor url(../assets/background_texture.png);
+  user-select: none;
 }
 
 ::-webkit-scrollbar {
@@ -27,6 +28,11 @@ html, body {
 }
 ::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+::selection {
+  color: @fullWhite;
+  background: @primaryColor;
 }
 
 @keyframes thumbnailFadeIn {
@@ -56,7 +62,7 @@ img[lazy=error], img[lazy=loaded] {
   src: url('../assets/fonts/dincondensedc.ttf') format('truetype');
 }
 .wf-din {
-  font-family: 'Din'
+  font-family: 'DIN'
 }
 .wc-primary {
   color: @primaryColor;
@@ -84,4 +90,18 @@ img[lazy=error], img[lazy=loaded] {
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+}
+
+@font-face {
+  font-family: 'liquidcr';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../assets/fonts/liquidcr.ttf') format('truetype');
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0
 }

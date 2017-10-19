@@ -220,14 +220,20 @@ export default {
   &.right {
     transform-origin: right top;
   }
-  &.mt {
+  &.main-popover {
     margin-top: 6px;
+    margin-left: -20px;
+  }
+  &.account-popover {
+    margin-top: 6px;
+    margin-left: 14px;
   }
 }
 
 .mu-popover-enter-active, .mu-popover-leave-active{
   transition-duration: 300ms;
-  transition-property: opacity, transform;
+  // transition-property: opacity, transform;
+  transition-property: opacity;
 }
 
 .mu-popover-enter, .mu-popover-leave-active {

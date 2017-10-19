@@ -46,8 +46,9 @@ export default {
   }
   .main {
     .setting-row {
-      margin-right: -12px;
-      padding: 8px 12px 8px 0;
+      // margin-right: -12px;
+      // padding: 8px 12px 8px 0;
+      padding: 8px 0;
       border-bottom: 1px solid @blockDividerColor;
       &:last-of-type {
         border-color: transparent;

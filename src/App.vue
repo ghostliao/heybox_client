@@ -3,29 +3,32 @@
     <app-header></app-header>
     <div class="app-content">
       <keep-alive>
+        <!-- <router-view></router-view> -->
         <router-view v-if="$route.meta.keepAlive"></router-view>
       </keep-alive>
-      <router-view v-if="!$route.meta.keepAlive"></router-view>      
+      <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
     <!-- S video player -->
     <cpt-dialog :open="videoPlayer" title="" @close="closeVideoPlayer" @hide="closeVideoPlayer" dialogClass="opt-dialog" :overlayOpacity="0.8" cornerClose>
       <div class="video-player-body">
         <div class="video-wrap">
-          <video-player  class="vjs-custom-skin"
-                          ref="videoPlayer"
-                          :options="$store.state.videoPlayerOptions"
-                          :playsinline="true"
-                          @play="onPlayerPlay($event)"
-                          @pause="onPlayerPause($event)"
-                          @ended="onPlayerEnded($event)"
-                          @loadeddata="onPlayerLoadeddata($event)"
-                          @waiting="onPlayerWaiting($event)"
-                          @playing="onPlayerPlaying($event)"
-                          @timeupdate="onPlayerTimeupdate($event)"
-                          @canplay="onPlayerCanplay($event)"
-                          @canplaythrough="onPlayerCanplaythrough($event)"
-                          @ready="playerReadied"
-                          @statechanged="playerStateChanged($event)">
+          <!-- <video-player v-if="$store.state.videoPlayerOptions.src" -->
+          <video-player
+            class="vjs-custom-skin"
+            ref="videoPlayer"
+            :options="$store.state.videoPlayerOptions"
+            :playsinline="true"
+            @play="onPlayerPlay($event)"
+            @pause="onPlayerPause($event)"
+            @ended="onPlayerEnded($event)"
+            @loadeddata="onPlayerLoadeddata($event)"
+            @waiting="onPlayerWaiting($event)"
+            @playing="onPlayerPlaying($event)"
+            @timeupdate="onPlayerTimeupdate($event)"
+            @canplay="onPlayerCanplay($event)"
+            @canplaythrough="onPlayerCanplaythrough($event)"
+            @ready="playerReadied"
+            @statechanged="playerStateChanged($event)">
           </video-player>
         </div>
         <div class="options"></div>
@@ -33,6 +36,13 @@
     </cpt-dialog>
     <!-- <cpt-video-player v-show="videoPlayer" :videoSource="videoSource"></cpt-video-player> -->
     <!-- E video player -->
+
+    <!-- S image checker -->
+    <cpt-dialog :open="imageChecker" title="" @close="closeImageChecker" @hide="closeImageChecker" dialogClass="image-checker" :overlayOpacity="0.8" cornerClose>
+      <cpt-image-checker></cpt-image-checker>
+    </cpt-dialog>
+    <!-- E image checker -->
+    <div class="font-preload">1</div>
   </div>
 </template>
 
@@ -43,14 +53,18 @@ import appHeader from '@/components/app-header'
 import dialog from '@/components/dialog'
 import cptVideoPlayer from '@/components/video-player'
 import { videoPlayer } from 'vue-video-player'
+import hotkeys from '@/components/hotkeys'
+import cptImageChecker from '@/components/image-checker'
 
 export default {
   name: 'app',
+  mixins: [hotkeys],
   components: {
     'cpt-video-player': cptVideoPlayer,
     'video-player': videoPlayer,
     'app-header': appHeader,
-    'cpt-dialog': dialog
+    'cpt-dialog': dialog,
+    'cpt-image-checker': cptImageChecker
   },
   data () {
     return {
@@ -64,7 +78,9 @@ export default {
   computed: {
     ...mapState([
       'videoPlayer',
-      'videoSource'
+      'videoSource',
+      'imageChecker',
+      'imageCheckerOptions'
     ]),
     player () {
       return this.$refs.videoPlayer.player
@@ -76,6 +92,7 @@ export default {
       'navigateToPage',
       'playVideoFile',
       'closeVideoPlayer',
+      'closeImageChecker',
       'easyStartVideoCapture'
     ]),
     handleTabChange (val) {
@@ -127,6 +144,7 @@ export default {
       // console.log('dynamic change options', this.player)
       this.player.muted(false)
     }, 2000)
+    // console.log(this)
   }
 }
 </script>
@@ -139,9 +157,10 @@ export default {
 #app {
   height: 100%;
   background: url(./assets/background_img.png) no-repeat right top;
-  padding-top: 56px;
-  border: 1px solid #000;
-  box-shadow: 0 0 0 1px @layoutBorderColor inset;
+  // background: url(//cdn.max-c.com/image/p_01.jpg) no-repeat right top;
+  padding-top: @navHeight + 1px;
+  // border: 1px solid #000;
+  // box-shadow: 0 0 0 1px @layoutBorderColor inset;
 }
 
 .app-content {
@@ -163,6 +182,12 @@ export default {
       overflow: hidden;
     }
   }
+}
+
+.font-preload {
+  position: absolute;
+  left: -9999px;
+  font-family: 'DIN'
 }
 
 

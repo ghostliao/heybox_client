@@ -30,22 +30,23 @@ export default {
     _addVideoItem (videoItem) {
       this.videoList.unshift(videoItem)
       this.updateVideoList()
+      // console.log(videoItem.createTimeStamp)
     },
     onVideoFileAdded (videoItem) {
-      console.log('onVideoFileAdded')
+      // console.log('onVideoFileAdded')
       this._addVideoItem(videoItem)
     },
     onVideoFileDeleted () {
-      console.log('onVideoFileDeleted')      
+      // console.log('onVideoFileDeleted')
       this.getVideoList()
     },
     onVideoFileStatusChanged (videoItem) {
-      console.log('onVideoFileStatusChanged')
+      // console.log('onVideoFileStatusChanged')
       //todo
       this.getVideoList()
     },
     getVideoList () {
-      console.log('getVideoList')
+      // console.log('getVideoList')
       maxjia.media.file.getVideoList((data) => {
         if (data && data['videos']) {
           this.videoList = []
@@ -85,9 +86,9 @@ export default {
           }
         }
       }
-      // this.$nextTick(() => {
+      this.$nextTick(() => {
         this.$emit('updateVideoList', this.videoList)
-      // })
+      })
     },
     getVideoItem (id) {
       for (let i of this.videoList) {
@@ -118,7 +119,7 @@ export default {
   },
   mounted () {
     this.initConnect()
-    console.log('video file man')
+    // console.log('video file man')
     this.getVideoList()
   }
 }

@@ -134,9 +134,7 @@ export default {
   background: none;
   color: inherit;
   text-decoration: none;
-  // transition-duration: 300ms;
-  // transition-timing-function: @easeOutFunction;
-  // transform: translate3d(0, 0, 0);
+  .common-transition;
   .flex-shrink(0);
   margin: 0;
   outline: 0;

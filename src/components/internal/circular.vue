@@ -47,7 +47,7 @@ export default {
 </script>
 
 <style lang="less">
-@import "../styles/import.less";
+@import "../../styles/import.less";
 .mu-circle-wrapper {
   display: inline-block;
   position: relative;

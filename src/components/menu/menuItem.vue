@@ -199,11 +199,11 @@ export default {
   }
   &.hover {
     color: @alternateTextColor;
-    background-color: fade(@alternateTextColor, 6%);
+    background-color: @dialogHoverBackgroundColor;
   }
   &:active {
     color: fade(@alternateTextColor, 80%);
-    background-color: fade(@alternateTextColor, 10%);
+    background-color: @dialogActiveBackgroundColor;
   }
   &.disabled {
     color: @disabledColor;

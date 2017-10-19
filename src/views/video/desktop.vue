@@ -20,7 +20,11 @@ export default {
   data () {
     return {
       videoList: [
-        { "createTimeStamp": 1505478630, "duration": 7, "file": "C:/Users/max/Videos/Desktop-2017-9-15 20-30-21-138.mp4", "fileSize": 1024134, "isMomentCapture": true, "localId": 1, "thumbnail": "C:/Users/max/Videos/thumb/Desktop-2017-9-15 20-30-21-138.png", "uploadFailed": false, "uploadFinished": false, "uploadProgress": 0, "uploading": false }
+        // { "createTimeStamp": 1505478630, "duration": 7, "file": "C:/Users/max/Videos/Desktop-2017-9-15 20-30-21-138.mp4", "fileSize": 1024134, "isMomentCapture": true, "localId": 1, "thumbnail": "C:/Users/max/Videos/thumb/Desktop-2017-9-15 20-30-21-138.png", "uploadFailed": false, "uploadFinished": false, "uploadProgress": 0, "uploading": false },
+        // { "createTimeStamp": 1505478630, "duration": 7, "file": "C:/Users/max/Videos/Desktop-2017-9-15 20-30-21-138.mp4", "fileSize": 1024134, "isMomentCapture": true, "localId": 1, "thumbnail": "C:/Users/max/Videos/thumb/Desktop-2017-9-15 20-30-21-138.png", "uploadFailed": false, "uploadFinished": false, "uploadProgress": 0, "uploading": false },
+        // { "createTimeStamp": 1505478630, "duration": 7, "file": "C:/Users/max/Videos/Desktop-2017-9-15 20-30-21-138.mp4", "fileSize": 1024134, "isMomentCapture": true, "localId": 1, "thumbnail": "C:/Users/max/Videos/thumb/Desktop-2017-9-15 20-30-21-138.png", "uploadFailed": false, "uploadFinished": false, "uploadProgress": 0, "uploading": false },
+        // { "createTimeStamp": 1505478630, "duration": 7, "file": "C:/Users/max/Videos/Desktop-2017-9-15 20-30-21-138.mp4", "fileSize": 1024134, "isMomentCapture": true, "localId": 1, "thumbnail": "C:/Users/max/Videos/thumb/Desktop-2017-9-15 20-30-21-138.png", "uploadFailed": false, "uploadFinished": false, "uploadProgress": 0, "uploading": false },
+        // { "createTimeStamp": 1505478630, "duration": 7, "file": "C:/Users/max/Videos/Desktop-2017-9-15 20-30-21-138.mp4", "fileSize": 1024134, "isMomentCapture": true, "localId": 1, "thumbnail": "C:/Users/max/Videos/thumb/Desktop-2017-9-15 20-30-21-138.png", "uploadFailed": false, "uploadFinished": false, "uploadProgress": 0, "uploading": false }
       ]
     }
   },
@@ -38,7 +42,7 @@ export default {
   .video-list {
     display: flex;
     flex-wrap: wrap;
-    max-width: 1072px;
+    // max-width: 1072px;
     margin: auto;
     
   }

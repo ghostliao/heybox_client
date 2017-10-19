@@ -10,7 +10,7 @@
         </div>
         <div class="layer">
           <div class="play">
-            <cpt-icon value="start-fill"></cpt-icon>
+            <cpt-icon value="start-fill" :size="24"></cpt-icon>
           </div>
         </div>
       </div>
@@ -36,10 +36,13 @@
       <div class="col col-5">
         <div class="btn-group">              
           <div class="btn">
-            <cpt-icon-button icon="delete-thin" @click.stop="deleteVideo(data.localId)"></cpt-icon-button>
+            <cpt-icon-button icon="delete-fill" :iconSize="16" @click.stop="deleteVideo(data.localId)" danger></cpt-icon-button>
           </div>
           <div class="btn">
-            <cpt-icon-button icon="upload-thin" :disabled="!(data.isMomentCapture && !data.uploadFinished && !data.uploading)" @click.stop="uploadVideo(data.localId)"></cpt-icon-button>              
+            <cpt-icon-button icon="upload-fill" :disabled="!(data.isMomentCapture && !data.uploadFinished && !data.uploading)" @click.stop="uploadVideo(data.localId)"></cpt-icon-button>              
+          </div>
+          <div class="btn">
+            <cpt-icon-button icon="search-file-fill" @click.stop="locateFileInExplorer({ url: data.file })"></cpt-icon-button>
           </div>
         </div>
       </div>
@@ -70,11 +73,12 @@ export default {
   },
   methods: {
     ...mapActions([
-      'playVideoFile'
+      'playVideoFile',
+      'locateFileInExplorer'
     ]),
     // 播放视频
     playVideo (url) {
-      console.log('play')
+      // console.log('play')
       const videoSource = url
       this.playVideoFile({
         'file': videoSource
@@ -89,11 +93,11 @@ export default {
     },
     // 上传视频
     uploadVideo (localId) {
-      console.log('upload')
+      // console.log('upload')
       maxjia.media.file.uploadVideo(localId)
     },
     deleteVideo (localId) {
-      console.log('delete')
+      // console.log('delete')
       maxjia.media.file.deleteVideo(localId)
     }
   },
@@ -113,14 +117,17 @@ export default {
     position: relative;
     display: flex;
     height: 64px;
-    border: 1px solid #151A20;
+    // border: 1px solid #151A20;
     border-radius: 2px;
     background: @blockBackgroundColor;
     // background-image: linear-gradient(to bottom, #2a2e34, #30343a);
     // box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 0 0 1px #151A20;
     cursor: pointer;
+    overflow: hidden;
     &:hover {
       background: #292D34;
+      box-shadow: none;
     }
     // &:after {
     //   content: '';
@@ -183,8 +190,9 @@ export default {
           height: 28px;
           font-size: 14px;
           color: fade(#fff, 80%);
-          background: fade(#000, 90%);
-          border-radius: 2px;
+          // background: fade(#000, 90%);
+          // border-radius: 2px;
+          
           // padding-left: 18px;
           // &:before {
           //   content: '';
@@ -204,18 +212,23 @@ export default {
       font-size: 14px;
       // background: rgba(20, 25, 30, 0.6);
       padding: 0 12px;
+      .name {
+        .ellipsis;
+      }
       .duration {
         font-size: 12px;
         color: fade(@textColor, 20%);
       }
     }
     > .col-3 {
-      width: 150px;
+      width: 12.5%;
+      // width: 150px;
       color: fade(@textColor, 20%);
       font-size: 12px;
     }
     > .col-4 {
-      width: 150px;
+      width: 20%;
+      // width: 150px;
       color: fade(@textColor, 20%);
       font-size: 12px;
       .size {
@@ -227,6 +240,7 @@ export default {
         height: 2px;
         border-radius: 2px;
         background-color: fade(#fff, 20%);
+        margin-top: 6px;
         .value {
           position: relative;
           height: 2px;
@@ -250,16 +264,17 @@ export default {
     > .col-5 {
       position: relative;
       z-index: 2;
-      width: 66px;
+      width: 12.5%;
+      // width: 90px;
       .btn-group {
         display: flex;
-        justify-content: center;
-        color: fade(@textColor, 40%);
+        padding-right: 15px;
+        justify-content: flex-end;
         .btn {
           // width: 14px;
           // height: 14px;
           margin: 0 3px;
-          color: fade(@textColor, 60%);              
+          color: @lightIconColor;
           &.disabled {
             color: fade(@textColor, 10%);
             cursor: not-allowed;

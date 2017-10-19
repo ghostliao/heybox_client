@@ -57,6 +57,7 @@ export default {
     padding-left: 16px;
     cursor: pointer;
     &.active {
+      color: @textColor;
       background-color: fade(@textColor, 8%);
       background-image: linear-gradient(to right, rgba(241, 242, 243, 0.16) 0%, rgba(241, 242, 243, 0.0) 50%);
     }

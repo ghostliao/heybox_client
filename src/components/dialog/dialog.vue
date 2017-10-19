@@ -4,7 +4,7 @@
       <div class="mu-dialog-wrapper" @click="handleWrapperClick" v-if="open" ref="popup" :style="{'z-index': zIndex}">
         <div class="mu-dialog" ref="dialog" :class="dialogClass">
           <div class="mu-dialog-close" v-if="cornerClose" @click="hide()">
-            <cpt-icon-button icon="close-thin" :iconSize="iconSize"></cpt-icon-button>
+            <cpt-icon-button icon="close-thin" :iconSize="36"></cpt-icon-button>
             <!-- <cpt-icon value="close-thin" :size="24"></cpt-icon> -->
           </div>
           <h3 class="mu-dialog-title" v-if="showTitle" ref="title" :class="headerClass">
@@ -166,6 +166,10 @@ export default {
   .depth(5);
   &.opt-dialog {
     // max-width: 924px;
+  }
+  &.image-checker {
+    width: auto;
+    background: transparent;
   }
 }
 .mu-dialog-close {

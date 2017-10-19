@@ -5,7 +5,7 @@ import mid from '@/views/mid'
 import viewGame from '@/views/game'
 import viewVideo from '@/views/video'
 import viewVideoDesktop from '@/views/video/desktop'
-import viewVideoHighlight from '@/views/video/highlight'
+import viewVideoScreenshot from '@/views/video/screenshot'
 import viewHardware from '@/views/hardware'
 import viewHardwareInfo from '@/views/hardware/info'
 import viewHardwareStatus from '@/views/hardware/status'
@@ -56,20 +56,30 @@ export default new Router({
           component: viewVideoDesktop,
           meta: {
             keepAlive: true
-          }
+          },
+          // beforeEnter: (to, from, next) => {
+          //   store.state.routerVideoName = to.name
+          //   next()
+          // }
         },
         {
-          path: 'highlight',
-          name: 'video-highlight',
-          component: viewVideoHighlight,
+          path: 'screenshot',
+          name: 'video-screenshot',
+          component: viewVideoScreenshot,
           meta: {
             keepAlive: true
-          }
+          },
+          // beforeEnter: (to, from, next) => {
+          //   store.state.routerVideoName = to.name
+          //   next()
+          // }
         }
       ],
       redirect: to => {
+        let name = store.state.routerVideoName
+        if (!name) name = 'video-desktop'
         return {
-          name: 'video-desktop'
+          name: name
         }
       },
       meta: {

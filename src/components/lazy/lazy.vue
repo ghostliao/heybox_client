@@ -17,7 +17,7 @@ export default {
   },
   created () {
     window.setTimeout(() => {
-        this.show = true
+      this.show = true
     }, this.time)
   }
 }
