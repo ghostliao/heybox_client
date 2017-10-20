@@ -9,28 +9,28 @@
           <cpt-set-block-head title="实时状态"></cpt-set-block-head>
           <div class="body">
             <template v-if="hardwareData.cpu">
-              <cpt-set-block title="CPU利用率" :setBlockStyle="setBlockStyle">
+              <cpt-set-block title="CPU" :setBlockStyle="setBlockStyle">
                 <div class="chart-wrap">
-                  <cpt-annular label="" :value="Number(hardwareData.cpu.usage)"></cpt-annular>
+                  <cpt-annular label="CPU利用率" :value="Number(hardwareData.cpu.usage)"></cpt-annular>
                   <cpt-chart id="cpulineChart" :data="hardwareData" dataType="cpu" chartType="line"></cpt-chart>
                 </div>
               </cpt-set-block>
 
-              <cpt-set-block title="内存使用量" :setBlockStyle="setBlockStyle">
+              <cpt-set-block title="内存" :setBlockStyle="setBlockStyle">
                 <div class="chart-wrap">
-                  <cpt-annular label="" :value="Number(hardwareData.memory.usage)"></cpt-annular>
+                  <cpt-annular label="内存利用率" :value="Number(hardwareData.memory.usage)" :status="memoryStatus"></cpt-annular>
                   <cpt-chart id="memorylineChart" :data="hardwareData" dataType="memory" chartType="line"></cpt-chart>
                 </div>
               </cpt-set-block>
 
-              <cpt-set-block title="GPU利用率" :setBlockStyle="setBlockStyle">
+              <cpt-set-block title="GPU" :setBlockStyle="setBlockStyle">
                 <div class="chart-wrap">
-                  <cpt-annular label="" :value="Number(hardwareData.gpus[0].gpu_usage)"></cpt-annular>
+                  <cpt-annular label="GPU利用率" :value="Number(hardwareData.gpus[0].gpu_usage)" :status="gpuStatus"></cpt-annular>
                   <cpt-chart id="gpulineChart" :data="hardwareData" dataType="gpu" chartType="line"></cpt-chart>
                 </div>
               </cpt-set-block>
 
-              <cpt-set-block title="网络吞吐量" :setBlockStyle="setBlockStyle">
+              <cpt-set-block title="网络" :setBlockStyle="setBlockStyle">
                 <div class="chart-wrap">
                   <div class="in-out-wrap">
                     <div class="legend out">
@@ -81,6 +81,12 @@ export default {
     }
   },
   computed: {
+    gpuStatus () {
+      return this.getStatus(this.hardwareData.gpus[0].memory_size, this.hardwareData.gpus[0].gpu_usage)
+    },
+    memoryStatus () {
+      return this.getStatus(this.hardwareData.memory.memory_size, this.hardwareData.memory.usage)
+    },
     netOutLoad () {
       return this.netLoadFormat(this.hardwareData.net.out_load)
     },
@@ -89,6 +95,21 @@ export default {
     }
   },
   methods: {
+    getStatus (size, usage) {
+      let a
+      if (size < 1024) {
+        a = size + ' MB'
+      } else {
+        a = Math.round(size / 1024) + ' GB'
+      }
+      let c = Math.round(size * (usage / 100))
+      if (c > 1024) {
+        c = Number(c / 1024).toFixed(1) + ' GB'
+      } else {
+        c = c + ' MB'
+      }
+      return c + ' / ' + a
+    },
     netLoadFormat (val) {
       let str
       const KVal = val * 8 / 1024
