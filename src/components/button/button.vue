@@ -98,9 +98,8 @@ export default {
     font-weight: 400;
     border: 1px solid fade(@textColor, 80%);
     border-radius: 2px;
-    // transition-duration: 300ms;
-    // transition-timing-function: @easeOutFunction;
-    // transform: translate3d(0, 0, 0);
+    letter-spacing: 0px;
+    // .common-transition; // 优化按钮 border bug
     cursor: pointer;
     &:hover, &:active {
       color: @alternateTextColor;
@@ -150,6 +149,9 @@ export default {
       min-width: 80px;
       height: 28px;
       font-size: 12px;
+      .iconfont {
+        font-size: 14px;
+      }
     }
     &.disabled {
       opacity: .1;
