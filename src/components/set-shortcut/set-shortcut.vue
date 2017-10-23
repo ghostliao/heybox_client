@@ -16,7 +16,6 @@
 import keycode from 'keycode'
 import cptTextField from '@/components/text-field'
 
-
 export default {
   name: "cpt-set-shortcut",
   components: {
@@ -44,7 +43,8 @@ export default {
   data () {
     return {
       shortcut: '',
-      hotKeys: [],
+      hotkeys: [],
+      hotkeyRepeat: false,
       saved: false,
       modifiers: [
         {
@@ -94,19 +94,35 @@ export default {
   methods: {
     getHotkeys () {
       maxjia.settings.getHotkeys((data) => {
-        this.hotKeys = data.hotkeys
-        console.log(this.hotKeys)
+        this.hotkeys = data.hotkeys
+        console.log(this.hotkeys)
         // document.getElementById('getHotkeys').innerHTML = JSON.stringify(data);
       })
     },
     getHotkey () {
       maxjia.settings.getHotkey(this.name, this.app, (data) => {
+        console.log(this.name, this.app)
+        console.log(data.hotkey)
         const virtualKey = keycode(data.hotkey.virtualKeyCode)
         const modifiers = data.hotkey.modifiers
-        this.displayHotKey(modifiers, virtualKey)
+        this.displayHotkey(modifiers, virtualKey)
       })
     },
-    displayHotKey (modifiers, virtualKey) {
+    // 记录已占用热键组合值
+    recordHotkey (str) {
+      const arr = this.$store.state.hotkeysModifiers
+      if (this.contains(arr, str)) {
+        this.shortcut = ''
+        for (let i of this.modifiers) {
+          i.e = false
+        }
+        this.hotkeyRepeat = true
+      } else {
+        arr.push(str)
+      }
+    },
+    // 显示热键组合
+    displayHotkey (modifiers, virtualKey) {
       let array = []
       for (let i of this.modifiers) {
         modifiers & i.v && array.push(i.k)
@@ -117,13 +133,28 @@ export default {
       } else {
         this.shortcut = virtualKey
       }
+      this.recordHotkey(this.shortcut)
     },
     setHotkey (modifier, key, cb) {
       maxjia.settings.setHotkey(this.name, this.app, modifier, key, cb)
     },
+    // 键盘按下
     handleKeydown (event) {
       const key = keycode(event)
+      // S 删除之前占用的热键组合记录
+      let array = this.$store.state.hotkeysModifiers
+      let i = array.length
+      while (i--) {
+        console.log(i)
+        if (array[i] === this.shortcut) {
+          array.splice(i, 1)
+          break
+        }
+      }
+      this.$store.state.hotkeysModifiers = array
+      // E
       this.shortcut = ''
+      this.hotkeyDefined = false
       if (this.saved) {
         for (let i of this.modifiers) {
           i.e = false
@@ -132,7 +163,7 @@ export default {
       // 判断是否是修饰键
       if (/ctrl|shift|alt/.test(key)) {
         this.saved = false
-        this.shortcut = ''
+        // this.shortcut = ''
         this.virtualKey.e = false
         for (let i of this.modifiers) {
           i.c === keycode(key) && (i.e = true)
@@ -145,19 +176,26 @@ export default {
         this.$refs.input.blur()
 
         let modifiers = 0
+        // 计算热键组合值
         for (let i of this.modifiers) {
           modifiers += i.e ? i.v : 0
         }
-        this.displayHotKey(modifiers, this.virtualKey.v)
-        this.setHotkey(modifiers, keycode(key), () => {
-          this.$store.state.hotkeys[this.hotkeyKey] = this.comb
-          console.log('Set hotkey: ' + this.name + ' ' + this.comb)
-        })
+        this.displayHotkey(modifiers, this.virtualKey.v)
+        if (this.hotkeyRepeat) {
+          console.log('repeat')
+          this.hotkeyRepeat = false
+        } else {
+          this.setHotkey(modifiers, keycode(key), () => {
+            this.$store.state.hotkeys[this.hotkeyKey] = this.comb
+            console.log('Set hotkey: ' + this.name + ' ' + this.comb)
+          })
+        }
       }
       
       console.log(key)
       console.log(keycode(key))
     },
+    // 键盘松开
     handleKeyup (event) {
       const key = keycode(event)
       // 判断是否是修饰键
@@ -180,9 +218,19 @@ export default {
       } else {
 
       }
+    },
+    contains (arr, obj) {
+      let i = arr.length;  
+      while (i--) {  
+        if (arr[i] === obj) {  
+          return true
+        }  
+      }  
+      return false
     }
   },
   created () {
+    // this.getHotkeys()
     this.getHotkey()
   }
 }
