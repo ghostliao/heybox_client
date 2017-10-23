@@ -6,12 +6,22 @@
         <cpt-set-block title="路径设置">
           <div class="setting-row path">
             <div class="label-wrap">
-              <span class="label">视频文件</span>
+              <span class="label">录屏文件</span>
               <!-- <span class="desc">（可用磁盘空间5.60G）</span> -->
             </div>
             <div class="text-field-wrap">
               <cpt-text-field :value="videoDir" preIcon="add-file-thin" readonly></cpt-text-field>
-              <cpt-button label="浏览" secondary small @click="setVideoDir"></cpt-button>
+              <cpt-button label="更改" secondary small @click="setVideoDir"></cpt-button>
+            </div>
+          </div>
+          <div class="setting-row path">
+            <div class="label-wrap">
+              <span class="label">截屏文件</span>
+              <!-- <span class="desc">（可用磁盘空间5.60G）</span> -->
+            </div>
+            <div class="text-field-wrap">
+              <cpt-text-field :value="imageDir" preIcon="add-file-thin" readonly></cpt-text-field>
+              <cpt-button label="更改" secondary small @click="setImageDir"></cpt-button>
             </div>
           </div>
         </cpt-set-block>
@@ -20,25 +30,26 @@
           <cpt-set-shortcut label="保存精彩时刻" name="Video.Save30Moment" app="Video" hotkeyKey="save30Moment"></cpt-set-shortcut>
           <cpt-set-shortcut label="截屏" name="Video.CaptureImage" app="Video" hotkeyKey="captureImage"></cpt-set-shortcut>
           <cpt-set-shortcut label="Dock显示/隐藏" name="Dock.Show" app="Dock" hotkeyKey="dockShow">
-            <span slot="desc">是否在打开任何游戏时都启动精彩时刻？</span>
+            <!-- <span slot="desc">是否在打开任何游戏时都启动精彩时刻？</span> -->
           </cpt-set-shortcut>
           <cpt-set-shortcut label="Overlay显示/隐藏" name="Overlay.ShowHide" app="Overlay" hotkeyKey="overlayShowHide"></cpt-set-shortcut>
+          <cpt-set-shortcut label="Overlay控制" name="Overlay.Control" app="Overlay" hotkeyKey="overlayControl"></cpt-set-shortcut>
         </cpt-set-block>    
-        <cpt-set-block title="启动设置">
-          <!-- <cpt-set-switch label="录制精彩镜头" :switch="isVideoCaptureForMoment" @input="setIsVideoCaptureForMoment">
+        <!-- <cpt-set-block title="启动设置">
+          <cpt-set-switch label="录制精彩镜头" :switch="isVideoCaptureForMoment" @input="setIsVideoCaptureForMoment">
             <span slot="desc">desc</span>
-          </cpt-set-switch> -->
+          </cpt-set-switch>
           <cpt-set-switch label="自动录屏" :switch="isAutoStartCaptureInGame" @input="setIsAutoStartCaptureInGame">
             <span slot="desc">desc</span>
           </cpt-set-switch>
-        </cpt-set-block> 
+        </cpt-set-block>  -->
       </div>
       <template v-if="gameOverlaySettings.length > 0">
         <cpt-set-block-head title="Overlay设置"></cpt-set-block-head>
         <div class="body">
           <cpt-set-block title="">
-            <cpt-set-switch :label="i.gameName" v-for="i in gameOverlaySettings" :key="i.gameId" :data="i" :switch="i.overlayEnabled" @input="setGameOverlaySwitch">
-              <span slot="desc">desc</span>
+            <cpt-set-switch :label="i.gameName" v-for="i in gameOverlaySettings" :key="i.gameId" v-if="i.overlayEnabled" :data="i" :switch="i.overlayEnabled" @input="setGameOverlaySwitch">
+              <!-- <span slot="desc">desc</span> -->
             </cpt-set-switch>
           </cpt-set-block>
         </div>
@@ -67,6 +78,7 @@ export default {
   data () {
     return {
       videoDir: '',
+      imageDir: '',
       isVideoCaptureForMoment: false,
       isAutoStartCaptureInGame: false,
       gameOverlaySettings: []
@@ -84,6 +96,20 @@ export default {
           const path = data.path
           maxjia.settings.setVideoDir(path)
           this.videoDir = path
+        }
+      })
+    },
+    getImageDir () {
+      maxjia.settings.getImageDir((data) => {
+        this.imageDir = data.imageDir
+      })
+    },
+    setImageDir () {
+      maxjia.store.selectDirectory('选择文件夹', (data) => {
+        if (data.result === 'selected') {
+          const path = data.path
+          maxjia.settings.setImageDir(path)
+          this.imageDir = path
         }
       })
     },
@@ -110,7 +136,7 @@ export default {
     // 是否启动overlay
     getGameOverlaySettings () {
       maxjia.settings.getGameOverlaySettings((data) => {
-        // console.log(data)
+        console.log(data)
         this.gameOverlaySettings = data.gameOverlaySettings
       })
     },
@@ -120,6 +146,7 @@ export default {
     },
     settingsInit () {
       this.getVideoDir()
+      this.getImageDir()
       // this.getIsVideoCaptureForMoment()
       this.getIsAutoStartCaptureInGame()
       this.getGameOverlaySettings()
@@ -136,7 +163,8 @@ export default {
 .view-settings-video {
   flex: 1;
   min-width: 0;
-  padding: 16px 36px 16px 236px;
+  // padding: 16px 36px 16px 236px;
+  padding: 16px 36px;
   .wrapper {
     max-width: 500px;
     margin: auto;
