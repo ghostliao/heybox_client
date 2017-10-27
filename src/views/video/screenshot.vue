@@ -1,6 +1,7 @@
 <template>
   <div class="view-video-screenshot">
     <div class="screenshot-list">
+      <div v-show="imageList.length <= 0" class="notice">暂无媒体文件</div>
       <cpt-screenshot-item v-for="i of imageList" :data="i" :key="i.localId"></cpt-screenshot-item>
     </div>
   </div>
@@ -33,12 +34,12 @@ export default {
     },
     _addImageItem (imageItem) {
       this.imageList.unshift(imageItem)
-      console.log(imageItem.createTimeStamp)
-      this.updateImageList()
+      // console.log(imageItem.createTimeStamp)
     },
     onImageFileAdded (imageItem) {
       // console.log('onImageFileAdded')
       this._addImageItem(imageItem)
+      this.updateImageList()
     },
     onImageFileDeleted () {
       // console.log('onImageFileDeleted')
@@ -58,6 +59,7 @@ export default {
           for (let imageItem of data['images']) {
             this._addImageItem(imageItem)
           }
+          this.updateImageList()
         } else {
           //should not happen
         }
@@ -120,7 +122,13 @@ export default {
     flex-wrap: wrap;
     // max-width: 1072px;
     margin: auto;
-    
+    .notice {
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      line-height: 60px;
+      color: @secondaryTextColor;
+    }
   }
 }
 </style>
