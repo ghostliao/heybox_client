@@ -51,16 +51,16 @@ export default {
     gameOptimize (config) {
       const _this = this
 
-      const fileType = config.fileType.toLowerCase()
-      const gameId = config.gameId
-      const level = config.level
+      const fileType = config.fileType ? config.fileType.toLowerCase() : ''
+      const gameId = config.gameId // required
+      const level = config.level // required
 
-      this._getAllSpecialFolderLocation().then(function (data) {
+      this._getAllSpecialFolderLocation().then(data => {
         const desktopPath = data.Desktop
         Promise.all([
           _this.readXML(desktopPath + '/optimization/G410005_4.xml'),
           _this.readINI(desktopPath + '/optimization/Engine.ini')
-        ]).then(function (array) {
+        ]).then(array => {
           console.log('promise all resolved')
           console.log(array)
           _this.diffFiles({
@@ -71,14 +71,6 @@ export default {
           })
         })
       })
-
-      // 文件diff
-      // for (let i in iniJSON) {
-      //   for (let j in iniJSON[i]) {
-      //     const optionKey = i + ':' + j
-      //     const optionValue = iniJSON[i][j]
-      //     // console.log(optionKey + ' --> ' + optionValue)
-      //   }
 
       // this.writeFile({
       //   path: res.path,
@@ -147,15 +139,36 @@ export default {
       const o = config.iniJSON // .ini json
       // console.log(d)
       window.d = d
-      const optimize = d.getElementsByTagName('Optimize')
-      console.log(optimize)
-      for (let i = 0, l = optimize.length; i < l; i++) {
-        // console.log(optimize[i])
-        let el = optimize[i]
+      const optimizes = d.getElementsByTagName('Optimize')
+      console.log(optimizes)
+      for (let i = 0, len1 = optimizes.length; i < len1; i++) {
+        // console.log(optimizes[i])
+        let el = optimizes[i]
         window['d' + i] = el
         if (Number(el.getAttribute('GameId')) === gameId && Number(el.getAttribute('Level')) === level) {
-          
+          const items = el.getElementsByTagName('Item')
+          let changesCounter = 0 // 更改项计数
+          for (let j = 0, len2 = items.length; j < len2; j++) {
+            const keyStr = items[j].getElementsByTagName('Key')[0].innerHTML // --> /script/engine.renderersettings:r.SSR
+            const keyStrArray = keyStr.split(':')
+            const section = keyStrArray[0] // --> /script/engine.renderersettings
+            const key = keyStrArray[1] // --> r.SSR
+            const value = items[j].getElementsByTagName('Value')[0].innerHTML // --> 0
 
+            const oValue = o[section][key]
+            if (oValue) {
+              if (oValue === value) { // 配置值相同
+                
+              } else { // 配置值不同
+                o[section][key] = value
+                changesCounter++
+              }
+            } else { // ini没有该配置项
+              o[section][key] = value
+            }
+          }
+          console.log(o)
+          console.log('options changed: ' + changesCounter)
         }
       }
 
@@ -163,11 +176,8 @@ export default {
   },
   mounted () {
     this.gameOptimize({
-      fileType: 'ini',
       gameId: 410005,
-      level: 1,
-
-
+      level: 2,
       callback: () => {
         // console.log('cb')
       }
