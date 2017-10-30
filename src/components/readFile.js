@@ -123,7 +123,9 @@ export default {
       return new Promise((resolve, reject) => {        
         this._readFile(path).then(function (data) {
           if (data.result) {
-            const iniJSON = _this.parseINIString(data.content)
+            let iniJSON = _this.parseINIString(data.content)
+            const ignoreStr = data.content.split('[/script/engine.engine]')[0] // 保留ini部分section字符串
+            iniJSON.IGNORESTR = ignoreStr
             console.log('read ini done')
             resolve(iniJSON)
           } else {
@@ -138,13 +140,11 @@ export default {
       const d = config.xmlDoc // .xml doc
       const o = config.iniJSON // .ini json
       // console.log(d)
-      window.d = d
       const optimizes = d.getElementsByTagName('Optimize')
-      console.log(optimizes)
+      // console.log(optimizes)
       for (let i = 0, len1 = optimizes.length; i < len1; i++) {
         // console.log(optimizes[i])
         let el = optimizes[i]
-        window['d' + i] = el
         if (Number(el.getAttribute('GameId')) === gameId && Number(el.getAttribute('Level')) === level) {
           const items = el.getElementsByTagName('Item')
           let changesCounter = 0 // 更改项计数
@@ -169,9 +169,23 @@ export default {
           }
           console.log(o)
           console.log('options changed: ' + changesCounter)
+          this._writeFile(o)
         }
       }
-
+    },
+    _writeFile (o) {
+      let iniStr = o.IGNORESTR.replace(/^\n|\n+$/g, '') // 去掉首尾换行
+      for (let i in o) {
+        if (!i.match(/IGNORESTR|Core.System|proconfig.moedaze.com/)) {
+          // console.log(i)
+          iniStr += `\n[${i}]\n`
+          for (let j in o[i]) {
+            // console.log(j)
+            iniStr += `${j}=${o[i][j]}\n`
+          }
+        }
+      }
+      console.log(iniStr)
     }
   },
   mounted () {
