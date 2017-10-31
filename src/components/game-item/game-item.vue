@@ -2,14 +2,23 @@
   <div class="cpt-game-item">
     <div class="game-item">
       <div class="layer">
-        <cpt-button label="启动" icon="start-fill" @click="launchGame" :param1="data.gameId" primary />
-        <cpt-button v-if="data.supportOptimize" label="优化" icon="optimization-fill" @click="openOptDialog" />
+        <div class="wrap progress" v-show="launching">
+          <div class="msg">启动中</div>
+          <cpt-linear-progress :size="2" />
+        </div>
+        <div class="wrap options" v-show="!launching">
+          <cpt-button label="启动" icon="start-fill" @click="launchGame" :param1="data.gameId" primary />
+          <cpt-button v-if="data.supportOptimize" label="优化" icon="optimization-fill" @click="openOptDialog" />
+        </div>
       </div>
       <div class="game-img">
         <img :src="'max-file:\\' + data.gameIcon" alt="">
       </div>
       <div class="info-bar">
-        <div class="name">{{ data.gameName }}</div>
+        <div class="name">
+          <img :src="'max-file:\\' + data.gameIcon" alt="">
+          <span>{{ data.gameName }}</span>
+        </div>
         <!-- <div class="duration">已玩 2324 h</div> -->
       </div>
     </div>
@@ -37,11 +46,11 @@
               <cpt-button label="启动游戏" primary @click="launchGame" :param1="data.gameId"></cpt-button>
             </div>
             <template v-if="optState === 0">
-              <div class="layer opt" v-for="(i, index) in optLevelData" :key="index" v-show="optLevel === i.level">
-                <div class="title">{{ i.title }}</div>
-                <div class="desc">{{ i.desc }}</div>
-                <cpt-button v-if="currentOptLevel === i.level" label="已优化" secondary disabled small></cpt-button>
-                <cpt-button v-else label="开始优化" primary small @click="optimizeConfirm(i.level)"></cpt-button>
+              <div class="layer opt" v-for="(i, index) in data.supportLevels" :key="index" v-show="optLevel === i.configLevel">
+                <div class="title">{{ i.levelName }}</div>
+                <div class="desc">{{ i.levelDesc }}</div>
+                <cpt-button v-if="currentOptLevel === i.configLevel" label="已优化" secondary disabled small></cpt-button>
+                <cpt-button v-else label="开始优化" primary small @click="optimizeConfirm(i.configLevel)"></cpt-button>
               </div>
             </template>
           </div>
@@ -55,12 +64,22 @@
           </div>
         </div>
         <div class="options">
-          <cpt-button v-for="(i, index) in 4" :key="index" :label="`${index + 1}档设置`" :secondary="optLevel === index + 1 ? false : true" :primary="optLevel === index + 1 ? true : false" small :success="currentOptLevel === index + 1" :icon="currentOptLevel === index + 1 ? 'success' : ''" @click="changeOptType(index + 1)"></cpt-button>
+          <cpt-button v-for="(i, index) in data.supportLevels" 
+            :key="index" 
+            :label="i.levelName" 
+            :secondary="optLevel === i.configLevel ? false : true" 
+            :primary="optLevel === i.configLevel ? true : false" 
+            small 
+            :success="currentOptLevel === i.configLevel" 
+            :icon="currentOptLevel === i.configLevel ? 'check-fill' : ''" 
+            @click="changeOptType(i.configLevel)">
+          </cpt-button>
 
           <!-- <cpt-button label="二档设置" :secondary="optLevel === 2 ? false : true" :primary="optLevel === 2 ? true : false" small :success="currentOptLevel === 2" @click="changeOptType(2)"></cpt-button>
           <cpt-button label="三档设置" :secondary="optLevel === 3 ? false : true" :primary="optLevel === 3 ? true : false" small :success="currentOptLevel === 3" @click="changeOptType(3)"></cpt-button>
           <cpt-button label="四档设置" :secondary="optLevel === 4 ? false : true" :primary="optLevel === 4 ? true : false" small :success="currentOptLevel === 4" @click="changeOptType(4)"></cpt-button> -->
-          <cpt-button label="还原设置" primary small></cpt-button>
+          
+          <!-- <cpt-button v-show="currentOptLevel !== 0" label="还原设置" primary small></cpt-button> -->
         </div>
       </div>
       <!-- <mu-flat-button slot="actions" @click="closeOptDialog" primary label="取消"/> -->
@@ -72,9 +91,11 @@
 <script>
 import dialog from '@/components/dialog'
 import linearProgress from '@/components/linearProgress'
+import readFile from '@/components/readFile'
 
 export default {
   name: "cpt-video-item",
+  mixins: [readFile],
   components: {
     'cpt-dialog': dialog,
     'cpt-linear-progress': linearProgress
@@ -86,6 +107,8 @@ export default {
   },
   data () {
     return {
+      launching: false,
+      launchingTime: 5000,
       optDialog: false,
       previewAfterImg: require('../../assets/opt_after.png'),
       previewBeforeImg: require('../../assets/opt_before.jpg'),
@@ -137,12 +160,23 @@ export default {
   },
   methods: {
     launchGame (gameId) {
+      this.launching = true
+      setTimeout(() => {
+        this.launching = false
+      }, this.launchingTime)
       console.log(`launch game: ${gameId}`)
       maxjia.store.games.launchGame(gameId)
     },
     // 游戏优化对话框
     openOptDialog () {
       this.optDialog = true
+
+      this.optLevel = this.data.recommandConfigLevel
+      if (this.optLevel < 1) {
+        this.optLevel = 1
+      }
+      console.log(this.optLevel)
+      this.changeOptType(this.optLevel)
     },
     closeOptDialog () {
       this.optDialog = false
@@ -158,25 +192,63 @@ export default {
       percent = percent > 90 ? 90 : percent
       this.diffLineWidth = percent
     },
-    optimizeGame (gameId) {
+    optimizeGame (gameId, optLevel) {
       this.optimizing = true
-      // maxjia.store.games.optimizeGame(gameId)
-      setTimeout(() => {
-        this.currentOptLevel = this.optLevel
-        this.optState = 2
-        this.optimizing = false
-      }, 2000)
+      console.log(gameId, optLevel)
+      maxjia.store.games.optimizeGameWithLevel(gameId, optLevel, res => {
+        console.log(res)
+        if (res.result) { // 优化成功回调
+          this.gameOptimize({
+            gameId: gameId,
+            level: optLevel,
+            callback: () => {
+              console.log(`游戏 ${gameId} level ${optLevel} 配置成功`)
+            }
+          })
+        
+          setTimeout(() => {
+            this.currentOptLevel = this.optLevel
+            this.optState = 2
+            this.optimizing = false
+          }, 1000)
+        } else {
+          // TODO
+        }
+      })
     },
     changeOptType (level) {
       if (!this.optimizing) {
+        // for (let [index, i] of this.data.supportLevels) {
+        //   if (i.configLevel === level) {
+        //     this.previewAfterImg = this.data.supportLevels[index].image
+        //   }
+        // }
+        for (let i = 0; i < this.data.supportLevels.length; i++) {
+          const el = this.data.supportLevels[i]
+          if (el.configLevel === level) {
+            this.previewAfterImg = this.data.supportLevels[i].image
+            this.previewBeforeImg = this.data.supportLevels[i].originalImage
+          }
+        }
+
         this.optLevel = level
         this.optState = 0
       }
     },
-    optimizeConfirm () {
+    optimizeConfirm (level) {
       this.optState = 1
-      this.optimizeGame()
+      this.optimizeGame(this.data.gameId, level)
     }
+  },
+  created () {
+    
+  },
+  mounted () {
+    // this.gameOptimize({
+    //   gameId: gameId,
+    //   level: optLevel,
+    //   callback: () => {}
+    // })
   }
 }
 
@@ -211,13 +283,32 @@ export default {
       left: 0;
       right: 0;
       bottom: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      // display: flex;
+      // justify-content: center;
+      // align-items: center;
       background: fade(@alternateTextColor, 80%);
       opacity: 0;
-      .common-transition;
+      // .common-transition;
       transition-property: opacity;
+      > .wrap {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        &.progress {
+          padding: 0 60px;
+          .msg {
+            font-size: 12px;
+            color: fade(@textColor, 60%);
+            margin-bottom: 12px;
+          }
+        }
+        &.options {
+          flex-direction: row;
+        }
+      }
       .cpt-button {
         margin: 0 6px;
       }
@@ -275,7 +366,15 @@ export default {
       .name {
         flex: 1;
         min-width: 0;
+        display: flex;
+        align-items: center;
         font-size: 14px;
+        img {
+          display: block;
+          width: 16px;
+          height: 16px;
+          margin-right: 8px;
+        }
       }
       .duration {
         color: fade(@textColor, 60%);
@@ -369,10 +468,10 @@ export default {
     font-size: 0;
     .cpt-button {
       margin-right: 16px;
-      &:last-of-type {
-        margin-right: 0;
-        float: right;
-      }
+      // &:last-of-type {
+      //   margin-right: 0;
+      //   float: right;
+      // }
     }
   }
 }
@@ -418,9 +517,10 @@ export default {
           font-size: 16px;
           color: @textColor;
           line-height: 30px;
+          margin-bottom: 10px;
         }
         .desc {
-          font-size: 14px;
+          font-size: 12px;
           color: fade(@textColor, 50%);
           line-height: 24px;
         }
