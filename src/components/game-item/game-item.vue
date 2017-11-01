@@ -1,7 +1,7 @@
 <template>
   <div class="cpt-game-item">
     <div class="game-item">
-      <div class="layer">
+      <div class="layer" :class="{ 'launching': launching }">
         <div class="wrap progress" v-show="launching">
           <div class="msg">启动中</div>
           <cpt-linear-progress :size="2" />
@@ -71,7 +71,7 @@
             :primary="optLevel === i.configLevel ? true : false" 
             small 
             :success="currentOptLevel === i.configLevel" 
-            :icon="currentOptLevel === i.configLevel ? 'check-fill' : ''" 
+            :icon="currentOptLevel === i.configLevel ? 'check-fill' : ''"
             @click="changeOptType(i.configLevel)">
           </cpt-button>
 
@@ -290,6 +290,9 @@ export default {
       opacity: 0;
       // .common-transition;
       transition-property: opacity;
+      &.launching {
+        opacity: 1;
+      }
       > .wrap {
         display: flex;
         flex-direction: column;
