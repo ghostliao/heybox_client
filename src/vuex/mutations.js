@@ -31,7 +31,7 @@ export default {
     maxjia.media.startImageCapture()
   },
   CHECK_IMAGE_FILE (state, obj) {
-    console.log('checkImageFile: ' + obj.file)
+    // console.log('checkImageFile: ' + obj.file)
     state.imageCheckerOptions.src = 'max-file://' + obj.file.replace(':', '')
     state.imageChecker = true
   },
@@ -42,6 +42,33 @@ export default {
   LOCATE_FILE_IN_EXPLORER (state, obj) {
     // console.log(maxjia.maxapi)
     maxjia.maxapi.locateFileInExplorer(obj.url)
+  },
+  OPEN_MSG_DIALOG (state, obj) {
+    state.msgDialogOptions.msg = obj.msg
+    state.msgDialog = true
+  },
+  CLOSE_MSG_DIALOG (state, obj) {
+    state.msgDialog = false
+    state.msgDialogOptions.msg = ''
+  },
+  DIALOG_INIT (state, obj) {
+    state.msgDialog = false
+    state.msgDialogOptions.msg = ''
+
+    state.imageChecker = false
+    state.imageCheckerOptions.src = ''
+
+    state.videoPlayer = false
+    state.videoPlayerOptions.sources[0].src = ''
+  },
+  GET_ALL_SPECIAL_FOLDER_LOCATION (state, callback) {
+    maxjia.maxapi.getAllSpecialFolderLocation(callback)
+  },
+  READ_FILE (state, obj) {
+    maxjia.maxapi.readFile(obj.path, obj.callback)
+  },
+  WRITE_FILE (state, obj) {
+    maxjia.maxapi.writeFile(obj.path, obj.mode, obj.content, obj.callback)
   }
   // E 客户端全局接口
 }

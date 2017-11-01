@@ -26,15 +26,22 @@ const state = {
       src: ""
       // src: "https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm"
     }],
-    poster: "/static/images/author.jpg",
+    // poster: "/static/images/author.jpg",
   },
   imageChecker: false,
   imageCheckerOptions: {
     src: ''
   },
+  msgDialog: false,
+  msgDialogOptions: {
+    markType: 'success',
+    msg: 'msg'
+  },
   hotkeys: {
     
-  }
+  },
+  hotkeysModifiers: [],
+  xmlDoc: {}
 }
 
 const getters = {
