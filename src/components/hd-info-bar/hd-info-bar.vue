@@ -2,25 +2,52 @@
   <div class="cpt-hd-info-bar setting-row">
     <div class="row row-1">
       <div class="col col-1">
-        {{ label }}
+        <div class="label">{{ label }}</div>
       </div>
       <div class="col col-2">
-        <slot name="desc"></slot>
+        <div v-if="level" class="level wf-din wc-light grd">
+          <div>{{ level_ }}</div>
+        </div>
+      </div>
+      <div class="col col-center">
+        <div class="row">
+          <div class="col col-2">
+            <!-- <div class="desc">{{ i.desc }}</div> -->
+            <slot name="desc"></slot>
+          </div>
+        </div>
       </div>
       <div class="col col-3">
-        <span>{{point}}分，超越</span>
+        <cpt-linear-progress mode="determinate" :value="pointPercent"/>
+        <!-- <span>{{point}}分，超越</span>
         <span class="percent wf-din">{{pointPercent}}%</span>
-        <span>的电脑</span>
+        <span>的电脑</span> -->
       </div>
       <div class="col col-4">
-        <div class="switch" @click="dropRowSwitch">
+        <div class="switch" v-if="dropRow" @click="dropRowSwitch">
           <span class="label">详情</span>
-          <icon value="select-thin" v-if="!dropRowShow"></icon>
-          <icon value="select-collapsing-th" v-else></icon>
+          <icon value="arrow-down" v-if="!dropRowShow"></icon>
+          <icon value="arrow-up" v-else></icon>
         </div>
       </div>
     </div>
-    <div class="drop-row" v-show="dropRowShow">
+    <div class="drop-row-rank" v-if="rankList" v-show="dropRowShow">
+      <div class="box">
+        <div class="unit" v-for="(i, index) of dropRowData" :key="index">
+          <div class="col col-1">
+            <div>{{ index + 1 }}</div>
+          </div>
+          <div class="col col-2">
+            <span class="desc">{{i.name}}</span>
+          </div>
+          <div class="col col-3">
+            <cpt-linear-progress mode="determinate" :value="i.percentage" light/>
+          </div>
+          <div class="col col-4"></div>
+        </div>
+      </div>
+    </div>
+    <div class="drop-row-detail" v-if="!rankList" v-show="dropRowShow">
       <div class="box">
         <div class="unit" v-for="i in dropRowData" :key="i.k">
           <div class="v">{{i.v}}</div>
@@ -34,18 +61,27 @@
 <script>
 import icon from '@/components/icon'
 import cptTextField from '@/components/text-field'
+import linearProgress from '@/components/linearProgress'
 
 
 export default {
   name: "cpt-hd-info-bar",
   components: {
     'icon': icon,
-    'cpt-text-field': cptTextField
+    'cpt-text-field': cptTextField,
+    'cpt-linear-progress': linearProgress
   },
   props: {
     label: {
       type: String,
       default: ''
+    },
+    level: {
+      type: String,
+      default: ''
+    },
+    data: {
+      type: [Object, Array]
     },
     point: {
       type: Number,
@@ -55,18 +91,45 @@ export default {
       type: Number,
       default: 0
     },
+    rankList: {
+      type: Boolean,
+      default: false
+    },
+    dropRow: {
+      type: Boolean,
+      default: false
+    },
     dropRowData: {
       type: Array,
-      default: []
+      default: function () {
+        return []
+      }
     }
   },
   data () {
     return {
+      level_: '',
       dropRowShow: false
     }
   },
   computed: {
-    
+    dataList () {
+      if (typeof this.data === 'object') {
+        // console.log('dataList: object')
+        return [this.data]
+      } else if (typeof this.data === 'array') {
+        // console.log('dataList: array')
+        return this.data
+      } else {
+        // console.log(typeof this.data)
+        return 'dataList: undefined'
+      }
+    }
+  },
+  watch: {
+    level (value) {
+      this.level_ = value
+    }
   },
   methods: {
     dropRowSwitch () {
@@ -81,11 +144,26 @@ export default {
 </script>
 <style lang="less">
 @import "../../styles/import.less";
+
 .cpt-hd-info-bar {
-  color: @labelColor;
-  font-size: 12px;
+  color: fade(@textColor, 80%);
+  font-size: 13px;
   padding: 14px 0 !important;
+  user-select: text;
   @colUnitWidth: 114px;
+  .row-col-2-style {
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .row-col-3-style {
+    // width: @colUnitWidth * 2;
+    flex: 1;
+    min-width: 0;
+    padding-left: 20px;
+  }
   > .row-1 {
     display: flex;
     min-height: 20px;
@@ -93,45 +171,117 @@ export default {
     > .col {
       display: flex;
       align-items: center;
+      &.col-1 {
+        width: @colUnitWidth - 50px;
+        display: flex;
+        .label {
+          flex: 1;
+          min-width: 0;
+        }
+      }
+      &.col-2 {
+        width: 50px;
+        font-size: 24px;
+        > div {
+          display: flex;
+          justify-content: center;
+          width: 12px;
+        }
+      }
+      &.col-3 {
+        .row-col-3-style;
+        .percent {
+          font-size: 18px;
+          margin: 0 4px;
+        }
+      }
+      &.col-4 {
+        color: fade(@textColor, 40%);
+        width: @colUnitWidth;
+        justify-content: flex-end;
+        .switch {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          .iconfont {
+            color: fade(@textColor, 60%);
+          }
+        }
+      }
     }
-    > .col-1 {
-      width: @colUnitWidth;
-    }
-    > .col-2 {
+    
+
+    > .col-center {
       flex: 1;
       min-width: 0;
       flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-      > div {
-        line-height: 20px;
-      }
-    }
-    > .col-3 {
-      width: @colUnitWidth * 2;
-      align-items: baseline;
-      .percent {
-        font-size: 18px;
-        margin: 0 4px;
-      }
-    }
-    > .col-4 {
-      color: @descColor;
-      width: @colUnitWidth;
-      justify-content: flex-end;
-      .switch {
+      > .row {
         display: flex;
-        align-items: center;
-        cursor: pointer;
+        width: 100%;
+        padding: 4px 0;
+        > .col {
+          display: flex;
+          align-items: center;
+          &.col-2 {
+            .row-col-2-style;
+            > .desc {
+              line-height: 20px;
+              margin-bottom: 10px;
+              &:last-of-type {
+                margin-bottom: 0;
+              }
+            }
+          }
+        }
       }
     }
   }
-  .drop-row {
+  .drop-row-rank {
+    padding-top: 12px;
+    .box {
+      border-top: 1px solid @blockDividerColor;
+      padding-top: 12px;
+      .unit {
+        display: flex;
+        padding: 0 12px 0 64px;
+        min-height: 35px;
+        color: fade(@textColor, 40%);
+        &:last-of-type {
+          border-color: transparent;
+        }
+        > .col {
+          display: flex;
+          align-items: center;
+          &.col-1 {
+            width: 50px;
+            > div {
+              display: flex;
+              justify-content: center;
+              width: 12px;
+            }
+          }
+          &.col-2 {
+            .row-col-2-style;
+            .desc {
+              line-height: 20px;
+            }
+          }
+          &.col-3 {
+            .row-col-3-style;
+          }
+          &.col-4 {
+            width: @colUnitWidth;
+          }
+        }
+      }
+    }
+  }
+  .drop-row-detail {
     padding: 10px 12px 0 @colUnitWidth;
     .box {
       display: flex;
       flex-wrap: wrap;
-      background: fade(@fullBlack, 10%);
+      background: fade(@fullBlack, 20%);
       padding: 4px 0;
       .unit {
         display: flex;
@@ -142,7 +292,7 @@ export default {
         height: 66px;
         line-height: 1;
         .v {
-          font-size: 14px;
+          font-size: 16px;
           color: fade(@textColor, 50%);
           margin-bottom: 8px;
         }

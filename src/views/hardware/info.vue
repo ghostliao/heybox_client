@@ -3,7 +3,54 @@
     <!-- {{hardwareInfo}} -->
     <div class="content">
       <cpt-set-block-head title="电脑概览"></cpt-set-block-head>
+      <!-- <div class="overview">
+        <div class="update">
+          <cpt-icon value="reload-fill"></cpt-icon>
+          <span class="label">2小时前更新</span>
+        </div>
+        <div class="row row-1">{{hardwareInfo.cpu.name}} </div>
+        <div class="row row-2">
+          <div class="level wc-light grd">S</div>
+        </div>
+        <div class="row row-3">
+          超越 <span>98%</span> 用户
+        </div>
+      </div> -->
+
       <div class="body">
+        <template v-if="hardwareInfo.system">
+          <cpt-set-block title="主要硬件">
+            <cpt-hd-info-bar label="CPU" :level="hardwareEvalInfo.cpu.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.cpu.score" rankList dropRow :dropRowData="hardwareEvalInfo.cpu.rank">
+              <template slot="desc">
+                <div class="desc">{{hardwareInfo.cpu.name}} {{hardwareInfo.cpu.cores}}&nbsp;核</div>
+              </template>
+            </cpt-hd-info-bar>
+
+            <cpt-hd-info-bar label="显卡" :level="hardwareEvalInfo.gpus.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.gpus.score" rankList dropRow :dropRowData="hardwareEvalInfo.gpus.rank">
+              <template slot="desc">
+                <div class="desc" v-for="(i, index) of hardwareInfo.gpus" :key="index">{{i.name}}（{{Math.round(i.memory_size / 1024)}} GB）</div>
+              </template>
+            </cpt-hd-info-bar>
+
+            <cpt-hd-info-bar label="内存" :level="hardwareEvalInfo.memory.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.memory.score" rankList>
+              <template slot="desc">
+                <div class="desc">
+                  {{Math.round(hardwareInfo.memory.memory_size / 1024)}} GB（{{hardwareInfo.memory.vendor}} {{hardwareInfo.memory.type_name}} {{hardwareInfo.memory.clock_speed}}MHz）
+                </div>
+              </template>
+            </cpt-hd-info-bar>
+
+            <cpt-hd-info-bar label="硬盘" :level="hardwareEvalInfo.disks.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.disks.score" rankList>
+              <template slot="desc">
+                <div class="desc" v-for="(i, index) of hardwareInfo.disks" :key="index">
+                  {{i.name}}（{{Math.round(i.size / 1024 / 1024 / 1024)}} GB）
+                </div>
+              </template>
+            </cpt-hd-info-bar>
+
+          </cpt-set-block>
+        </template>
+
         <template v-if="hardwareInfo.system">
           <cpt-set-block title="基本信息">
             <cpt-hd-info-bar label="系统" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
@@ -18,27 +65,27 @@
               </template>
             </cpt-hd-info-bar>
 
-            <cpt-hd-info-bar label="处理器" :point="14232" :pointPercent="1234567890" :dropRowData="cpuDetail">
-              <template slot="desc">
-                <div class="label">{{hardwareInfo.cpu.name}} {{hardwareInfo.cpu.cores}}核</div>
-              </template>
-            </cpt-hd-info-bar>
-
-            <cpt-hd-info-bar label="内存" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
+            <!-- <cpt-hd-info-bar label="内存" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
               <template slot="desc">
                 <div class="label">{{Math.round(hardwareInfo.memory.memory_size / 1024)}} GB（{{hardwareInfo.memory.vendor}} {{hardwareInfo.memory.type_name}} {{hardwareInfo.memory.clock_speed}}MHz）</div>
               </template>
-            </cpt-hd-info-bar>
+            </cpt-hd-info-bar> -->
 
-            <cpt-hd-info-bar label="主硬盘" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
+            <!-- <cpt-hd-info-bar v-for="(i, index) of hardwareInfo.disks" :key="index" label="硬盘" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
               <template slot="desc">
-                <div class="label">{{hardwareInfo.disks[0].name}}</div>
+                <div class="label">{{i.name}}（{{Math.round(i.size / 1024 / 1024 / 1024)}} GB）</div>
               </template>
-            </cpt-hd-info-bar>
+            </cpt-hd-info-bar> -->
 
-            <cpt-hd-info-bar label="显卡" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
+            <!-- <cpt-hd-info-bar v-for="(i, index) of hardwareInfo.gpus" :key="index" label="显卡" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
               <template slot="desc">
-                <div class="label">{{hardwareInfo.gpus[0].name}}（{{Math.round(hardwareInfo.gpus[0].memory_size / 1024)}} GB）</div>
+                <div class="label">{{i.name}}（{{Math.round(i.memory_size / 1024)}} GB）</div>
+              </template>
+            </cpt-hd-info-bar> -->
+
+            <cpt-hd-info-bar v-for="(i, index) of hardwareInfo.displays" :key="index" v-if="index === 0" label="显示器" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
+              <template slot="desc">
+                <div class="label">{{i.name}}</div>
               </template>
             </cpt-hd-info-bar>
 
@@ -50,6 +97,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import {cptSetBlock, cptSetBlockHead} from '@/components/set-block'
 import cptHdInfoBar from '@/components/hd-info-bar'
 
@@ -63,21 +111,90 @@ export default {
   data () {
     return {
       hardwareInfo: {},
+      hardwareEvalInfo: {
+        cpu: {
+          perf_level: '-'
+        },
+        gpus: {
+          perf_level: '-'
+        },
+        memory: {
+          perf_level: '-'
+        },
+        disks: {
+          perf_level: '-'
+        }
+      },
       cpuDetail: [
         {'k': 'CPU厂商', 'v': 'GenuineIntel'}
       ]
     }
   },
+  computed: {
+    cpuData () {
+      return [
+        {
+          level: '-',
+          pointPercent: 50,
+          desc: `${this.hardwareInfo.cpu.name} ${this.hardwareInfo.cpu.cores} 核`
+        }
+      ]
+    },
+    gpuData () {
+      let array = []
+      for (let i in hardwareEvalInfo.gpus) {
+
+      }
+    }
+  },
   methods: {
+    ...mapActions([
+      'openMsgDialog'
+    ]),
     getPreviewHardwareInfo () {
       maxjia.hardware.getPreviewHardwareInfo((data) => {
-        // console.log(data)
+        console.log(data)
         this.hardwareInfo = data
+      })
+    },
+    getHardwareEvalInfo () {
+      const url = '/account/pc_info/v2/'
+      const options = {
+        params: {
+          'heybox_id': this.$store.state.accountInfo.uid
+        }
+      }
+      this.$ajax.get(url, options).then(res => {
+        if (res.data.status === 'ok') {
+          this.hardwareEvalInfo = res.data.result
+          console.log(this.hardwareEvalInfo)
+        }
+      }, res => {
+        console.log(res)
       })
     }
   },
   created () {
     this.getPreviewHardwareInfo()
+    
+  },
+  mounted () {
+    let count = 0
+    let interval = setInterval(() => {
+      if (count <= 50) {
+        if (this.$store.state.accountInfo.uid !== 999999) {
+          this.getHardwareEvalInfo()
+          clearInterval(interval)
+        } else {
+          count ++
+        }
+      } else {
+        this.openMsgDialog({
+          msg: '请求评分信息失败',
+          markType: 'fail'
+        })
+      }
+    }, 100)
   }
 }
 
@@ -86,9 +203,40 @@ export default {
 @import "../../styles/import.less";
 .view-hardware-info {
   .content {
-    width: 784px;
-    margin: auto;
-    padding: 16px 0;
+    max-width: 1040px;
+    // width: 808px;
+    // margin: auto;
+    padding: 6px 40px;
+    .overview {
+      position: relative;
+      padding: 20px 0;
+      .update {
+        position: absolute;
+        top: 20px;
+        right: 0;
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        color: fade(@textColor, 60%);
+      }
+      > .row {
+        display: flex;
+        justify-content: center;
+        &.row-2 {
+          font-size: 54px;
+          font-family: Arial, Helvetica, sans-serif;
+          font-weight: 600;
+        }
+        &.row-3 {
+          font-size: 14px;
+          color: fade(@textColor, 60%);
+          span {
+            color: @primaryColor;
+            padding: 0 4px;
+          }
+        }
+      }
+    }
     > .body {
       
     }
