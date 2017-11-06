@@ -12,7 +12,10 @@
         </div>
       </div>
       <div class="game-img">
-        <img :src="'max-file:\\' + data.gameIcon" alt="">
+        <transition name="fade" mode="out-in">
+          <img v-if="data.gameHeaderImage" :src="data.gameHeaderImage" alt="">
+        </transition>
+        <img v-if="!data.gameHeaderImage" :src="'max-file:\\' + data.gameIcon" alt="">
       </div>
       <div class="info-bar">
         <div class="name">
@@ -158,6 +161,11 @@ export default {
       }
     }
   },
+  // watch: {
+  //   data (value) {
+  //     this.gameInfo = value
+  //   }
+  // },
   methods: {
     launchGame (gameId) {
       this.launching = true
@@ -195,14 +203,30 @@ export default {
     optimizeGame (gameId, optLevel) {
       this.optimizing = true
       console.log(gameId, optLevel)
-      maxjia.store.games.optimizeGameWithLevel(gameId, optLevel, res => {
-        console.log(res)
-        if (res.result) { // 优化成功回调
+
+      // maxjia.store.games.optimizeGameWithLevel(gameId, optLevel, res => {
+      //   console.log(res)
+      //   if (res.result) { // 优化成功回调
+
+          // engine
+          // this.gameOptimize({
+          //   fileName: 'engine',
+          //   filePath: this.data.enginePath,
+          //   gameId: gameId,
+          //   level: optLevel,
+          //   callback: () => {
+          //     console.log(`游戏 ${gameId} level ${optLevel} engine 配置成功`)
+          //   }
+          // })
+
+          // gameUserSettings
           this.gameOptimize({
+            fileName: 'gameUserSettings',
+            filePath: this.data.gameUserSettingsPath,
             gameId: gameId,
             level: optLevel,
             callback: () => {
-              console.log(`游戏 ${gameId} level ${optLevel} 配置成功`)
+              console.log(`游戏 ${gameId} level ${optLevel} gameUserSettings配置成功`)
             }
           })
         
@@ -211,10 +235,12 @@ export default {
             this.optState = 2
             this.optimizing = false
           }, 1000)
-        } else {
-          // TODO
-        }
-      })
+
+        // } else {
+        //   // TODO
+        // }
+      // })
+
     },
     changeOptType (level) {
       if (!this.optimizing) {
@@ -271,6 +297,7 @@ export default {
     border-radius: 2px;
     background-color: fade(@alternateTextColor, 80%);
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
+    overflow: hidden;
     &:hover {
       .layer {
         opacity: 1;
@@ -326,6 +353,9 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
+      img {
+        max-height: 100%;
+      }
     }
     &.add-game {
       &:hover {
@@ -365,6 +395,7 @@ export default {
       height: 38px;
       line-height: 38px;
       text-shadow: @textShadow;
+      background-image: linear-gradient(to bottom, fade(@fullBlack, 0%) 0%, fade(@fullBlack, 60%) 100%);
       padding: 0 12px;
       .name {
         flex: 1;
@@ -372,6 +403,7 @@ export default {
         display: flex;
         align-items: center;
         font-size: 14px;
+        text-shadow: 0 1px 1px rgba(0,0,0,1);
         img {
           display: block;
           width: 16px;

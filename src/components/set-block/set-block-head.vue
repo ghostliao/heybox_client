@@ -29,10 +29,10 @@ export default {
 <style lang="less">
 @import "../../styles/import.less";
 .cpt-set-block-head {
-  height: 46px;
-  line-height: 46px;
+  height: 54px;
+  line-height: 54px;
   .title {
-    font-size: 16px;
+    font-size: 18px;
   }
   .subtitle {
     font-size: 12px;

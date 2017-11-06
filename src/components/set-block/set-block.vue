@@ -31,7 +31,7 @@ export default {
 <style lang="less">
 @import "../../styles/import.less";
 .cpt-set-block {
-  padding: 16px 12px;
+  padding: 16px 12px 4px;
 	background: @blockBackgroundColor;
 	border: solid 1px @blockBorderColor;
   border-radius: 2px;
@@ -40,7 +40,8 @@ export default {
     margin-bottom: 0;
   }
   .title {
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: 400;
     line-height: 1;
     margin-bottom: 8px;
   }

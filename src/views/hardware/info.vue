@@ -32,18 +32,18 @@
               </template>
             </cpt-hd-info-bar>
 
-            <cpt-hd-info-bar label="内存" :level="hardwareEvalInfo.memory.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.memory.score" rankList>
+            <cpt-hd-info-bar label="硬盘" :level="hardwareEvalInfo.disks.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.disks.score" rankList dropRow :dropRowData="hardwareEvalInfo.disks.rank">
               <template slot="desc">
-                <div class="desc">
-                  {{Math.round(hardwareInfo.memory.memory_size / 1024)}} GB（{{hardwareInfo.memory.vendor}} {{hardwareInfo.memory.type_name}} {{hardwareInfo.memory.clock_speed}}MHz）
+                <div class="desc" v-for="(i, index) of hardwareInfo.disks" :key="index">
+                  {{i.name}}（{{Math.round(i.size / 1024 / 1024 / 1024)}} GB）
                 </div>
               </template>
             </cpt-hd-info-bar>
 
-            <cpt-hd-info-bar label="硬盘" :level="hardwareEvalInfo.disks.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.disks.score" rankList>
+            <cpt-hd-info-bar label="内存" :level="hardwareEvalInfo.memory.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.memory.score" rankList>
               <template slot="desc">
-                <div class="desc" v-for="(i, index) of hardwareInfo.disks" :key="index">
-                  {{i.name}}（{{Math.round(i.size / 1024 / 1024 / 1024)}} GB）
+                <div class="desc">
+                  {{Math.round(hardwareInfo.memory.memory_size / 1024)}} GB（{{hardwareInfo.memory.vendor}} {{hardwareInfo.memory.type_name}} {{hardwareInfo.memory.clock_speed}}MHz）
                 </div>
               </template>
             </cpt-hd-info-bar>
@@ -53,13 +53,13 @@
 
         <template v-if="hardwareInfo.system">
           <cpt-set-block title="基本信息">
-            <cpt-hd-info-bar label="系统" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
+            <cpt-hd-info-bar label="系统" :point="14232" :dropRowData="cpuDetail">
               <template slot="desc">
                 <div class="label">{{hardwareInfo.system.name}}</div>
               </template>
             </cpt-hd-info-bar>
 
-            <cpt-hd-info-bar label="主板" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
+            <cpt-hd-info-bar label="主板" :point="14232" :dropRowData="cpuDetail">
               <template slot="desc">
                 <div class="label">{{hardwareInfo.board.name}}</div>
               </template>
@@ -83,7 +83,7 @@
               </template>
             </cpt-hd-info-bar> -->
 
-            <cpt-hd-info-bar v-for="(i, index) of hardwareInfo.displays" :key="index" v-if="index === 0" label="显示器" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
+            <cpt-hd-info-bar v-for="(i, index) of hardwareInfo.displays" :key="index" v-if="index === 0" label="显示器" :point="14232" :dropRowData="cpuDetail">
               <template slot="desc">
                 <div class="label">{{i.name}}</div>
               </template>
@@ -158,7 +158,7 @@ export default {
       })
     },
     getHardwareEvalInfo () {
-      const url = '/account/pc_info/v2/'
+      const url = '/tools/games/pc_info/v2/'
       const options = {
         params: {
           'heybox_id': this.$store.state.accountInfo.uid
