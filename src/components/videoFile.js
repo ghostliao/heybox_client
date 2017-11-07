@@ -37,10 +37,22 @@ export default {
     },
     onVideoFileStatusChanged (videoItem) {
       // console.log('onVideoFileStatusChanged')
-      //todo
-      this.getVideoList().then(data => {
-        this.mergeMediaList(data, this.imageList)
-      })
+      const list = this.mediaList
+      for (let i = 0, len = list.length; i < len; i++) {
+        let mediaItem = list[i]
+        if (mediaItem.fileType === 'video' && mediaItem.localId === videoItem.localId) {
+          console.log(mediaItem)
+          this.$set(mediaItem, 'uploadFailed', videoItem.uploadFailed)
+          this.$set(mediaItem, 'uploadFinished', videoItem.uploadFinished)
+          this.$set(mediaItem, 'uploadProgress', videoItem.uploadProgress)
+          this.$set(mediaItem, 'uploading', videoItem.uploading)
+          break
+        }
+      }
+
+      // this.getVideoList().then(data => {
+      //   this.mergeMediaList(data, this.imageList)
+      // })
     },
     getVideoList () {
       console.log('getVideoList')
@@ -50,7 +62,6 @@ export default {
             this.videoList = []
             // console.log('getVideoList')
             for (let videoItem of data['videos']) {
-              this.$set(videoItem, 'fileType', 'video')
               this._addVideoItem(videoItem)
             }
             resolve(this.videoList)
@@ -58,9 +69,9 @@ export default {
             //should not happen
           }
   
-          if (this.getParameterByName('video')) {
-            playVideo(videofile)
-          }
+          // if (this.getParameterByName('video')) {
+          //   this.playVideo(videofile)
+          // }
   
         })
       })
@@ -88,12 +99,12 @@ export default {
         return false
       }
     },
-    playVideo (file) {
-      if (setCurrentVideo(file)) {
-        var video = document.getElementById('single-play')
-        video.play()
-      }
-    }
+    // playVideo (file) {
+    //   if (this.setCurrentVideo(file)) {
+    //     const video = document.getElementById('single-play')
+    //     video.play()
+    //   }
+    // }
   },
   mounted () {
     this.videoInitConnect()

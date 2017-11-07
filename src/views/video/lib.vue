@@ -45,8 +45,14 @@ export default {
         // this.imageList = null
       })
     },
-    mergeMediaList (array1, array2) {
-      this.mediaList = array1.concat(array2)
+    mergeMediaList (videoList, imageList) {
+      for (let i = 0, len = videoList.length; i < len; i++) {
+        videoList[i].fileType = 'video'
+      }
+      for (let i = 0, len = imageList.length; i < len; i++) {
+        imageList[i].fileType = 'image'
+      }
+      this.mediaList = videoList.concat(imageList)
       this.sortMediaList()
     },
     sortMediaList () {

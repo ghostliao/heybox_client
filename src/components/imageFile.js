@@ -35,10 +35,21 @@ export default {
     },
     onImageFileStatusChanged (imageItem) {
       // console.log('onImageFileStatusChanged')
-      // todo
-      this.getImageList().then(data => {
-        this.mergeMediaList(this.videoList, data)
-      })
+      const list = this.mediaList
+      for (let i = 0, len = list.length; i < len; i++) {
+        let mediaItem = list[i]
+        if (mediaItem.fileType === 'image' && mediaItem.localId === imageItem.localId) {
+          this.$set(mediaItem, 'uploadFailed', imageItem.uploadFailed)
+          this.$set(mediaItem, 'uploadFinished', imageItem.uploadFinished)
+          this.$set(mediaItem, 'uploadProgress', imageItem.uploadProgress)
+          this.$set(mediaItem, 'uploading', imageItem.uploading)
+          break
+        }
+      }
+
+      // this.getImageList().then(data => {
+      //   this.mergeMediaList(this.videoList, data)
+      // })
     },
     getImageList () {
       console.log('getImageList')
@@ -48,7 +59,6 @@ export default {
           if (data && data['images']) {
             this.imageList = []
             for (let imageItem of data['images']) {
-              this.$set(imageItem, 'fileType', 'image')
               this._addImageItem(imageItem)
             }
             resolve(this.imageList)
@@ -57,7 +67,7 @@ export default {
           }
   
           // if (this.getParameterByName('image')) {
-          //   playVideo(videofile)
+          //   this.checkImage(imagefile)
           // }
   
         })
