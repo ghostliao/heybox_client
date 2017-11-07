@@ -80,13 +80,17 @@ export default {
       routeDepth: 2,
       navTabs: [
         {
-          name: 'video-desktop',
-          label: '录像'
+          name: 'video-lib',
+          label: '精彩时刻'
         },
-        {
-          name: 'video-screenshot',
-          label: '截屏'
-        }
+        // {
+        //   name: 'video-desktop',
+        //   label: '录像'
+        // },
+        // {
+        //   name: 'video-screenshot',
+        //   label: '截屏'
+        // }
       ],
       show: false,
       trigger: null,
@@ -149,7 +153,7 @@ export default {
 <style lang="less">
 @import "../styles/import.less";
 .view-video {
-  padding: 16px 36px;
+  padding: 24px 40px;
   .record {
     position: relative;
     .video-setting-btn {
@@ -228,7 +232,7 @@ export default {
   .nav-list {
     position: relative;
     display: flex;
-    height: 40px;
+    height: 54px;
     border-bottom: 1px solid @layoutBorderColor;
     margin-bottom: 16px;
     > li {
@@ -237,10 +241,10 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 300;
       color: fade(@textColor, 40%);
-      border-color: transparent;
+      border-bottom: 1px solid transparent;
       cursor: pointer;
       margin-right: 24px;
       .common-transition;

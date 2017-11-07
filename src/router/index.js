@@ -4,6 +4,7 @@ import Hello from '@/components/Hello'
 import mid from '@/views/mid'
 import viewGame from '@/views/game'
 import viewVideo from '@/views/video'
+import viewVideoLib from '@/views/video/lib'
 import viewVideoDesktop from '@/views/video/desktop'
 import viewVideoScreenshot from '@/views/video/screenshot'
 import viewHardware from '@/views/hardware'
@@ -51,6 +52,14 @@ export default new Router({
       component: viewVideo,
       children: [
         {
+          path: 'lib',
+          name: 'video-lib',
+          component: viewVideoLib,
+          meta: {
+            keepAlive: true
+          }
+        },
+        {
           path: 'desktop',
           name: 'video-desktop',
           component: viewVideoDesktop,
@@ -77,7 +86,7 @@ export default new Router({
       ],
       redirect: to => {
         let name = store.state.routerVideoName
-        if (!name) name = 'video-desktop'
+        if (!name) name = 'video-lib'
         return {
           name: name
         }
@@ -143,7 +152,7 @@ export default new Router({
       ],
       redirect: to => {
         let name = store.state.routerSettingsName
-        if (!name) name = 'settings-account'
+        if (!name) name = 'settings-video'
         return {
           name: name
         }
