@@ -17,6 +17,15 @@ Vue.use(VueLazyload, {
   loading: '',
   attempt: 1
 })
+import axios from 'axios'
+
+axios.defaults.baseURL = store.state.config.dev
+  ? 'http://heybox.test.maxjia.com:58888'
+  : 'https://api.xiaoheihe.cn'
+// axios.defaults.baseURL = 'https://api.xiaoheihe.cn'
+import qs from 'qs'
+Vue.prototype.$ajax = axios
+Vue.prototype.qs = qs
 
 import lazy from '@/components/lazy'
 Vue.component(lazy.name, lazy)
@@ -30,6 +39,8 @@ import tooltip from '@/components/tooltip'
 Vue.component(tooltip.name, tooltip)
 import mark from '@/components/mark'
 Vue.component(mark.name, mark)
+import dialog from '@/components/dialog'
+Vue.component(dialog.name, dialog)
 
 Vue.config.productionTip = false
 
@@ -75,11 +86,38 @@ Vue.filter('duration', (t) => {
   timeStr = `${h}:${m}:${s}`
   return timeStr
 })
+Vue.prototype.filterDuration = function (t) {
+  let timeStr, mid, h = 0, m = 0, s = 0
+  if (t >= 3600) {
+    h = parseInt(t / 3600)
+    t -= h * 3600
+
+    m = parseInt(t / 60)
+    t -= m * 60
+
+    s = t
+  } else if (t >= 60) {
+    m = parseInt(t / 60)
+    t -= m * 60
+    
+    s = t
+  } else {
+    s = t
+  }
+
+  h = h < 10 ? `0${h}` : h
+  m = m < 10 ? `0${m}` : m
+  s = s < 10 ? `0${s}` : s
+
+  timeStr = `${h}:${m}:${s}`
+  return timeStr
+}
 Vue.filter('formDate', function (t, type = 1) {
   // filter type
   // 1 日期带时分秒
   // 2 距离现在过去多久
   // 3 24小时显示内距离现在过去多久,24小时以上显示日期不带时分秒
+  // 4 年月日
 
   const timeSpan = t * 1000
   const dateTime = new Date(parseInt(timeSpan))
@@ -94,6 +132,8 @@ Vue.filter('formDate', function (t, type = 1) {
 
   if (type === 1) {
     return year + '-' + month + '-' + day + ' ' + hour + ':' + minute
+  } else if (type === 4) {
+    return year + '-' + month + '-' + day
   } else {
     const now = new Date()
     const nowNew = Date.parse(now)

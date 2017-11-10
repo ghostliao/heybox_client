@@ -6,7 +6,8 @@
       :disableFocusRipple="disableFocusRipple" :disabled="disabled" containerElement="div"
       @click="handleClick" @keyboardFocus="handleKeyboardFocus" @hover="handleHover" @hoverExit="handleHoverExit">
      <div class="mu-menu-item" :class="{'have-left-icon': leftIcon || inset}">
-       <icon :value="leftIcon" :style="{'color': filterColor(leftIconColor)}" class="mu-menu-item-left-icon" :class="leftIconClass"/>
+       <icon v-if="leftIcon !== 'img'" :value="leftIcon" :size="12" :style="{'color': filterColor(leftIconColor)}" class="mu-menu-item-left-icon" :class="leftIconClass"/>
+       <slot v-if="leftIcon === 'img'" name="leftIcon"></slot>
        <div class="mu-menu-item-title" :class="titleClass">
          <slot name="title">
            {{title}}
@@ -16,7 +17,7 @@
          <span v-if="showAfterText" :class="afterTextClass">{{afterText}}</span>
          <slot name="after"></slot>
        </div>
-       <icon :value="rightIcon" :style="{'color': filterColor(rightIconColor)}" class="mu-menu-item-right-icon" :class="rightIconClass"/>
+       <icon :value="rightIcon" :size="12" :style="{'color': filterColor(rightIconColor)}" class="mu-menu-item-right-icon" :class="rightIconClass"/>
      </div>
    </abstract-button>
    <popover :open="openMenu" v-if="$slots && $slots.default && $slots.default.length > 0" :anchorOrigin="{ vertical: 'top', horizontal: 'right'}"
@@ -185,10 +186,10 @@ export default {
   display: block;
   font-size: 12px;
   font-weight: 400;
-  height: 40px;
-  line-height: 40px;
+  height: 32px;
+  line-height: 32px;
   transition: all .45s @easeOutFunction;
-  color: fade(@alternateTextColor, 100%);
+  color: fade(#f1f2f3, 50%);
   position: relative;
   cursor: pointer;
   user-select: none;
@@ -198,13 +199,13 @@ export default {
     font-size: 15px;
   }
   &.hover {
-    color: @alternateTextColor;
-    background-color: @dialogHoverBackgroundColor;
+    color: #f1f2f3;
+    // background-color: @dialogHoverBackgroundColor;
   }
-  &:active {
-    color: fade(@alternateTextColor, 80%);
-    background-color: @dialogActiveBackgroundColor;
-  }
+  // &:active {
+  //   color: fade(@alternateTextColor, 80%);
+  //   background-color: @dialogActiveBackgroundColor;
+  // }
   &.disabled {
     color: @disabledColor;
     cursor: not-allowed;
@@ -212,7 +213,7 @@ export default {
 }
 
 .mu-menu-item{
-  padding: 0px 20px;
+  padding: 0px 12px;
   position: relative;
   display: flex;
   justify-content: space-between;
@@ -221,7 +222,16 @@ export default {
     padding: 0 24px;
   }
   &.have-left-icon{
-    padding-left: 72px;
+    padding-left: 12px + 16px + 6px;
+  }
+  & > img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin: 8px;
   }
 }
 
@@ -236,7 +246,7 @@ export default {
   position: absolute;
   top: 0;
   left: 4px;
-  margin: 12px;
+  margin: 8px;
   color: @grey600;
   .mu-menu-destop & {
     top: 4px;
@@ -246,15 +256,15 @@ export default {
 }
 
 .mu-menu-item-right-icon{
-  position: absolute;
-  top: 0;
-  right: 4px;
-  margin: 12px;
-  color: @grey600;
-  .mu-menu-destop & {
-    top: 4px;
-    right: 24px;
-    margin: 0;
-  }
+  // position: absolute;
+  // top: 0;
+  // right: 4px;
+  // margin: 12px;
+  // color: @grey600;
+  // .mu-menu-destop & {
+  //   top: 4px;
+  //   right: 24px;
+  //   margin: 0;
+  // }
 }
 </style>

@@ -1,26 +1,21 @@
 <template>
   <div class="view-video">
-    <div class="record">
+    <div class="toolbar">
       <!-- <div class="title">录制</div> -->
       <!-- <div class="video-setting-btn">
         <cpt-button label="录制设置" icon="set-video-thin" @click="$router.push({ name: 'settings-video' })" secondary small></cpt-button>
       </div> -->
-      <div class="main">
-        <div class="main-btn" ref="imageCapture" @click="startImageCapture" @mouseenter="handleHover" @mouseleave="handleHoverExit">
-          <cpt-icon value="screenshot-fill" :size="24"></cpt-icon>
-          <span class="txt">截屏</span>
-          <cpt-tooltip :label="$store.state.hotkeys.captureImage" :show="show" :trigger="trigger" verticalPosition="bottom" horizontalPosition="center"/>
-        </div>
-        <div v-show="$store.state.recordingState === 'RS_Stop'" class="main-btn" ref="videoCapture" @click="easyStartVideoCapture" @mouseenter="handleHover2" @mouseleave="handleHoverExit2">
-          <cpt-icon value="record-fill" :size="24"></cpt-icon>
-          <span class="txt">录制</span>
-          <cpt-tooltip :label="$store.state.hotkeys.captureVideo" :show="show2" :trigger="trigger2" verticalPosition="bottom" horizontalPosition="center"/>          
-        </div>
-        <div v-show="$store.state.recordingState !== 'RS_Stop'" class="main-btn recording" @click="stopVideoCapture">
-          <cpt-icon value="record-stop-fill" :size="24"></cpt-icon>
-          <span v-show="$store.state.recordingState === 'RS_Init'" class="txt">初始化中</span>
-          <span v-show="$store.state.recordingState === 'RS_Recording'" class="txt time">{{ $store.state.recordingSeconds | duration }}</span>
-        </div>
+      <div class="wrap">
+        <cpt-block-button icon="screenshot-fill" :text="'截屏'" :tooltipLabel="$store.state.hotkeys.captureImage" @click="startImageCapture"></cpt-block-button>
+        <cpt-block-button
+          :buttonClass="recordButtonClass"
+          icon="record-fill" 
+          :text="recordButtonText" 
+          :textClass="recordButtonTextClass" 
+          :tooltipLabel="$store.state.hotkeys.captureVideo" 
+          @click="recordButtonClickEvent"></cpt-block-button>
+        <cpt-block-button buttonClass="set" icon="set-fill" @click="$router.push({ name: 'settings-video' })"></cpt-block-button>
+         
         <!-- <div v-show="isAutoStartCaptureInGame" class="main-btn auto" @click="setIsAutoStartCaptureInGame(false)">
           <cpt-icon value="capture-fill" :size="24"></cpt-icon>
           <span class="txt">精彩时刻已开启</span>
@@ -29,10 +24,6 @@
           <cpt-icon value="capture-fill" :size="24"></cpt-icon>
           <span class="txt">精彩时刻已关闭</span>
         </div> -->
-        <div class="main-btn set" @click="$router.push({ name: 'settings-video' })">
-          <cpt-icon value="set-fill" :size="24"></cpt-icon>
-          <!-- <span class="txt">录制</span> -->
-        </div>
       </div>
     </div>
     <ul class="nav-list">
@@ -64,6 +55,7 @@
 </template>
 <script>
 import cptButton from '@/components/button'
+import cptBlockButton from '@/components/blockButton'
 import { mapState, mapActions } from 'vuex'
 import cptBackTop from '@/components/backTop'
 import tabHighlight from '@/components/tab-highlight'
@@ -73,6 +65,7 @@ export default {
   // mixins: [tabHighlight],
   components: {
     'cpt-button': cptButton,
+    'cpt-block-button': cptBlockButton,
     'cpt-back-top': cptBackTop
   },
   data () {
@@ -91,38 +84,38 @@ export default {
         //   name: 'video-screenshot',
         //   label: '截屏'
         // }
-      ],
-      show: false,
-      trigger: null,
-      show2: false,
-      trigger2: null
+      ]
     }
   },
   computed: {
     ...mapState({
       // 'recordingState'
-    })
+    }),
+    recordButtonClass () {
+       return this.$store.state.recordingState !== 'RS_Stop' ? 'recording' : ''
+    },
+    recordButtonText () {
+      if (this.$store.state.recordingState === 'RS_Init') {
+        return '初始化中'
+      } else if (this.$store.state.recordingState === 'RS_Recording') {
+        return this.filterDuration(this.$store.state.recordingSeconds)
+      } else {
+        return '录制'
+      }
+    },
+    recordButtonTextClass () {
+      return this.$store.state.recordingState === 'RS_Recording' ? 'time' : ''
+    }
   },
   methods: {
-    // S tooltip 
-    handleHover () {
-      this.show = true
-    },
-    handleHoverExit () {
-      this.show = false
-    },
-    handleHover2 () {
-      this.show2 = true
-    },
-    handleHoverExit2 () {
-      this.show2 = false
-    },
-    // E tooltip
     ...mapActions([
       'startImageCapture',
       'easyStartVideoCapture',
       'stopVideoCapture'
     ]),
+    recordButtonClickEvent () {
+      this.$store.state.recordingState === 'RS_Stop' ? this.easyStartVideoCapture() : this.stopVideoCapture()
+    },
     onRecordingSecondsChanged () {
       this.getRecordingSeconds()
     },
@@ -143,9 +136,6 @@ export default {
     }
   },
   mounted () {
-    this.trigger = this.$refs.imageCapture
-    this.trigger2 = this.$refs.videoCapture
-
     this.init()
   },
 }
@@ -154,8 +144,9 @@ export default {
 @import "../styles/import.less";
 .view-video {
   padding: 24px 40px;
-  .record {
+  .toolbar {
     position: relative;
+    margin-bottom: 16px;
     .video-setting-btn {
       position: absolute;
       top: 10px;
@@ -167,66 +158,8 @@ export default {
       height: 48px;
       font-size: 16px;
     }
-    > .main {
+    > .wrap {
       display: flex;
-      margin-bottom: 16px;
-      .main-btn {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 134px;
-        height: 76px;
-        color: @textColor;
-	      border-radius: 2px;
-        background-color: fade(@alternateTextColor, 80%);
-        box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
-        margin-right: 12px;
-        cursor: pointer;
-        .iconfont {
-          color: fade(@textColor, 80%);
-        }
-        .txt {
-          font-size: 12px;
-          font-weight: 400;
-          line-height: 1;
-          margin-top: 8px;
-          &.time {
-            font-family: 'liquidcr';
-            font-size: 16px;
-            margin-top: 2px;
-          }
-        }
-        &:hover {
-          background-color: fade(@textColor, 8%);
-        }
-        &:active {
-          background-color: fade(@textColor, 8%);
-        }
-        &.recording {
-          color: @dangerColor;
-          .iconfont {
-            color: @dangerColor;
-          }
-        }
-        &.close {
-          color: fade(@textColor, 40%);
-          .iconfont {
-            color: fade(@textColor, 40%);
-          }
-        }
-        &.set {
-          width: 76px;
-          background-color: fade(@alternateTextColor, 40%);
-          .iconfont {
-            color: fade(@textColor, 40%);
-          }
-          &:hover {
-            background-color: fade(@textColor, 8%);
-          }
-        }
-      }
     }
   }
   .nav-list {
