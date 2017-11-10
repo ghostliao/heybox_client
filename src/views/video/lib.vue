@@ -46,6 +46,7 @@ export default {
       })
     },
     mergeMediaList (videoList, imageList) {
+      console.log('merge media list')
       for (let i = 0, len = videoList.length; i < len; i++) {
         videoList[i].fileType = 'video'
       }
@@ -56,7 +57,7 @@ export default {
       this.sortMediaList()
     },
     sortMediaList () {
-      this.mediaList = this.mediaList.sort(sortBy('createTimeStamp'))
+      this.mediaList.sort(sortBy('createTimeStamp'))
       function sortBy (name) {
         return function(o, p) {
           let a, b

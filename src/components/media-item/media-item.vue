@@ -1,10 +1,12 @@
 <template>
   <div class="cpt-media-item">
-    <div v-if="manageBar" class="manage-bar">
-      <div class="col date">{{ data.createTimeStamp | formDate(2) }}</div>
-      <!-- <div class="col arrow">arrow</div> -->
+    <div v-if="manageBar" class="manage-bar" @click="toggleManageBar">
+      <div class="row">
+        <div class="date label">{{ data.createTimeStamp | formDate(4) }}</div>
+        <cpt-icon :value="arrowIcon"></cpt-icon>
+      </div>
     </div>
-    <div class="media-item" @click="mediaAction(data.file)">
+    <div class="media-item" @click="mediaAction(data.file)" v-show="manageBarOpen">
       <div class="col col-1">
         <!-- <div class="thumbnail" v-lazy:background-image="thumbnail"> -->
         <div class="thumbnail">
@@ -21,7 +23,7 @@
       </div>
       <div class="col col-2">
         <span class="name">{{ data.file | fileName }}</span>
-        <span v-if="data.fileType === 'video'" class="duration">{{ data.duration | duration }}</span>        
+        <span v-if="data.fileType === 'video'" class="duration">{{ data.duration | duration }}</span>
       </div>
       <div class="col col-3">
         <span class="time">{{ data.createTimeStamp | formDate(1) }}</span>
@@ -67,6 +69,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import Bus from '@/components/bus'
 
 export default {
   name: "cpt-media-item",
@@ -83,7 +86,8 @@ export default {
   },
   data () {
     return {
-      deleteDialog: false
+      deleteDialog: false,
+      manageBarOpen: true
     }
   },
   computed: {
@@ -92,10 +96,13 @@ export default {
     },
     uploadDisabled () {
       if (this.data.fileType === 'video') {
-        return !(this.data.isMomentCapture && !this.data.uploadFinished && !this.data.uploading)
+        return !(this.data.isMomentCapture && !this.data.uploadFinished && !this.data.uploading && this.data.fileSize < 100 * 1024 * 1024)
       } else if (this.data.fileType === 'image') {
         return !(!this.data.uploadFinished && !this.data.uploading)
       }
+    },
+    arrowIcon () {
+      return this.manageBarOpen ? 'arrow-up' : 'arrow-down'
     }
   },
   methods: {
@@ -159,7 +166,28 @@ export default {
         maxjia.media.file.deleteImage(localId)
       }
       this.closeDeleteDialog()
+    },
+    toggleManageBar () {
+      this.manageBarOpen = !this.manageBarOpen
+      Bus.$emit('toggleManageBar', [this.data.createTimeStamp])
+    },
+    formDate (t) {
+      const timeSpan = t * 1000
+      const dateTime = new Date(parseInt(timeSpan))
+      const year = dateTime.getFullYear()
+      const month = dateTime.getMonth() + 1
+      const day = dateTime.getDate()
+      return `${year}-${month}-${day}`
     }
+  },
+  created () {
+    Bus.$on('toggleManageBar', data => {
+      if (data[0] === this.data.createTimeStamp) { // media item 组件自己
+        return
+      } else if (this.formDate(data[0]) === this.formDate(this.data.createTimeStamp)) {
+        this.manageBarOpen = !this.manageBarOpen
+      }
+    })
   },
   mounted () {
     // console.log(this.data)
@@ -171,17 +199,19 @@ export default {
 @import "../../styles/import.less";
 .cpt-media-item {
   width: 100%;
-  margin-bottom: 2px;
   .manage-bar {
-    display: flex;
-    height: 52px;
     padding-top: 12px;
-    > .col {
+    .row {
       display: flex;
       align-items: center;
-      &.date {
+      height: 40px;
+      cursor: pointer;
+      .date {
         font-family: 'DIN';
         font-size: 20px;
+      }
+      .iconfont {
+        color: fade(@textColor, 60%);
       }
     }
   }
@@ -195,6 +225,7 @@ export default {
     // background-image: linear-gradient(to bottom, #2a2e34, #30343a);
     // box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
     // box-shadow: inset 0 0 0 1px #151A20;
+    margin-bottom: 2px;
     cursor: pointer;
     overflow: hidden;
     &:hover {

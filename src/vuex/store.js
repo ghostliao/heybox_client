@@ -9,6 +9,10 @@ import mutations from './mutations'
 const v = Vue.prototype
 
 const state = {
+  config: {
+    dev: true
+  },
+
   routerName: 'game',
   routerVideoName: '',
   routerSettingsName: '',
@@ -41,7 +45,12 @@ const state = {
     
   },
   hotkeysModifiers: [],
-  xmlDoc: {}
+  xmlDoc: {},
+  accountInfo: {
+    uid: 999999,
+    userName: '匿名',
+    avatarUrl: '../../assets/default_avatar.png'
+  }
 }
 
 const getters = {

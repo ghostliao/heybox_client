@@ -7,17 +7,18 @@
           <cpt-menu width="160" :autoWidth="menuAutoWidth">
             <div class="menu-account-wrap">
               <div class="col col-1">
-                <img :src="accountInfo.avatarUrl" alt="">
+                <img :src="$store.state.accountInfo.avatarUrl" alt="">
               </div>
               <div class="col col-2">
-                <div class="name">{{accountInfo.userName}}</div>
-                <div class="id">ID: {{accountInfo.uid}}</div>
+                <div class="name">{{$store.state.accountInfo.userName}}</div>
+                <div class="id">ID: {{$store.state.accountInfo.uid}}</div>
               </div>
             </div>
+            <cpt-divider light />
             <cpt-menu-item title="设置" @click="mainGoToPage({ name: 'settings'})" />
-            <cpt-menu-item title="打开Dock浮窗" @click="showDock" />
+            <cpt-menu-item title="召唤Dock" @click="showDock" />
             <!-- <cpt-menu-item title="关于小黑盒" /> -->
-            <cpt-divider shallow-inset light />
+            <cpt-divider light />
             <cpt-menu-item title="切换用户" @click="switchUser" />
             <cpt-menu-item title="退出" @click="quit" />
           </cpt-menu>
@@ -25,12 +26,6 @@
       </div>
 
       <div class="navigation">
-        <!-- <div class="tab-btn">
-          <cpt-icon-button icon="previous-thin" :iconSize="20" @click="$router.go(-1)"></cpt-icon-button>
-        </div> -->
-        <div class="tab-btn">
-          <cpt-icon-button icon="reload-thin" :iconSize="20" @click="routeReload"></cpt-icon-button>
-        </div>
         <div class="tabs-wrap">
           <ul class="tabs">
             <router-link v-for="(i, index) in navTabs" :to="{ name: i.name }" tag="li" :key="i.name">
@@ -39,19 +34,31 @@
             <span class="tab-link-highlight" ref="highlight"></span>
           </ul>
         </div>
+        <template v-if="$store.state.config.dev">
+          <!-- <div class="tab-btn">
+            <cpt-icon-button icon="previous-thin" :iconSize="20" @click="$router.go(-1)"></cpt-icon-button>
+          </div> -->
+          <div class="tab-btn">BETA</div>
+          <div class="tab-btn">
+            <cpt-icon-button icon="reload-thin" :iconSize="20" @click="routeReload"></cpt-icon-button>
+          </div>
+          <!-- <div class="tab-btn">
+            <cpt-icon-button icon="fullscreen-thin" :iconSize="20" @click="fullscreen"></cpt-icon-button>
+          </div> -->
+        </template>
         <!-- <div class="account">
           <div class="avatar" ref="accountMenuButton" @click="accountMenuToggle">
-            <img :src="accountInfo.avatarUrl" alt="">
+            <img :src="$store.state.accountInfo.avatarUrl" alt="">
           </div>
           <cpt-popover :trigger="accountMenuTrigger" :popoverClass="[ 'right', 'account-popover' ]" :open="accountMenuOpen" @close="accountMenuHandleClose" :anchorOrigin="accountMenuAnchorOrigin" :targetOrigin="accountMenuTargetOrigin">
             <cpt-menu width="160" :autoWidth="menuAutoWidth">
               <div class="menu-account-wrap">
                 <div class="col col-1">
-                  <img :src="accountInfo.avatarUrl" alt="">
+                  <img :src="$store.state.accountInfo.avatarUrl" alt="">
                 </div>
                 <div class="col col-2">
-                  <div class="name">{{accountInfo.userName}}</div>
-                  <div class="id">ID: {{accountInfo.uid}}</div>
+                  <div class="name">{{$store.state.accountInfo.userName}}</div>
+                  <div class="id">ID: {{$store.state.accountInfo.uid}}</div>
                 </div>
               </div>
               <cpt-menu-item title="个人设置" @click="accountGoToPage({ name: 'settings-account'})" />
@@ -122,10 +129,7 @@ export default {
           name: 'hardware',
           label: '我的设备'
         }
-      ],
-      accountInfo: {
-        avatarUrl: require('../../assets/default_avatar.png')
-      }
+      ]
     }
   },
   methods: {
@@ -161,10 +165,13 @@ export default {
       //   name: this.$route.name
       // })
     },
-    
+    fullscreen () {
+      console.log('fullscreen')
+      document.documentElement.webkitRequestFullScreen()
+    },
     showDock () {
       maxjia.store.showDock()
-      this.mainMenuToggle()      
+      this.mainMenuToggle()
     },
     quit () {
       maxjia.store.quit()
@@ -177,9 +184,9 @@ export default {
     getAccountInfo () {
       maxjia.user.getCurrentUser(data => {
         // console.log(data)
-        data.avatarUrl && (this.accountInfo.avatarUrl = data.avatarUrl)
-        data.uid && (this.accountInfo.uid = data.uid)
-        data.userName && (this.accountInfo.userName = data.userName)
+        data.avatarUrl && (this.$store.state.accountInfo.avatarUrl = data.avatarUrl)
+        data.uid && (this.$store.state.accountInfo.uid = data.uid)
+        data.userName && (this.$store.state.accountInfo.userName = data.userName)
       })
     }
   },
@@ -213,7 +220,8 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 160px;
+      width: 152px;
+      margin-right: -16px;
       // .logo {
       //   width: 36px;
       //   height: 36px;
@@ -263,7 +271,7 @@ export default {
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 0 20px;
+            padding: 0 16px;
             color: fade(@textColor, 60%);
             font-size: 16px;
             cursor: pointer;
@@ -326,15 +334,16 @@ export default {
 
 .menu-account-wrap {
   display: flex;
-  height: 56px;
-  padding: 8px 20px;
-  background: fade(@fullBlack, 5%);
+  height: 52px;
+  padding: 12px 12px 8px;
+  // background: fade(@fullBlack, 5%);
   margin-top: -4px;
+  user-select: text;
   > .col-1 {
-    width: 40px;
+    width: 32px;
     img {
-      width: 40px;
-      height: 40px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
     }
   }
@@ -348,12 +357,12 @@ export default {
     .name {
       font-size: 12px;
       font-weight: 400;
-      color: @alternateTextColor;
+      color: fade(@textColor, 50%);
       margin-bottom: 5px;
     }
     .id {
       font-size: 12px;
-      color: fade(@alternateTextColor, 40%);
+      color: fade(@textColor, 20%);
     }
   }
 }

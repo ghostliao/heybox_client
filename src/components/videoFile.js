@@ -21,13 +21,17 @@ export default {
     _addVideoItem (videoItem) {
       // console.log('addVideoItem')
       this.$set(videoItem, 'fileType', 'video')
+      // console.log(this.videoList)
       this.videoList.unshift(videoItem)
-      // console.log(videoItem.createTimeStamp)
+      // console.log(videoItem)
     },
     onVideoFileAdded (videoItem) {
       // console.log('onVideoFileAdded')
       this._addVideoItem(videoItem)
-      this.mergeMediaList(this.videoList, this.imageList)
+      // BUG: 新增文件列表显示两个
+      this.getVideoList().then(data => {
+        this.mergeMediaList(this.videoList, this.imageList)
+      })
     },
     onVideoFileDeleted () {
       // console.log('onVideoFileDeleted')
@@ -41,7 +45,6 @@ export default {
       for (let i = 0, len = list.length; i < len; i++) {
         let mediaItem = list[i]
         if (mediaItem.fileType === 'video' && mediaItem.localId === videoItem.localId) {
-          console.log(mediaItem)
           this.$set(mediaItem, 'uploadFailed', videoItem.uploadFailed)
           this.$set(mediaItem, 'uploadFinished', videoItem.uploadFinished)
           this.$set(mediaItem, 'uploadProgress', videoItem.uploadProgress)

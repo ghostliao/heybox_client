@@ -45,6 +45,7 @@ export default {
   },
   OPEN_MSG_DIALOG (state, obj) {
     state.msgDialogOptions.msg = obj.msg
+    obj.markType && (state.msgDialogOptions.markType = obj.markType)
     state.msgDialog = true
   },
   CLOSE_MSG_DIALOG (state, obj) {

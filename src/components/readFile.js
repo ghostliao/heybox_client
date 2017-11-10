@@ -12,7 +12,7 @@ export default {
       const doc = parser.parseFromString(str, "text/xml")
       return doc
     },
-    parseINIString (data) { 
+    parseINIString (data) {
       var regex = {
         section: /^\s*\[\s*([^\]]*)\s*\]\s*$/,
         param: /^\s*([\w\.\-\_]+)\s*=\s*(.*?)\s*$/,
