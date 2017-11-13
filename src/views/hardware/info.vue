@@ -1,21 +1,31 @@
 <template>
   <div class="view-hardware-info">
-    <!-- {{hardwareInfo}} -->
     <div class="content">
-      <cpt-set-block-head title="电脑概览"></cpt-set-block-head>
-      <!-- <div class="overview">
-        <div class="update">
+      <!-- <cpt-set-block-head title="电脑概览"></cpt-set-block-head> -->
+      <div class="overview">
+        <transition name="fade" mode="out-in">
+          <div v-if="loading" key="loading" class="progress">
+            <cpt-circular-progress :size="40" />
+          </div>
+        </transition>
+        <!-- <div class="update">
           <cpt-icon value="reload-fill"></cpt-icon>
           <span class="label">2小时前更新</span>
-        </div>
-        <div class="row row-1">{{hardwareInfo.cpu.name}} </div>
-        <div class="row row-2">
-          <div class="level wc-light grd">S</div>
-        </div>
-        <div class="row row-3">
-          超越 <span>98%</span> 用户
-        </div>
-      </div> -->
+        </div> -->
+        <template v-if="!loading">
+          <div class="row row-1">
+            <span class="cpu">{{hardwareEvalInfo.cpu.show_key}}</span>
+            <span class="gpu">{{hardwareEvalInfo.gpus.show_key}}</span>
+            <span class="board">{{hardwareInfo.board.name}}</span>
+          </div>
+          <div class="row row-2">
+            <div class="level wc-light grd">{{hardwareEvalInfo.avg_perf_level}}</div>
+          </div>
+          <!-- <div class="row row-3">
+            超越 <span>98%</span> 用户
+          </div> -->
+        </template>
+      </div>
 
       <div class="body">
         <template v-if="hardwareInfo.system">
@@ -100,16 +110,19 @@
 import { mapActions } from 'vuex'
 import {cptSetBlock, cptSetBlockHead} from '@/components/set-block'
 import cptHdInfoBar from '@/components/hd-info-bar'
+import cptCircularProgress from '@/components/circularProgress'
 
 export default {
   name: "view-hardware-info",
   components: {
     'cpt-set-block': cptSetBlock,
     'cpt-set-block-head': cptSetBlockHead,
-    'cpt-hd-info-bar': cptHdInfoBar
+    'cpt-hd-info-bar': cptHdInfoBar,
+    'cpt-circular-progress': cptCircularProgress
   },
   data () {
     return {
+      loading: true,
       hardwareInfo: {},
       hardwareEvalInfo: {
         cpu: {
@@ -166,6 +179,7 @@ export default {
         }
       }
       this.$ajax.get(url, options).then(res => {
+        this.loading = false
         if (res.data.status === 'ok') {
           this.hardwareEvalInfo = res.data.result
           console.log(this.hardwareEvalInfo)
@@ -207,10 +221,21 @@ export default {
     max-width: 1040px;
     // width: 808px;
     // margin: auto;
-    padding: 6px 40px;
+    padding: 6px 40px 40px;
     .overview {
       position: relative;
       padding: 20px 0;
+      min-height: 121px;
+      .progress {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
       .update {
         position: absolute;
         top: 20px;
@@ -223,6 +248,16 @@ export default {
       > .row {
         display: flex;
         justify-content: center;
+        &.row-1 {
+          font-weight: 600;
+          span {
+            padding: 0 4px;
+          }
+          .board {
+            color: fade(@textColor, 60%);
+            font-weight: 400;
+          }
+        }
         &.row-2 {
           font-size: 54px;
           font-family: Arial, Helvetica, sans-serif;

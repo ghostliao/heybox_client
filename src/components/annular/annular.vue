@@ -4,7 +4,7 @@
     <div class="info">
       <p class="label">{{label}}</p>
       <p class="value wf-din grd" :class="{ 'wc-primary': value <= 60, 'wc-danger': value > 60 }">{{value}}%</p>
-      <!-- <p class="status">流畅</p> -->
+      <p class="status">{{status}}</p>
     </div>
   </div>
 </template>
@@ -23,6 +23,9 @@ export default {
     value: {
       type: Number,
       default: 0
+    },
+    status: {
+      type: String
     }
   },
   data () {

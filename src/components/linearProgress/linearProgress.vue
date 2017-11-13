@@ -37,6 +37,10 @@ export default {
     page: {
       type: Boolean,
       default: false
+    },
+    light: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -58,7 +62,12 @@ export default {
       }
     },
     linearClass () {
-      return 'mu-linear-progress-' + this.mode
+      // return 'mu-linear-progress-' + this.mode
+      return {
+        'mu-linear-progress-determinate': this.mode === 'determinate',
+        'mu-linear-progress-indeterminate': this.mode === 'indeterminate',
+        'light': this.light
+      }
     }
   }
 }
@@ -76,6 +85,9 @@ export default {
   // border-radius: 2px;
   margin: 0px;
   overflow: hidden;
+  .light {
+    .light-primary-linear-gradient;
+  }
 }
 
 .mu-linear-progress-indeterminate{
@@ -95,7 +107,8 @@ export default {
   top: 0;
   bottom: 0;
   left: 0;
-  background-color: @primaryColor;
+  // background-color: @primaryColor;
+  .primary-linear-gradient;
   transition: width .3s linear;
   border-radius: 2px;
 }

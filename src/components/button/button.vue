@@ -54,6 +54,10 @@ export default {
     small: {
       type: Boolean,
       default: false
+    },
+    narrow: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -66,7 +70,8 @@ export default {
         'primary': this.primary,
         'secondary': this.secondary,
         'success': this.success,
-        'small': this.small
+        'small': this.small,
+        'narrow': this.narrow
       }
     }
   },
@@ -152,6 +157,9 @@ export default {
       .iconfont {
         font-size: 14px;
       }
+    }
+    &.narrow {
+      min-width: 68px;
     }
     &.disabled {
       opacity: .1;
