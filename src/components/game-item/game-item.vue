@@ -55,6 +55,12 @@
                 <cpt-button v-if="currentOptLevel === i.configLevel" label="已优化" secondary disabled small></cpt-button>
                 <cpt-button v-else label="开始优化" primary small @click="optimizeConfirm(i.configLevel)"></cpt-button>
               </div>
+              <div class="layer opt" v-if="optRecommandLevel">
+                <div class="title">{{ data.supportLevels[1].levelName }}</div>
+                <div class="desc">{{ data.supportLevels[1].levelDesc }}</div>
+                <cpt-button v-if="currentOptRecommandLevel" label="已优化" secondary disabled small></cpt-button>
+                <cpt-button v-else label="开始优化" primary small @click="optimizeConfirm(data.recommand_level)"></cpt-button>
+              </div>
             </template>
           </div>
           <div class="preview after" :style="previewAfter">
@@ -67,21 +73,27 @@
           </div>
         </div>
         <div class="options">
-          <cpt-button v-for="(i, index) in data.supportLevels" 
+          <cpt-button v-for="(i, index) in data.supportLevels"
             :key="index" 
+            v-if="i.configLevel !== '2'"
             :label="i.levelName" 
             :secondary="optLevel === i.configLevel ? false : true" 
             :primary="optLevel === i.configLevel ? true : false" 
             small 
             :success="currentOptLevel === i.configLevel" 
             :icon="currentOptLevel === i.configLevel ? 'check-fill' : ''"
-            @click="changeOptType(i.configLevel)">
+            @click="changeOptType({ level: i.configLevel })">
+          </cpt-button>
+          <cpt-button v-if="data.recommand_level"
+            label="推荐配置" 
+            :secondary="!optRecommandLevel" 
+            :primary="optRecommandLevel" 
+            small 
+            :success="currentOptRecommandLevel" 
+            :icon="currentOptRecommandLevel ? 'check-fill' : ''"
+            @click="changeOptType({ level: data.recommand_level, recommand: true })">
           </cpt-button>
 
-          <!-- <cpt-button label="二档设置" :secondary="optLevel === 2 ? false : true" :primary="optLevel === 2 ? true : false" small :success="currentOptLevel === 2" @click="changeOptType(2)"></cpt-button>
-          <cpt-button label="三档设置" :secondary="optLevel === 3 ? false : true" :primary="optLevel === 3 ? true : false" small :success="currentOptLevel === 3" @click="changeOptType(3)"></cpt-button>
-          <cpt-button label="四档设置" :secondary="optLevel === 4 ? false : true" :primary="optLevel === 4 ? true : false" small :success="currentOptLevel === 4" @click="changeOptType(4)"></cpt-button> -->
-          
           <!-- <cpt-button v-show="currentOptLevel !== 0" label="还原设置" primary small></cpt-button> -->
         </div>
       </div>
@@ -138,8 +150,10 @@ export default {
           desc: '关闭了XX进程，清理RAM……游戏更新后可能需要重新进行优化……关闭了XX进程，清理RAM……游戏更新后可能需要重新进行优化……'
         }
       ],
-      optLevel: 1,
-      currentOptLevel: 0,
+      optLevel: 1, // 选中的优化level
+      optRecommandLevel: false, // 选中推荐的level
+      currentOptLevel: 0, // 已优化的level
+      currentOptRecommandLevel: false, // 已优化的是否为推荐level
       optState: 0, // opt state 0 -> 默认, 1 -> 优化中, 2 -> 优化结束
       optimizing: false
     }
@@ -178,13 +192,24 @@ export default {
     // 游戏优化对话框
     openOptDialog () {
       this.optDialog = true
-
-      this.optLevel = this.data.recommandConfigLevel
-      if (this.optLevel < 1) {
+      if (this.data.recommand_level) {
+        this.changeOptType({
+          level: this.data.recommand_level,
+          recommand: true
+        })
+      } else {
         this.optLevel = 1
+        this.changeOptType({
+          level: this.optLevel
+        })
       }
-      console.log(this.optLevel)
-      this.changeOptType(this.optLevel)
+
+      // this.optLevel = this.data.recommand_level
+      // if (this.optLevel < 1) {
+      //   this.optLevel = 1
+      // }
+      // console.log(this.optLevel)
+      // this.changeOptType(this.optLevel)
     },
     closeOptDialog () {
       this.optDialog = false
@@ -209,15 +234,15 @@ export default {
       //   if (res.result) { // 优化成功回调
 
           // engine
-          // this.gameOptimize({
-          //   fileName: 'engine',
-          //   filePath: this.data.enginePath,
-          //   gameId: gameId,
-          //   level: optLevel,
-          //   callback: () => {
-          //     console.log(`游戏 ${gameId} level ${optLevel} engine 配置成功`)
-          //   }
-          // })
+          this.gameOptimize({
+            fileName: 'engine',
+            filePath: this.data.enginePath,
+            gameId: gameId,
+            level: optLevel,
+            callback: () => {
+              console.log(`游戏 ${gameId} level ${optLevel} engine 配置成功`)
+            }
+          })
 
           // gameUserSettings
           this.gameOptimize({
@@ -231,7 +256,13 @@ export default {
           })
         
           setTimeout(() => {
-            this.currentOptLevel = this.optLevel
+            if (this.optRecommandLevel) {
+              this.currentOptRecommandLevel = true
+              this.currentOptLevel = 0
+            } else {
+              this.currentOptLevel = this.optLevel
+              this.currentOptRecommandLevel = false
+            }
             this.optState = 2
             this.optimizing = false
           }, 1000)
@@ -242,7 +273,8 @@ export default {
       // })
 
     },
-    changeOptType (level) {
+    changeOptType (config) {
+      // console.log(config.recommand)
       if (!this.optimizing) {
         // for (let [index, i] of this.data.supportLevels) {
         //   if (i.configLevel === level) {
@@ -251,13 +283,18 @@ export default {
         // }
         for (let i = 0; i < this.data.supportLevels.length; i++) {
           const el = this.data.supportLevels[i]
-          if (el.configLevel === level) {
+          if (el.configLevel === config.level) {
             this.previewAfterImg = this.data.supportLevels[i].image
             this.previewBeforeImg = this.data.supportLevels[i].originalImage
           }
         }
-
-        this.optLevel = level
+        if (config.recommand) {
+          this.optRecommandLevel = true
+          this.optLevel = 0
+        } else {
+          this.optLevel = config.level
+          this.optRecommandLevel = false
+        }
         this.optState = 0
       }
     },
@@ -293,7 +330,7 @@ export default {
   }
   .game-item {
     position: relative;
-    padding-top: 50%;
+    padding-top: 47%;
     border-radius: 2px;
     background-color: fade(@alternateTextColor, 80%);
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
