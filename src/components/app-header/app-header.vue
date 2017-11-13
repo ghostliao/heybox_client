@@ -1,5 +1,5 @@
 <template>
-  <div class="app-header">
+  <div class="app-header" ref="drag">
     <div class="app-header-wrap">
       <div class="logo-wrap">
         <div class="logo" ref="mainMenuButton" @click="mainMenuToggle"></div>
@@ -38,7 +38,7 @@
           <!-- <div class="tab-btn">
             <cpt-icon-button icon="previous-thin" :iconSize="20" @click="$router.go(-1)"></cpt-icon-button>
           </div> -->
-          <div class="tab-btn">BETA 0.1.1</div>
+          <div class="tab-btn">{{ $store.state.config.ver }}</div>
           <div class="tab-btn" v-if="$store.state.config.dev">
             <cpt-icon-button icon="reload-thin" :iconSize="20" @click="routeReload"></cpt-icon-button>
           </div>
@@ -191,14 +191,30 @@ export default {
           resolve()
         })
       })
+    },
+    getCurrentWindow () {
+      return new Promise((resolve, reject) => {
+        maxjia.windows.getCurrentWindow(data => {
+          resolve(data.id)
+        })
+      })
+    },
+    dragWindow (id) {
+      const el = this.$refs.drag
+      el.onmousedown = function (e) {
+        el.onmousemove = function (ev) {
+          maxjia.windows.dragWindow(id)
+        }
+      }
     }
   },
   created () {
-    this.getAccountInfo().then(() => {
-
-    })
+    this.getAccountInfo().then(() => {})
   },
   mounted () {
+    this.getCurrentWindow().then(id => {
+      this.dragWindow(id)
+    })
     this.mainMenuTrigger = this.$refs.mainMenuButton
     this.accountMenuTrigger = this.$refs.accountMenuButton
   }
