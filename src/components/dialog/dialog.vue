@@ -4,7 +4,7 @@
       <div class="mu-dialog-wrapper" @click="handleWrapperClick" v-if="open" ref="popup" :style="{'z-index': zIndex}">
         <div class="mu-dialog" ref="dialog" :class="dialogClass">
           <div class="mu-dialog-close" v-if="cornerClose" @click="hide()">
-            <cpt-icon-button icon="close-thin" :iconSize="36"></cpt-icon-button>
+            <cpt-icon-button icon="close" :iconSize="iconSize"></cpt-icon-button>
             <!-- <cpt-icon value="close-thin" :size="24"></cpt-icon> -->
           </div>
           <h3 class="mu-dialog-title" v-if="showTitle" ref="title" :class="headerClass">
@@ -30,7 +30,7 @@ import PopupManager from '../internal/popup/manager'
 import {convertClass} from '../utils'
 export default {
   mixins: [Popup],
-  name: 'mu-dialog',
+  name: 'cpt-dialog',
   props: {
     dialogClass: {
       type: [String, Array, Object]
@@ -157,19 +157,34 @@ export default {
 }
 .mu-dialog {
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: 77%;
   // max-width: 768px;
   padding: 0;
   background-color: @darkDialogBackgroundColor;
-  border-radius: 2px;
+  border: 1px solid @darkDialogBorderColor;
+  // border-radius: 2px;
   font-size: 16px;
   .depth(5);
   &.opt-dialog {
     // max-width: 924px;
+    border: none;
+    .mu-dialog-body {
+      padding: 0;
+    }
   }
   &.image-checker {
     width: auto;
     background: transparent;
+    border: none;
+  }
+  &.msg-dialog {
+    width: 400px;
+  }
+  &.delete-dialog {
+    width: 400px;
+    min-height: 170px;
   }
 }
 .mu-dialog-close {
@@ -178,17 +193,20 @@ export default {
   top: 12px;
   right: 12px;
   font-size: 0;
+  color: fade(@textColor, 60%);
 }
 
+@dialogPadding: 16px;
 .mu-dialog-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 24px 20px;
+  // padding: 24px 24px 20px;
+  padding: @dialogPadding;
   margin: 0;
-  font-size: 22px;
-  font-weight: normal;
-  line-height: 32px;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 24px;
   color: @textColor;
   + .mu-dialog-body{
     padding-top: 0;
@@ -198,18 +216,24 @@ export default {
   }
 }
 .mu-dialog-body {
+  flex: 1;
   // padding: 24px 24px 20px;
+  padding: 0 @dialogPadding;
   color: fade(@textColor, 60%);
+  font-size: 14px;
 }
 
 .mu-dialog-actions {
   min-height: 48px;
-  padding: 8px;
+  padding: @dialogPadding;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   .mu-raised-button + .mu-raised-button{
     margin-left: 10px;
+  }
+  .cpt-button + .cpt-button {
+    margin-left: @dialogPadding;
   }
   &.scrollable{
     border-top: 1px solid @lightBorderColor;

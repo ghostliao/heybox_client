@@ -2,6 +2,7 @@
   <div class="view-video-desktop">
     <video-file-man @updateVideoList="updateVideoList"></video-file-man>
     <div class="video-list">
+      <div v-show="videoList.length <= 0" class="notice">暂无媒体文件</div>
       <cpt-video-item v-for="i of videoList" :data="i" :key="i.localId"></cpt-video-item>
     </div>
   </div>
@@ -44,7 +45,13 @@ export default {
     flex-wrap: wrap;
     // max-width: 1072px;
     margin: auto;
-    
+    .notice {
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      line-height: 60px;
+      color: @secondaryTextColor;
+    }
   }
 }
 </style>

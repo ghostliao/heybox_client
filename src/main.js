@@ -19,7 +19,7 @@ Vue.use(VueLazyload, {
 })
 import axios from 'axios'
 
-axios.defaults.baseURL = store.state.config.dev
+axios.defaults.baseURL = (store.state.config.env === 'test')
   ? 'http://heybox.test.maxjia.com:58888'
   : 'https://api.xiaoheihe.cn'
 // axios.defaults.baseURL = 'https://api.xiaoheihe.cn'

@@ -206,7 +206,7 @@ export default {
 .mu-switch-ripple-wrapper {
   height: 200%;
   width: 200%;
-  top: -10px;
-  left: -10px;
+  top: -7px;
+  left: -7px;
 }
 </style>

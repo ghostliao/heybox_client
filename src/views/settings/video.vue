@@ -10,7 +10,7 @@
               <!-- <span class="desc">（可用磁盘空间5.60G）</span> -->
             </div>
             <div class="text-field-wrap">
-              <cpt-text-field :value="videoDir" preIcon="add-file-thin" readonly></cpt-text-field>
+              <cpt-text-field :value="videoDir" preIcon="search-file-fill" readonly></cpt-text-field>
               <cpt-button label="更改" secondary small @click="setVideoDir"></cpt-button>
             </div>
           </div>
@@ -20,7 +20,7 @@
               <!-- <span class="desc">（可用磁盘空间5.60G）</span> -->
             </div>
             <div class="text-field-wrap">
-              <cpt-text-field :value="imageDir" preIcon="add-file-thin" readonly></cpt-text-field>
+              <cpt-text-field :value="imageDir" preIcon="search-file-fill" readonly></cpt-text-field>
               <cpt-button label="更改" secondary small @click="setImageDir"></cpt-button>
             </div>
           </div>
@@ -29,11 +29,11 @@
           <cpt-set-shortcut label="开始/停止视频录制" name="Video.CaptureVideo" app="Video" hotkeyKey="captureVideo"></cpt-set-shortcut>
           <cpt-set-shortcut label="保存精彩时刻" name="Video.Save30Moment" app="Video" hotkeyKey="save30Moment"></cpt-set-shortcut>
           <cpt-set-shortcut label="截屏" name="Video.CaptureImage" app="Video" hotkeyKey="captureImage"></cpt-set-shortcut>
-          <cpt-set-shortcut label="Dock显示/隐藏" name="Dock.Show" app="Dock" hotkeyKey="dockShow">
+          <cpt-set-shortcut label="Dock显示" name="Dock.Show" app="Dock" hotkeyKey="dockShow">
             <!-- <span slot="desc">是否在打开任何游戏时都启动精彩时刻？</span> -->
           </cpt-set-shortcut>
-          <cpt-set-shortcut label="Overlay显示/隐藏" name="Overlay.ShowHide" app="Overlay" hotkeyKey="overlayShowHide"></cpt-set-shortcut>
           <cpt-set-shortcut label="Overlay控制" name="Overlay.Control" app="Overlay" hotkeyKey="overlayControl"></cpt-set-shortcut>
+          <cpt-set-shortcut label="Overlay显示/隐藏" name="Overlay.ShowHide" app="Overlay" hotkeyKey="overlayShowHide"></cpt-set-shortcut>
         </cpt-set-block>    
         <!-- <cpt-set-block title="启动设置">
           <cpt-set-switch label="录制精彩镜头" :switch="isVideoCaptureForMoment" @input="setIsVideoCaptureForMoment">
@@ -136,7 +136,7 @@ export default {
     // 是否启动overlay
     getGameOverlaySettings () {
       maxjia.settings.getGameOverlaySettings((data) => {
-        console.log(data)
+        // console.log(data)
         this.gameOverlaySettings = data.gameOverlaySettings
       })
     },

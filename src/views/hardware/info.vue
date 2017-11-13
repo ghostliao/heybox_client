@@ -158,7 +158,8 @@ export default {
       })
     },
     getHardwareEvalInfo () {
-      const url = '/tools/games/pc_info/v2/'
+      const url = '/pc/hardware_info/web/'
+      // const url = '/tools/games/pc_info/v2/'
       const options = {
         params: {
           'heybox_id': this.$store.state.accountInfo.uid

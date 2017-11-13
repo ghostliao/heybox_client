@@ -76,16 +76,15 @@ export default {
       'checkImageFile',
       'locateFileInExplorer'
     ]),
-    // 播放视频
+    // 查看图片
     checkImage (url) {
       // console.log('check')
       const imageSource = url
       this.checkImageFile({
         'file': imageSource
       })
-
     },
-    // 上传视频
+    // 上传图片
     uploadImage (localId) {
       // console.log(localId)
       maxjia.media.file.uploadImage(localId)
@@ -116,11 +115,12 @@ export default {
     background: @blockBackgroundColor;
     // background-image: linear-gradient(to bottom, #2a2e34, #30343a);
     // box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
-    box-shadow: inset 0 0 0 1px #151A20;
+    // box-shadow: inset 0 0 0 1px #151A20;
     cursor: pointer;
     overflow: hidden;
     &:hover {
-      background: #292D34;
+      // background: #292D34;
+      background: fade(#fff, 10%);
       box-shadow: none;
     }
     // &:after {
@@ -211,17 +211,17 @@ export default {
       }
       .duration {
         font-size: 12px;
-        color: fade(@textColor, 20%);
+        color: fade(@textColor, 40%);
       }
     }
     > .col-3 {
       width: 12.5%;
-      color: fade(@textColor, 20%);
+      color: fade(@textColor, 40%);
       font-size: 12px;
     }
     > .col-4 {
       width: 20%;
-      color: fade(@textColor, 20%);
+      color: fade(@textColor, 60%);
       font-size: 12px;
       .size {
         .upload-size {
@@ -259,7 +259,8 @@ export default {
       width: 12.5%;
       .btn-group {
         display: flex;
-        justify-content: center;
+        justify-content: flex-end;
+        padding-right: 15px;
         .btn {
           // width: 14px;
           // height: 14px;

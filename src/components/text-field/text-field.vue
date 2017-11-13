@@ -57,6 +57,7 @@ export default {
       top: 5px;
     }
     &.pre-icon {
+      color: @lightIconColor;
       padding-left: 28px;
     }
   }

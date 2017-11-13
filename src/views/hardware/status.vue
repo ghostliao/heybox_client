@@ -25,7 +25,7 @@
 
               <cpt-set-block title="GPU" :setBlockStyle="setBlockStyle">
                 <div class="chart-wrap">
-                  <cpt-annular label="GPU利用率" :value="Number(hardwareData.gpus[0].gpu_usage)" :status="gpuStatus"></cpt-annular>
+                  <cpt-annular label="核心利用率" :value="Number(hardwareData.gpus[0].gpu_usage)" :status="gpuStatus"></cpt-annular>
                   <cpt-chart id="gpulineChart" :data="hardwareData" dataType="gpu" chartType="line"></cpt-chart>
                 </div>
               </cpt-set-block>
@@ -77,12 +77,14 @@ export default {
         'margin': '0 8px 8px 0'
       },
       hardwareData: {},
-      hardwarePrefInfoReady: false
+      hardwarePrefInfoReady: false,
+      hardwarePerfInfoTimer: undefined,
+      hardwareHeatbeatTimer: undefined
     }
   },
   computed: {
     gpuStatus () {
-      return this.getStatus(this.hardwareData.gpus[0].memory_size, this.hardwareData.gpus[0].gpu_usage)
+      return this.getStatus(this.hardwareData.gpus[0].memory_size, this.hardwareData.gpus[0].memory_usage)
     },
     memoryStatus () {
       return this.getStatus(this.hardwareData.memory.memory_size, this.hardwareData.memory.usage)
@@ -122,22 +124,22 @@ export default {
       return str
     },
     init () {
-      // console.log('init')
+      console.log('init')
       maxjia.hardware.hardwarePerfInfoReady.addListener(() => {
         if (!this.hardwarePrefInfoReady) {
           this.hardwarePrefInfoReady = true
           
-          // console.log('hardwarePrefInfoReady')
+          console.log('hardwarePrefInfoReady')
         
           this.getHardwarePerfInfo()
-          window.hardwarePerfInfoTimer = setInterval(() => {
+          this.hardwarePerfInfoTimer = setInterval(() => {
             if (this.$route.name === 'hardware-status') {
-              // console.log('hardwarePerfInfoTimer')
+              console.log('hardwarePerfInfoTimer')
               this.getHardwarePerfInfo()
             }
           }, 1000)
 
-          window.hardwareHeatbeatTimer = setInterval(() => {
+          this.hardwareHeatbeatTimer = setInterval(() => {
             if (this.$route.name === 'hardware-status') {
               maxjia.hardware.heartbeat()
             }
@@ -159,7 +161,9 @@ export default {
     getHardwarePerfInfo () {
       // console.log('data')
       maxjia.hardware.getHardwarePerfInfo((data) => {
-        // console.log(data)
+        // console.log(data.gpus[0])
+        // console.log('clock speed: ' + data.gpus[0].clock_speed)
+        // console.log('memory speed: ' + data.gpus[0].memory_speed)
         this.hardwareData = data
         this.loading = false
       })
@@ -168,9 +172,18 @@ export default {
   mounted () {
     this.init()
   },
+  // activated () {
+  //   console.log('activated')
+  //   this.init()
+  // },
+  // deactivated () {
+  //   console.log('deactivated')
+  //   clearInterval(this.hardwarePerfInfoTimer)
+  //   clearInterval(this.hardwareHeatbeatTimer)
+  // },
   beforeDestroy () {
-    clearInterval(window.hardwarePerfInfoTimer)
-    clearInterval(window.hardwareHeatbeatTimer)
+    clearInterval(this.hardwarePerfInfoTimer)
+    clearInterval(this.hardwareHeatbeatTimer)
     // console.log(`clear interval`)
   }
 
@@ -201,10 +214,10 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
+    padding: 6px 40px;
     > .wrap {
       width: 784px;
       margin: auto;
-      padding: 16px 0;
       > .body {
         display: flex;
         flex-wrap: wrap;

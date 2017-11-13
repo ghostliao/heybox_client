@@ -17,14 +17,14 @@
           </div>
         </div>
       </div>
-      <div v-if="pointPercent" class="col col-3">
-        <cpt-linear-progress mode="determinate" :value="pointPercent"/>
+      <div class="col col-3">
+        <cpt-linear-progress v-if="pointPercent" mode="determinate" :value="pointPercent"/>
         <!-- <span>{{point}}分，超越</span>
         <span class="percent wf-din">{{pointPercent}}%</span>
         <span>的电脑</span> -->
       </div>
       <div class="col col-4">
-        <div class="switch" v-if="dropRow" @click="dropRowSwitch">
+        <div class="switch" v-if="dropRow" v-show="pointPercent" @click="dropRowSwitch">
           <span class="label" v-if="rankList">排名</span>
           <span class="label" v-if="!rankList">详情</span>
           <icon value="arrow-down" v-if="!dropRowShow"></icon>

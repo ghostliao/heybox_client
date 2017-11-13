@@ -37,7 +37,8 @@ export default {
     margin-left: 20px;
   }
   &.light {
-    background-color: fade(@fullBlack, 4%);
+    background-color: #2F3238;
+    // background-color: fade(@fullBlack, 4%);
   }
   html.pixel-ratio-2 & {
     .transform(scaleY(0.5));

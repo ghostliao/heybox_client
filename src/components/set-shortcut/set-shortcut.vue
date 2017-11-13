@@ -95,14 +95,14 @@ export default {
     getHotkeys () {
       maxjia.settings.getHotkeys((data) => {
         this.hotkeys = data.hotkeys
-        console.log(this.hotkeys)
+        // console.log(this.hotkeys)
         // document.getElementById('getHotkeys').innerHTML = JSON.stringify(data);
       })
     },
     getHotkey () {
       maxjia.settings.getHotkey(this.name, this.app, (data) => {
-        console.log(this.name, this.app)
-        console.log(data.hotkey)
+        // console.log(this.name, this.app)
+        // console.log(data.hotkey)
         const virtualKey = keycode(data.hotkey.virtualKeyCode)
         const modifiers = data.hotkey.modifiers
         this.displayHotkey(modifiers, virtualKey)
@@ -145,7 +145,7 @@ export default {
       let array = this.$store.state.hotkeysModifiers
       let i = array.length
       while (i--) {
-        console.log(i)
+        // console.log(i)
         if (array[i] === this.shortcut) {
           array.splice(i, 1)
           break

@@ -9,7 +9,7 @@
       <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
     <!-- S video player -->
-    <cpt-dialog :open="videoPlayer" title="" @close="closeVideoPlayer" @hide="closeVideoPlayer" dialogClass="opt-dialog" :overlayOpacity="0.8" cornerClose>
+    <cpt-dialog :open="videoPlayer" title="" @close="closeVideoPlayer" @hide="closeVideoPlayer" dialogClass="opt-dialog" :overlayOpacity="0.8" cornerClose :escPressClose="false">
       <div class="video-player-body">
         <div class="video-wrap">
           <!-- <video-player v-if="$store.state.videoPlayerOptions.src" -->
@@ -38,10 +38,19 @@
     <!-- E video player -->
 
     <!-- S image checker -->
-    <cpt-dialog :open="imageChecker" title="" @close="closeImageChecker" @hide="closeImageChecker" dialogClass="image-checker" :overlayOpacity="0.8" cornerClose>
+    <cpt-dialog :open="imageChecker" title="" @close="closeImageChecker" @hide="closeImageChecker" dialogClass="image-checker" :overlayOpacity="0.8">
       <cpt-image-checker></cpt-image-checker>
     </cpt-dialog>
     <!-- E image checker -->
+
+    <!-- S msg dialog -->
+    <cpt-dialog :open="msgDialog" title="" @close="closeMsgDialog" @hide="closeMsgDialog" dialogClass="msg-dialog" :overlayOpacity="0.8" cornerClose>
+      <cpt-msg-dialog :markType="$store.state.msgDialogOptions.markType" :msg="$store.state.msgDialogOptions.msg">
+        
+      </cpt-msg-dialog>
+    </cpt-dialog>
+    <!-- E msg dialog -->
+
     <div class="font-preload">1</div>
   </div>
 </template>
@@ -50,11 +59,11 @@
 import invokeHBJsGlobal from './js/global'
 import { mapState, mapActions } from 'vuex'
 import appHeader from '@/components/app-header'
-import dialog from '@/components/dialog'
 import cptVideoPlayer from '@/components/video-player'
 import { videoPlayer } from 'vue-video-player'
 import hotkeys from '@/components/hotkeys'
 import cptImageChecker from '@/components/image-checker'
+import cptMsgDialog from '@/components/msg-dialog'
 
 export default {
   name: 'app',
@@ -63,8 +72,8 @@ export default {
     'cpt-video-player': cptVideoPlayer,
     'video-player': videoPlayer,
     'app-header': appHeader,
-    'cpt-dialog': dialog,
-    'cpt-image-checker': cptImageChecker
+    'cpt-image-checker': cptImageChecker,
+    'cpt-msg-dialog': cptMsgDialog
   },
   data () {
     return {
@@ -80,7 +89,9 @@ export default {
       'videoPlayer',
       'videoSource',
       'imageChecker',
-      'imageCheckerOptions'
+      'imageCheckerOptions',
+      'msgDialog',
+      'msgDialogOptions'
     ]),
     player () {
       return this.$refs.videoPlayer.player
@@ -92,8 +103,11 @@ export default {
       'navigateToPage',
       'playVideoFile',
       'closeVideoPlayer',
+      'checkImageFile',
       'closeImageChecker',
-      'easyStartVideoCapture'
+      'easyStartVideoCapture',
+      'openMsgDialog',
+      'closeMsgDialog'
     ]),
     handleTabChange (val) {
       this.$store.state.routerName = val
@@ -156,8 +170,9 @@ export default {
 
 #app {
   height: 100%;
-  background: url(./assets/background_img.png) no-repeat right top;
-  // background: url(//cdn.max-c.com/image/p_01.jpg) no-repeat right top;
+  // background: url(./assets/background_img.png) no-repeat right top;
+  background: url(./assets/main_bg_1.jpg) no-repeat center;
+  background-size: cover;
   padding-top: @navHeight + 1px;
   // border: 1px solid #000;
   // box-shadow: 0 0 0 1px @layoutBorderColor inset;

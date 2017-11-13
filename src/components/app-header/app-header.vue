@@ -34,12 +34,12 @@
             <span class="tab-link-highlight" ref="highlight"></span>
           </ul>
         </div>
-        <template v-if="$store.state.config.dev">
+        <template v-if="$store.state.config.env === 'test'">
           <!-- <div class="tab-btn">
             <cpt-icon-button icon="previous-thin" :iconSize="20" @click="$router.go(-1)"></cpt-icon-button>
           </div> -->
-          <div class="tab-btn">BETA</div>
-          <div class="tab-btn">
+          <div class="tab-btn">BETA 0.1.1</div>
+          <div class="tab-btn" v-if="$store.state.config.dev">
             <cpt-icon-button icon="reload-thin" :iconSize="20" @click="routeReload"></cpt-icon-button>
           </div>
           <!-- <div class="tab-btn">
@@ -182,21 +182,25 @@ export default {
       this.accountMenuToggle()
     },
     getAccountInfo () {
-      maxjia.user.getCurrentUser(data => {
-        // console.log(data)
-        data.avatarUrl && (this.$store.state.accountInfo.avatarUrl = data.avatarUrl)
-        data.uid && (this.$store.state.accountInfo.uid = data.uid)
-        data.userName && (this.$store.state.accountInfo.userName = data.userName)
+      return new Promise((resolve, reject) => {
+        maxjia.user.getCurrentUser(data => {
+          // console.log(data)
+          data.avatarUrl && (this.$store.state.accountInfo.avatarUrl = data.avatarUrl)
+          data.uid && (this.$store.state.accountInfo.uid = data.uid)
+          data.userName && (this.$store.state.accountInfo.userName = data.userName)
+          resolve()
+        })
       })
     }
   },
-  mounted () {
-    this.getAccountInfo()
+  created () {
+    this.getAccountInfo().then(() => {
 
+    })
+  },
+  mounted () {
     this.mainMenuTrigger = this.$refs.mainMenuButton
     this.accountMenuTrigger = this.$refs.accountMenuButton
-
-    
   }
 }
 

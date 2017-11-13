@@ -13,6 +13,18 @@ export default {
     success: {
       type: Boolean,
       default: false
+    },
+    fail: {
+      type: Boolean,
+      default: false
+    },
+    large: {
+      type: Boolean,
+      default: false
+    },
+    small: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -24,16 +36,22 @@ export default {
     markClass () {
       return {
         'success': this.success,
-        'fail': this.fail
+        'fail': this.fail,
+        'large': this.large,
+        'small': this.small
       }
     },
     markIcon () {
       if (this.success) {
         return 'success'
+      } else if (this.fail) {
+        return 'close'
       }
     },
     iconSize () {
-      if (this.small) {
+      if (this.large) {
+        return 32
+      } else if (this.small) {
         return 12
       } else {
         return 20
@@ -58,6 +76,17 @@ export default {
     color: #fff;
     &.success {
       background-color: @successColor; 
+    }
+    &.fail {
+      background-color: @dangerColor;
+    }
+    &.large {
+      width: 48px;
+      height: 48px;
+    }
+    &.small {
+      width: 18px;
+      height: 18px;
     }
   }
 }
