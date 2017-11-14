@@ -116,8 +116,9 @@ Vue.filter('formDate', function (t, type = 1) {
   // filter type
   // 1 日期带时分秒
   // 2 距离现在过去多久
-  // 3 24小时显示内距离现在过去多久,24小时以上显示日期不带时分秒
+  // 3 24小时显示内距离现在过去多久，24小时以上显示日期不带时分秒
   // 4 年月日
+  // 5 年月日，当天日期显示“今天”
 
   const timeSpan = t * 1000
   const dateTime = new Date(parseInt(timeSpan))
@@ -134,6 +135,16 @@ Vue.filter('formDate', function (t, type = 1) {
     return year + '-' + month + '-' + day + ' ' + hour + ':' + minute
   } else if (type === 4) {
     return year + '-' + month + '-' + day
+  } else if (type === 5) {
+    const _d = new Date()
+    const _year = _d.getFullYear()
+    const _month = _d.getMonth() + 1
+    const _day = _d.getDate()
+    if (year === _year && month === _month && day === _day) {
+      return '今天'
+    } else {
+      return year + '-' + month + '-' + day
+    }
   } else {
     const now = new Date()
     const nowNew = Date.parse(now)

@@ -2,7 +2,7 @@
   <div class="cpt-media-item">
     <div v-if="manageBar" class="manage-bar" @click="toggleManageBar">
       <div class="row">
-        <div class="date label">{{ data.createTimeStamp | formDate(4) }}</div>
+        <div class="date label">{{ data.createTimeStamp | formDate(5) }}</div>
         <cpt-icon :value="arrowIcon"></cpt-icon>
       </div>
     </div>
@@ -207,10 +207,14 @@ export default {
       height: 40px;
       cursor: pointer;
       .date {
-        font-family: 'DIN';
-        font-size: 20px;
+        // font-family: 'DIN';
+        // font-size: 20px;
+        font-size: 16px;
+        font-weight: 600;
       }
       .iconfont {
+        position: relative;
+        top: 1px;
         color: fade(@textColor, 60%);
       }
     }
