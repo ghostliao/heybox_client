@@ -49,11 +49,11 @@
               <cpt-button label="启动游戏" primary @click="launchGame" :param1="data.gameId"></cpt-button>
             </div>
             <template v-if="optState === 0">
-              <div class="layer opt" v-for="(i, index) in data.supportLevels" :key="index" v-show="optLevel === i.configLevel">
+              <div class="layer opt" v-for="(i, index) in data.supportLevels" :key="index" v-show="optLevel === Number(i.configLevel)">
                 <div class="title">{{ i.levelName }}</div>
                 <div class="desc">{{ i.levelDesc }}</div>
-                <cpt-button v-if="currentOptLevel === i.configLevel" label="已优化" secondary disabled small></cpt-button>
-                <cpt-button v-else label="开始优化" primary small @click="optimizeConfirm(i.configLevel)"></cpt-button>
+                <cpt-button v-if="currentOptLevel === Number(i.configLevel)" label="已优化" secondary disabled small></cpt-button>
+                <cpt-button v-else label="开始优化" primary small @click="optimizeConfirm(Number(i.configLevel))"></cpt-button>
               </div>
               <div class="layer opt" v-if="optRecommandLevel">
                 <div class="title">{{ data.supportLevels[1].levelName }}</div>
@@ -75,14 +75,14 @@
         <div class="options">
           <cpt-button v-for="(i, index) in data.supportLevels"
             :key="index" 
-            v-if="i.configLevel !== '2'"
+            v-if="Number(i.configLevel) !== 2"
             :label="i.levelName" 
-            :secondary="optLevel === i.configLevel ? false : true" 
-            :primary="optLevel === i.configLevel ? true : false" 
+            :secondary="optLevel === Number(i.configLevel) ? false : true" 
+            :primary="optLevel === Number(i.configLevel) ? true : false" 
             small 
-            :success="currentOptLevel === i.configLevel" 
-            :icon="currentOptLevel === i.configLevel ? 'check-fill' : ''"
-            @click="changeOptType({ level: i.configLevel })">
+            :success="currentOptLevel === Number(i.configLevel)" 
+            :icon="currentOptLevel === Number(i.configLevel) ? 'check-fill' : ''"
+            @click="changeOptType({ level: Number(i.configLevel) })">
           </cpt-button>
           <cpt-button v-if="data.recommand_level"
             label="推荐配置" 
@@ -229,48 +229,39 @@ export default {
       this.optimizing = true
       console.log(gameId, optLevel)
 
-      // maxjia.store.games.optimizeGameWithLevel(gameId, optLevel, res => {
-      //   console.log(res)
-      //   if (res.result) { // 优化成功回调
+      // engine
+      this.gameOptimize({
+        fileName: 'engine',
+        filePath: this.data.enginePath,
+        gameId: gameId,
+        level: optLevel,
+        callback: () => {
+          console.log(`游戏 ${gameId} level ${optLevel} engine 配置成功`)
+        }
+      })
 
-          // engine
-          this.gameOptimize({
-            fileName: 'engine',
-            filePath: this.data.enginePath,
-            gameId: gameId,
-            level: optLevel,
-            callback: () => {
-              console.log(`游戏 ${gameId} level ${optLevel} engine 配置成功`)
-            }
-          })
-
-          // gameUserSettings
-          this.gameOptimize({
-            fileName: 'gameUserSettings',
-            filePath: this.data.gameUserSettingsPath,
-            gameId: gameId,
-            level: optLevel,
-            callback: () => {
-              console.log(`游戏 ${gameId} level ${optLevel} gameUserSettings配置成功`)
-            }
-          })
-        
-          setTimeout(() => {
-            if (this.optRecommandLevel) {
-              this.currentOptRecommandLevel = true
-              this.currentOptLevel = 0
-            } else {
-              this.currentOptLevel = this.optLevel
-              this.currentOptRecommandLevel = false
-            }
-            this.optState = 2
-            this.optimizing = false
-          }, 1000)
-
-        // } else {
-        //   // TODO
-        // }
-      // })
+      // gameUserSettings
+      this.gameOptimize({
+        fileName: 'gameUserSettings',
+        filePath: this.data.gameUserSettingsPath,
+        gameId: gameId,
+        level: optLevel,
+        callback: () => {
+          console.log(`游戏 ${gameId} level ${optLevel} gameUserSettings 配置成功`)
+        }
+      })
+    
+      setTimeout(() => {
+        if (this.optRecommandLevel) {
+          this.currentOptRecommandLevel = true
+          this.currentOptLevel = 0
+        } else {
+          this.currentOptLevel = this.optLevel
+          this.currentOptRecommandLevel = false
+        }
+        this.optState = 2
+        this.optimizing = false
+      }, 1000)
 
     },
     changeOptType (config) {
@@ -283,18 +274,25 @@ export default {
         // }
         for (let i = 0; i < this.data.supportLevels.length; i++) {
           const el = this.data.supportLevels[i]
-          if (el.configLevel === config.level) {
+          if (Number(el.configLevel) === Number(config.level)) {
             this.previewAfterImg = this.data.supportLevels[i].image
             this.previewBeforeImg = this.data.supportLevels[i].originalImage
           }
         }
+
+        // 记录用户上次选择的优化方案
+        let gameJSON = JSON.parse(localStorage.getItem(this.data.gameId))
         if (config.recommand) {
           this.optRecommandLevel = true
           this.optLevel = 0
+          gameJSON.recommend = true
         } else {
           this.optLevel = config.level
           this.optRecommandLevel = false
+          gameJSON.optLevel = Number(config.level)
+          gameJSON.recommend = false          
         }
+        localStorage.setItem(this.data.gameId, JSON.stringify(gameJSON))
         this.optState = 0
       }
     },
@@ -304,7 +302,18 @@ export default {
     }
   },
   created () {
-    
+    // 显示用户上次选择的优化方案
+    const local = localStorage.getItem(this.data.gameId)
+    if (local) {
+      const gameJSON = JSON.parse(local)
+      console.log(gameJSON)
+      if (gameJSON.recommend) {
+        this.currentOptRecommandLevel = true
+      } else if (gameJSON.optLevel) {
+        this.currentOptLevel = gameJSON.optLevel
+        this.currentOptRecommandLevel = false        
+      }
+    }
   },
   mounted () {
     // this.gameOptimize({
