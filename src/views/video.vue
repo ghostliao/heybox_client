@@ -167,7 +167,7 @@ export default {
     display: flex;
     height: 54px;
     border-bottom: 1px solid @layoutBorderColor;
-    margin-bottom: 16px;
+    margin-bottom: 2px;
     > li {
       position: relative;
       top: 1px;

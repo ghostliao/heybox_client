@@ -1,5 +1,7 @@
 <template>
   <div class="view-game">
+    <template v-if="$store.state.config.dev">
+
     <div class="toolbar">
       <div class="wrap">
         <cpt-block-button :text="'亚洲服务器'" ref="acceleratorMenuButton" @click="acceleratorMenuToggle">
@@ -20,9 +22,12 @@
         </cpt-popover>
 
         <cpt-block-button icon="accelerator-fill" text="一键加速"></cpt-block-button>
+        <cpt-block-button buttonClass="set" icon="set-fill" @click="$router.push({ name: 'settings-accelerator' })"></cpt-block-button>
 
       </div>
     </div>
+
+    </template>
     <div class="title-bar">
       <div class="title">游戏库</div>
       <!-- <cpt-button icon="add-fill" label="添加游戏" secondary small @click="manuallySelectGameDir"></cpt-button> -->
@@ -159,7 +164,8 @@ export default {
       const url = '/tools/games/pc/games/optimize'
       const options = {
         params: {
-          game_ids: ids
+          game_ids: ids,
+          heybox_id: this.$store.state.accountInfo.uid
         }
       }
       this.$ajax(url, options).then(res => {
@@ -169,6 +175,12 @@ export default {
           // 检查游戏配置文件
           for (let i = 0, len = this.installedGames.length; i < len; i++) {
             let item = this.installedGames[i]
+            
+            // 设置推荐config level
+            if (data[item.gameId].recommand_level) {
+              this.$set(item, 'recommand_level', data[item.gameId].recommand_level)
+            }
+
             const ver = data[item.gameId].file_version
             if (ver > 0) {
               const localGameInfo = JSON.parse(localStorage.getItem(item.gameId)) // 读本地游戏配置文件
@@ -245,14 +257,16 @@ export default {
     })
   },
   mounted () {
-    this.acceleratorMenuTrigger = this.$refs.acceleratorMenuButton.$el
+    if (this.$store.state.config.dev) { // dev !!!!!!!!!!!!!!!
+      this.acceleratorMenuTrigger = this.$refs.acceleratorMenuButton.$el
+    }
   }
 }
 </script>
 <style lang="less">
 @import "../styles/import.less";
 .view-game {
-  padding: 24px 40px;
+  padding: 6px 40px 24px;
   .toolbar {
     margin-bottom: 16px;
     > .wrap {

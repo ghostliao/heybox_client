@@ -2,7 +2,7 @@
 <abstract-button @click="handleClick"
   @hover="handleHover" @hoverExit="handleHoverExit" @keyboardFocus="handleKeyboardFocus"
   :to="to" :tag="tag" :activeClass="activeClass" :event="event" :exact="exact" :append="append" :replace="replace"
-  :type="type" :href="href" :target="target" :disabled="disabled" :keyboardFocused="keyboardFocused" wrapperClass="icon-wrap" :style="buttonStyle" class="mu-icon-button" :danger="danger">
+  :type="type" :href="href" :target="target" :disabled="disabled" :keyboardFocused="keyboardFocused" wrapperClass="icon-wrap" :style="buttonStyle" class="mu-icon-button" :danger="danger" :success="success">
   <slot>
     <icon :value="icon" :class="iconClass" :size="iconSize"></icon>
   </slot>
@@ -59,6 +59,10 @@ export default {
       default: false
     },
     danger: {
+      type: Boolean,
+      default: false
+    },
+    success: {
       type: Boolean,
       default: false
     }
@@ -155,6 +159,9 @@ export default {
     &:active {
       color: @dangerActiveColor;
     }
+  }
+  &.success {
+    color: @successColor;
   }
   &.disabled{
     color: @disabledColor;
