@@ -1,5 +1,5 @@
 <template>
-  <div class="cpt-media-item">
+  <div class="cpt-media-item" :class="mediaItemStyle">
     <div v-if="manageBar" class="manage-bar" @click="toggleManageBar">
       <div class="row">
         <div class="date label">{{ data.createTimeStamp | formDate(5) }}</div>
@@ -59,9 +59,9 @@
     <!-- S delete confirm dialog -->
     <cpt-dialog :open="deleteDialog" title="" @close="closeDeleteDialog" @hide="closeDeleteDialog" dialogClass="delete-dialog" :overlayOpacity="0.8" cornerClose>
       <div slot="title" class="title">删除</div>
-      <div class="content">确认删除所选文件/分组吗？</div>
-      <cpt-button slot="actions" label="取消" @click="closeDeleteDialog" secondary narrow />
-      <cpt-button slot="actions" label="确认" @click="_deleteMedia" :param1="data.localId" primary narrow />
+      <div class="content">确认删除所选文件吗？</div>
+      <cpt-button slot="actions" label="取消" @click="closeDeleteDialog" secondary />
+      <cpt-button slot="actions" label="确认" @click="_deleteMedia" :param1="data.localId" primary />
     </cpt-dialog>
     <!-- E delete confirm dialog -->
   </div>
@@ -78,6 +78,10 @@ export default {
   props: {
     data: {
       type: Object
+    },
+    mediaItemStyle: {
+      type: [Object, Array, String],
+      default: 'block'
     },
     manageBar: {
       type: Boolean,
@@ -178,9 +182,21 @@ export default {
       const month = dateTime.getMonth() + 1
       const day = dateTime.getDate()
       return `${year}-${month}-${day}`
+    },
+    firstUploadNotice () { // 首次上传成功后提示
+      if (localStorage.getItem('firstUpload') !== '1') {
+        this.$watch('data.uploadFinished', (newValue, oldValue) => {
+          if (localStorage.getItem('firstUpload') !== '1' && oldValue === false && newValue === true) {
+            localStorage.setItem('firstUpload', 1)
+            this.$emit('firstUpload')
+          }
+        })
+
+      }
     }
   },
   created () {
+    this.firstUploadNotice()
     Bus.$on('toggleManageBar', data => {
       if (data[0] === this.data.createTimeStamp) { // media item 组件自己
         return

@@ -2,9 +2,26 @@
   <div class="view-video-lib">
     <media-file-man @updateVideoList="updateVideoList"></media-file-man>
     <div class="media-list">
-      <div v-show="mediaList.length <= 0" class="notice">暂无媒体文件</div>
-      <cpt-media-item v-for="(i, index) of mediaList" :data="i" :key="i.localId" :manageBar="hasManageBar(mediaList, index)"></cpt-media-item>
+      <transition name="fade" mode="out-in">
+        <div v-if="loading" key="loading" class="progress">
+          <cpt-circular-progress :size="40" />
+        </div>
+        <div v-if="!loading && mediaList.length <= 0" key="notice" class="notice">暂无媒体文件</div>
+        <div v-if="!loading && mediaList.length > 0" key="list" class="list">
+          <cpt-media-item v-for="(i, index) of mediaList" :data="i" :key="i.localId" mediaItemStyle="line" :manageBar="hasManageBar(mediaList, index)" @firstUpload="firstUpload"></cpt-media-item>
+        </div>
+      </transition>
     </div>
+    <!-- S first upload notice dialog -->
+    <cpt-dialog :open="firstUploadNoticeDialog" title="" @close="closeFirstUploadNoticeDialog" @hide="closeFirstUploadNoticeDialog" dialogClass="msg-dialog" :overlayOpacity="0.8" cornerClose>
+      <div class="first-upload-notice-dialog">
+        <cpt-mark success large></cpt-mark>
+        <div class="msg">上传成功！</div>
+        <div class="desc">审核通过后将会同步至您的小黑盒账号中</div>
+        <cpt-button label="知道了" @click="closeFirstUploadNoticeDialog" secondary />
+      </div>
+    </cpt-dialog>
+    <!-- E first upload notice dialog -->
   </div>
 </template>
 
@@ -14,6 +31,7 @@
 // 按时间戳排序
 // video image 列表更新时
 
+import cptCircularProgress from '@/components/circularProgress'
 import mediaFileMan from '@/components/media-file-man'
 import cptMediaItem from '@/components/media-item'
 import videoFile from '@/components/videoFile'
@@ -23,12 +41,15 @@ export default {
   name: "view-video-lib",
   mixins: [videoFile, imageFile],
   components: {
+    'cpt-circular-progress': cptCircularProgress,
     'media-file-man': mediaFileMan,
     'cpt-media-item': cptMediaItem
   },
   data () {
     return {
-      mediaList: []
+      loading: true,
+      mediaList: [],
+      firstUploadNoticeDialog: false
     }
   },
   computed: {
@@ -55,6 +76,7 @@ export default {
       }
       this.mediaList = videoList.concat(imageList)
       this.sortMediaList()
+      this.loading = false
     },
     sortMediaList () {
       this.mediaList.sort(sortBy('createTimeStamp'))
@@ -103,6 +125,16 @@ export default {
       const month = dateTime.getMonth() + 1
       const day = dateTime.getDate()
       return `${year}-${month}-${day}`
+    },
+    firstUpload () {
+      console.log('firstUpload')
+      this.openFirstUploadNoticeDialog()
+    },
+    openFirstUploadNoticeDialog () {
+      this.firstUploadNoticeDialog = true
+    },
+    closeFirstUploadNoticeDialog () {
+      this.firstUploadNoticeDialog = false
     }
   },
   mounted () {
@@ -115,17 +147,56 @@ export default {
 @import "../../styles/import.less";
 .view-video-lib {
   .media-list {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     // max-width: 1072px;
     margin: auto;
+    .progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
     .notice {
-      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
       text-align: center;
       font-size: 14px;
-      line-height: 60px;
       color: @secondaryTextColor;
     }
+    .list {
+      width: 100%;
+    }
+  }
+}
+
+.first-upload-notice-dialog {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: @dialogHeight;
+  line-height: 22px;
+  .msg {
+    font-size: 16px;
+    color: @textColor;
+    margin-top: 12px;
+  }
+  .desc {
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 12px;
   }
 }
 </style>
