@@ -41,7 +41,7 @@
         <div class="progress-msg" v-show="data.uploadFailed">上传失败</div>
       </div>
       <div class="col col-5">
-        <div class="btn-group">              
+        <div class="btn-group">
           <div class="btn">
             <cpt-icon-button icon="delete-fill" :iconSize="16" @click.stop="deleteMedia" danger></cpt-icon-button>
           </div>
@@ -64,20 +64,38 @@
       <cpt-button slot="actions" label="确认" @click="_deleteMedia" :param1="data.localId" primary />
     </cpt-dialog>
     <!-- E delete confirm dialog -->
+
+    <!-- S upload guide toast -->
+    <transition name="fade">
+      <div v-if="index === 0 && guideToast" class="guide-toast" ref="toast" v-clickoutside="closeGuideToast">
+        <div class="wrap">
+          <div class="msg">点击上传，同步精彩时刻至小黑盒APP</div>
+          <cpt-icon-button icon="close" @click="closeGuideToast"></cpt-icon-button>
+        </div>
+      </div>
+    </transition>
+    <!-- E upload guide toast -->
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
 import Bus from '@/components/bus'
+import clickoutside from '@/components/internal/clickoutside'
 
 export default {
   name: "cpt-media-item",
   components: {
   },
+  directives: {
+    clickoutside
+  },
   props: {
     data: {
       type: Object
+    },
+    index: {
+      type: Number
     },
     mediaItemStyle: {
       type: [Object, Array, String],
@@ -91,6 +109,7 @@ export default {
   data () {
     return {
       deleteDialog: false,
+      guideToast: false,
       manageBarOpen: true
     }
   },
@@ -193,9 +212,19 @@ export default {
         })
 
       }
+    },
+    closeGuideToast () {
+      this.guideToast = false
+      localStorage.setItem('uploadGuide', 1)
+    },
+    uploadGuide () { // 上传引导
+      if (localStorage.getItem('uploadGuide') !== '1') {
+        this.guideToast = true
+      }
     }
   },
   created () {
+    this.uploadGuide()
     this.firstUploadNotice()
     Bus.$on('toggleManageBar', data => {
       if (data[0] === this.data.createTimeStamp) { // media item 组件自己
@@ -207,6 +236,7 @@ export default {
   },
   mounted () {
     // console.log(this.data)
+    
   }
 }
 
@@ -214,6 +244,7 @@ export default {
 <style lang="less">
 @import "../../styles/import.less";
 .cpt-media-item {
+  position: relative;
   width: 100%;
   .manage-bar {
     padding-top: 12px;
@@ -247,7 +278,6 @@ export default {
     // box-shadow: inset 0 0 0 1px #151A20;
     margin-bottom: 2px;
     cursor: pointer;
-    overflow: hidden;
     &:hover {
       // background: #292D34;
       background: fade(#fff, 10%);
@@ -285,11 +315,13 @@ export default {
         overflow: hidden;
         background-size: cover;
         img {
-          position: absolute;
-          top: 0;
-          left: 50%;
-          transform: translateX(-50%);
+          // position: absolute;
+          // top: 0;
+          // left: 50%;
+          // transform: translateX(-50%);
+          width: 100%;
           height: 100%;
+          object-fit: cover;
         }
       }
       .layer {
@@ -393,6 +425,7 @@ export default {
         padding-right: 15px;
         justify-content: flex-end;
         .btn {
+          position: relative;
           // width: 14px;
           // height: 14px;
           margin: 0 3px;
@@ -409,6 +442,42 @@ export default {
         .layer {
           opacity: 1;
         }
+      }
+    }
+  }
+  .guide-toast {
+    position: absolute;
+    right: 31px;
+    bottom: 54px;
+    width: 400px;
+    height: 56px;
+    .wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      background: fade(@primaryColor, 80%);
+      color: #fff;
+      &:after {
+        content: '';
+        position: absolute;
+        right: 16px;
+        bottom: -10px;
+        border-top: 10px solid fade(@primaryColor, 80%);
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+      }
+    }
+    .msg {
+      flex: 1;
+      min-width: 0;
+    }
+    .cpt-icon-button {
+      color: fade(@textColor, 60%);
+      &:hover, &:active {
+        color: #fff;
       }
     }
   }
