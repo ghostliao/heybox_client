@@ -10,8 +10,9 @@ const v = Vue.prototype
 
 const state = {
   config: {
-    env: 'test',
-    dev: false
+    ver: 'BETA 0.1.1d',
+    env: 'test', // test | prod
+    dev: true
   },
 
   routerName: 'game',

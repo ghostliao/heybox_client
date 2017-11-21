@@ -1,9 +1,6 @@
 import router from '@/router'
 
 export default {
-  SET_GAMETYPE (state, gameType) {
-    localStorage.setItem('ACTIVEGAME', gameType)
-  },
   // S 客户端全局接口
   NAVIGATE_TO_PAGE (state, obj) {
     console.log('navigateToPage:' + obj.page)

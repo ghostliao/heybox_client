@@ -1,7 +1,3 @@
-export const setGameType = ({ commit }, gameType) => {
-  commit('SET_GAMETYPE', gameType)
-}
-
 export const navigateToPage = ({ commit }, obj) => {
   commit('NAVIGATE_TO_PAGE', obj)
 }

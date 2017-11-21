@@ -175,11 +175,11 @@ export default {
       }
     }
   },
-  // watch: {
-  //   data (value) {
-  //     this.gameInfo = value
-  //   }
-  // },
+  watch: {
+    data (value) {
+      this.pubgFullscreenHandler()
+    }
+  },
   methods: {
     launchGame (gameId) {
       this.launching = true
@@ -299,6 +299,22 @@ export default {
     optimizeConfirm (level) {
       this.optState = 1
       this.optimizeGame(this.data.gameId, level)
+    },
+    // pubg强制设置全屏
+    pubgFullscreenHandler () {
+      if (this.data.gameId === 10410005 && this.data.gameUserSettingsPath) {
+        const filePath = this.data.gameUserSettingsPath
+        // this._readFile(filePath).then(data => {
+        //   // console.log(data)
+        //   const str = data.content
+        //   console.log(str.match(/FullscreenMode=\d/))
+        // })
+        this.readINI(filePath).then(data => {
+          data['/Script/TslGame.TslGameUserSettings']['FullscreenMode'][0].v = '1'
+          this._writeFile(data, filePath)
+          console.log('全屏参数设置项更改')
+        })
+      }
     }
   },
   created () {
@@ -306,7 +322,7 @@ export default {
     const local = localStorage.getItem(this.data.gameId)
     if (local) {
       const gameJSON = JSON.parse(local)
-      console.log(gameJSON)
+      // console.log(gameJSON)
       if (gameJSON.recommend) {
         this.currentOptRecommandLevel = true
       } else if (gameJSON.optLevel) {
@@ -314,6 +330,7 @@ export default {
         this.currentOptRecommandLevel = false        
       }
     }
+
   },
   mounted () {
     // this.gameOptimize({
