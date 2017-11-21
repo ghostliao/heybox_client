@@ -1,5 +1,5 @@
 <template>
-  <div class="app-header" ref="drag">
+  <div class="app-header">
     <div class="app-header-wrap">
       <div class="logo-wrap">
         <div class="logo" ref="mainMenuButton" @click="mainMenuToggle"></div>
@@ -16,7 +16,7 @@
             </div>
             <cpt-divider light />
             <cpt-menu-item title="设置" @click="mainGoToPage({ name: 'settings'})" />
-            <cpt-menu-item title="召唤Dock" @click="showDock" />
+            <cpt-menu-item title="召唤浮窗" @click="showDock" />
             <!-- <cpt-menu-item title="关于小黑盒" /> -->
             <cpt-divider light />
             <cpt-menu-item title="切换用户" @click="switchUser" />
@@ -33,12 +33,13 @@
             </router-link>
             <span class="tab-link-highlight" ref="highlight"></span>
           </ul>
+          <div class="drag" ref="drag"></div>
         </div>
         <template v-if="$store.state.config.env === 'test'">
           <!-- <div class="tab-btn">
             <cpt-icon-button icon="previous-thin" :iconSize="20" @click="$router.go(-1)"></cpt-icon-button>
           </div> -->
-          <div class="tab-btn">{{ $store.state.config.ver }}</div>
+          <div class="tab-btn" v-if="$store.state.config.env === 'test'">{{ $store.state.config.ver }}</div>
           <div class="tab-btn" v-if="$store.state.config.dev">
             <cpt-icon-button icon="reload-thin" :iconSize="20" @click="routeReload"></cpt-icon-button>
           </div>
@@ -319,6 +320,10 @@ export default {
             transform: translate3d(0, 0, 0);
             backface-visibility: hidden;
           }
+        }
+        .drag {
+          flex: 1;
+          min-width: 0;
         }
       }
       .account {
