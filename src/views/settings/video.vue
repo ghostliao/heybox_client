@@ -1,7 +1,7 @@
 <template>
   <div class="view-settings-video">
     <div class="wrapper">
-      <cpt-set-block-head title="录制设置"></cpt-set-block-head>
+      <cpt-set-block-head title="设置"></cpt-set-block-head>
       <div class="body">
         <cpt-set-block title="路径设置">
           <div class="setting-row path">
@@ -25,16 +25,18 @@
             </div>
           </div>
         </cpt-set-block>
+
         <cpt-set-block title="热键设置">
           <cpt-set-shortcut label="开始/停止视频录制" name="Video.CaptureVideo" app="Video" hotkeyKey="captureVideo"></cpt-set-shortcut>
           <cpt-set-shortcut label="保存精彩时刻" name="Video.Save30Moment" app="Video" hotkeyKey="save30Moment"></cpt-set-shortcut>
           <cpt-set-shortcut label="截屏" name="Video.CaptureImage" app="Video" hotkeyKey="captureImage"></cpt-set-shortcut>
-          <cpt-set-shortcut label="Dock显示" name="Dock.Show" app="Dock" hotkeyKey="dockShow">
+          <cpt-set-shortcut label="召唤浮窗" name="Dock.Show" app="Dock" hotkeyKey="dockShow">
             <!-- <span slot="desc">是否在打开任何游戏时都启动精彩时刻？</span> -->
           </cpt-set-shortcut>
-          <cpt-set-shortcut label="Overlay控制" name="Overlay.Control" app="Overlay" hotkeyKey="overlayControl"></cpt-set-shortcut>
-          <cpt-set-shortcut label="Overlay显示/隐藏" name="Overlay.ShowHide" app="Overlay" hotkeyKey="overlayShowHide"></cpt-set-shortcut>
-        </cpt-set-block>    
+          <cpt-set-shortcut label="游戏内浮窗控制" name="Overlay.Control" app="Overlay" hotkeyKey="overlayControl"></cpt-set-shortcut>
+          <cpt-set-shortcut label="游戏内浮窗显示/隐藏" name="Overlay.ShowHide" app="Overlay" hotkeyKey="overlayShowHide"></cpt-set-shortcut>
+        </cpt-set-block>
+
         <!-- <cpt-set-block title="启动设置">
           <cpt-set-switch label="录制精彩镜头" :switch="isVideoCaptureForMoment" @input="setIsVideoCaptureForMoment">
             <span slot="desc">desc</span>
@@ -43,17 +45,21 @@
             <span slot="desc">desc</span>
           </cpt-set-switch>
         </cpt-set-block>  -->
+
+        <cpt-set-block v-if="gameOverlaySettings.length > 0" title="游戏内浮窗开关">
+          <cpt-set-switch :label="i.gameName" v-for="i in gameOverlaySettings" :key="i.gameId" v-if="i.overlayEnabled" :data="i" :switch="i.overlayEnabled" @input="setGameOverlaySwitch">
+            <!-- <span slot="desc">desc</span> -->
+          </cpt-set-switch>
+        </cpt-set-block>
+
+        <cpt-set-block title="关于小黑盒">
+          <div class="setting-row info">
+            <div class="label-wrap">
+              <span class="label">当前版本：Heybox v{{clientVersion}}</span>
+            </div>
+          </div>
+        </cpt-set-block>
       </div>
-      <template v-if="gameOverlaySettings.length > 0">
-        <cpt-set-block-head title="Overlay设置"></cpt-set-block-head>
-        <div class="body">
-          <cpt-set-block title="">
-            <cpt-set-switch :label="i.gameName" v-for="i in gameOverlaySettings" :key="i.gameId" v-if="i.overlayEnabled" :data="i" :switch="i.overlayEnabled" @input="setGameOverlaySwitch">
-              <!-- <span slot="desc">desc</span> -->
-            </cpt-set-switch>
-          </cpt-set-block>
-        </div>
-      </template>
     </div>
   </div>
 </template>
@@ -81,7 +87,8 @@ export default {
       imageDir: '',
       isVideoCaptureForMoment: false,
       isAutoStartCaptureInGame: false,
-      gameOverlaySettings: []
+      gameOverlaySettings: [],
+      clientVersion: '999.0.0'
     }
   },
   methods: {
@@ -150,7 +157,13 @@ export default {
       // this.getIsVideoCaptureForMoment()
       this.getIsAutoStartCaptureInGame()
       this.getGameOverlaySettings()
+    },
+    getClientInfo () {
+      this.clientVersion = maxjia.maxapi.version
     }
+  },
+  created () {
+    this.getClientInfo()
   },
   mounted () {
     this.settingsInit()
@@ -185,6 +198,12 @@ export default {
   }
 }
 .setting-row {
+  min-height: 46px;
+  &.info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
   &.path {
     .label-wrap {
       line-height: 1;
