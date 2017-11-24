@@ -24,7 +24,7 @@ html, body {
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: fade(#f1f2f3, 20%);
+  background: fade(#f1f2f3, 20%) !important;
 }
 ::-webkit-scrollbar-corner {
   background: transparent;
@@ -109,8 +109,16 @@ img[lazy=error], img[lazy=loaded] {
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .3s
+  transition: opacity .3s;
 }
 .fade-enter, .fade-leave-to {
-  opacity: 0
+  opacity: 0;
+}
+
+.fade-rotate-enter-active, .fade-rotate-leave-active {
+  transition: opacity .5s, transform .5s;
+}
+.fade-rotate-enter, .fade-rotate-leave-to {
+  transform: rotate(90deg);
+  opacity: 0;
 }

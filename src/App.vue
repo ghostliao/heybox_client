@@ -9,7 +9,10 @@
       <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
     <!-- S video player -->
-    <cpt-dialog :open="videoPlayer" title="" @close="closeVideoPlayer" @hide="closeVideoPlayer" dialogClass="opt-dialog" :overlayOpacity="0.8" cornerClose :escPressClose="false">
+    <!-- <div id="video-close-button" class="video-close-button">
+      <cpt-icon value="close" :size="24"></cpt-icon>
+    </div> -->
+    <cpt-dialog :open="videoPlayer" title="" @close="closeVideoPlayer" @hide="closeVideoPlayer" dialogClass="video-player" :overlayOpacity="0.8" cornerClose :escPressClose="false">
       <div class="video-player-body">
         <div class="video-wrap">
           <!-- <video-player v-if="$store.state.videoPlayerOptions.src" -->
@@ -50,6 +53,8 @@
       </cpt-msg-dialog>
     </cpt-dialog>
     <!-- E msg dialog -->
+    
+    <cpt-feedback></cpt-feedback>
 
     <div class="font-preload">1</div>
   </div>
@@ -64,6 +69,7 @@ import { videoPlayer } from 'vue-video-player'
 import hotkeys from '@/components/hotkeys'
 import cptImageChecker from '@/components/image-checker'
 import cptMsgDialog from '@/components/msg-dialog'
+import cptFeedback from '@/components/feedback'
 
 export default {
   name: 'app',
@@ -73,7 +79,8 @@ export default {
     'video-player': videoPlayer,
     'app-header': appHeader,
     'cpt-image-checker': cptImageChecker,
-    'cpt-msg-dialog': cptMsgDialog
+    'cpt-msg-dialog': cptMsgDialog,
+    'cpt-feedback': cptFeedback
   },
   data () {
     return {
@@ -99,7 +106,6 @@ export default {
   },
   methods: {
     ...mapActions([
-      'setGameType',
       'navigateToPage',
       'playVideoFile',
       'closeVideoPlayer',
@@ -138,6 +144,7 @@ export default {
     }
   },
   created () {
+    // 客户端调用网页方法api
     const vm = this
     window.invokeHBJsGlobal = function (func, param) {
       if (typeof param === 'string') {
@@ -149,8 +156,6 @@ export default {
 
     const routeName = this.$route.name.split('-')[0]
     this.$store.state.routerName = routeName
-
-    this.setGameType('aaa')
   },
   mounted () {
     // console.log('this is current player instance object', this.player)
@@ -184,16 +189,30 @@ export default {
   margin-right: 2px;
 }
 
+// .video-close-button {
+//   display: none;
+//   position: fixed;
+//   z-index: @videoCloseButton;
+//   top: 75px;
+//   right: 15px;
+//   color: @lightIconColor;
+//   cursor: pointer;
+//   .common-transition;
+//   &:hover {
+//     color: @primaryColor;
+//   }
+// }
+
 .video-player-body {
   .video-wrap {
-    position: relative;
-    padding-top: 56.25%;
+    // position: relative;
+    // padding-top: 56.25%;
     .video-player {
       position: absolute;
-      top: 0;
+      top: 60px;
       left: 0;
       width: 100%;
-      height: 100%;
+      height: calc(~"100% - 60px");
       overflow: hidden;
     }
   }

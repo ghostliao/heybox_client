@@ -5,6 +5,8 @@
 @lighterPrimaryColor: @grey400;
 @darkerAccentColor: @grey100;
 
+@darkColor: #14191E;
+
 @accentColor: @pinkA200;
 
 @successColor: #32B846;
@@ -24,7 +26,7 @@
 @descColor: fade(@textColor, 20%);
 
 @lightBorderColor: #F1F2F3;
-@darkBorderColor: #14191E;
+@darkBorderColor: @darkColor;
 @layoutBorderColor: fade(@lightBorderColor, 10%);
 @blockBorderColor: fade(@darkBorderColor, 40%);
 @blockDividerColor: fade(@fullBlack, 20%);
@@ -38,12 +40,12 @@
 
 // background
 @backgroundColor: #20252F;
-@blockBackgroundColor: fade(#14191E, 60%);
+@blockBackgroundColor: fade(@darkColor, 60%);
 @textFieldBackgroundColor: fade(@fullBlack, 20%);
 @dialogBackgroundColor: fade(@textColor, 95%);
 @dialogHoverBackgroundColor: fade(@fullWhite, 50%);
-@dialogActiveBackgroundColor: fade(#14191E, 4%);
-@darkDialogBackgroundColor: fade(#292c34, 96%);
+@dialogActiveBackgroundColor: fade(@darkColor, 4%);
+@darkDialogBackgroundColor: fade(#292c34, 95%);
 @tooltipBackgroundColor: fade(@fullBlack, 95%);
 
 .primary-linear-gradient {
@@ -55,6 +57,9 @@
 
 // shadow
 @textShadow: 0 0 4px rgba(0, 0, 0, 0.2);
+
+// size
+@dialogHeight: 216px;
 
 // spacing
 @iconSize: 16px;
