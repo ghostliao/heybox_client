@@ -13,6 +13,8 @@ import viewHardwareStatus from '@/views/hardware/status'
 import viewSettings from '@/views/settings'
 import viewSettingsAccount from '@/views/settings/account'
 import viewSettingsVideo from '@/views/settings/video'
+import viewSettingsAccelerator from '@/views/settings/accelerator'
+import viewMessage from '@/views/message'
 
 import store from '../vuex/store'
 
@@ -148,6 +150,14 @@ export default new Router({
           meta: {
             keepAlive: true
           }
+        },
+        {
+          path: 'accelerator',
+          name: 'settings-accelerator',
+          component: viewSettingsAccelerator,
+          meta: {
+            keepAlive: true
+          }
         }
       ],
       redirect: to => {
@@ -157,6 +167,14 @@ export default new Router({
           name: name
         }
       },
+      meta: {
+        keepAlive: true
+      }
+    },
+    {
+      path: '/message',
+      name: 'message',
+      component: viewMessage,
       meta: {
         keepAlive: true
       }

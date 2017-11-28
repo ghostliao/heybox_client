@@ -35,6 +35,10 @@
           </ul>
           <div class="drag" ref="drag"></div>
         </div>
+
+        <div class="tab-btn" v-if="$store.state.config.dev">
+          <cpt-icon-button icon="message-fill" :iconSize="20" @click="$router.push({ name: 'message'})"></cpt-icon-button>
+        </div>
         <template v-if="$store.state.config.env === 'test'">
           <!-- <div class="tab-btn">
             <cpt-icon-button icon="previous-thin" :iconSize="20" @click="$router.go(-1)"></cpt-icon-button>
