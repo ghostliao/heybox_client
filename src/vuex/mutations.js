@@ -29,7 +29,11 @@ export default {
   },
   CHECK_IMAGE_FILE (state, obj) {
     // console.log('checkImageFile: ' + obj.file)
-    state.imageCheckerOptions.src = 'max-file://' + obj.file.replace(':', '')
+    if (obj.local) {
+      state.imageCheckerOptions.src = 'max-file://' + obj.file.replace(':', '')
+    } else {
+      state.imageCheckerOptions.src = obj.file
+    }
     state.imageChecker = true
   },
   CLOSE_IMAGE_CHECKER (state, obj) {

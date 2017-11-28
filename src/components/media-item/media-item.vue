@@ -160,6 +160,7 @@ export default {
       // console.log('check')
       const imageSource = url
       this.checkImageFile({
+        'local': true,
         'file': imageSource
       })
     },

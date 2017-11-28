@@ -6,14 +6,24 @@
           <img :src="adminAvatar">
         </div>
       </div>
-      <div class="fb-dialog-conversation-msg">
+      <div class="fb-dialog-conversation-msg" v-if="data.info_type === 'text'">
         <div>{{data.text}}</div>
+      </div>
+      <div class="fb-dialog-conversation-img" v-if="data.info_type === 'image'">
+        <div class="fb-dialog-conversation-status" v-show="!imageLoaded">
+          <cpt-circular-progress :size="24"></cpt-circular-progress>
+        </div>
+        <div class="fb-dialog-conversation-img-wrap" v-show="imageLoaded" ref="imageWrap">
+          <img :src="data.img.url" @load="onImageLoaded" @click="checkImage(data.img.url)" ref="image">
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   name: 'cpt-feedback-part',
   props: {
@@ -26,12 +36,25 @@ export default {
   },
   data () {
     return {
-
+      imageLoaded: false
     }
   },
   methods: {
-    
-    
+    ...mapActions([
+      'checkImageFile'
+    ]),
+    onImageLoaded () {
+      const h = this.$refs.image.naturalHeight
+      if (h < 138) {
+        this.$refs.imageWrap.style.height = h + 'px'
+      }
+      this.imageLoaded = true
+    },
+    checkImage (url) {
+      this.checkImageFile({
+        'file': url
+      })
+    }
   },
   created () {
 
@@ -91,5 +114,30 @@ export default {
   line-height: 20px;
   border-radius: 4px;
   word-wrap: break-word;
+}
+.fb-dialog-conversation-img {
+  
+}
+.fb-dialog-conversation-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 246px;
+  height: 138px;
+  background: #23282d;
+  border-radius: 4px;
+}
+.fb-dialog-conversation-img-wrap {
+  height: 138px;
+  padding: 2px;
+  background: #23282d;
+  border-radius: 4px;  
+  cursor: pointer;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+  }
 }
 </style>

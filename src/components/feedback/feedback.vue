@@ -24,8 +24,8 @@
               <div class="fb-dialog-admin-info">
                 <div class="fb-dialog-admin-avatar">
                   <div class="fb-dialog-admin-avatar-wrap">
-                    <img :src="adminAvatar">
-                    <!-- <img src="https://static.intercomassets.com/avatars/1156593/square_128/timg-1-1511335537.jpg?1511335537"> -->
+                    <!-- <img :src="adminAvatar"> -->
+                    <img src="http://cdn.max-c.com/@/heybox/imgs/e52c7a9444958b36a42a597543a9f9c9">
                   </div>
                 </div>
                 <div class="fb-dialog-admin-name">
@@ -43,7 +43,7 @@
               <div class="fb-dialog-conversation-wrap">
                 <template v-for="(i, index) of conversationList">
                   <div class="fb-dialog-conversation-time" :key="index" v-if="index === 0">{{filterFormDate(conversationList[0].create_at, 6)}}</div>
-                  <div class="fb-dialog-conversation-time" :key="index" v-show="conversationList[index - 1] && filterFormDate(conversationList[index - 1].create_at, 6) !== filterFormDate(conversationList[index].create_at, 6)">{{filterFormDate(i.create_at, 6)}}</div>
+                  <div class="fb-dialog-conversation-time" :key="index" v-if="conversationList[index - 1] && filterFormDate(conversationList[index - 1].create_at, 6) !== filterFormDate(conversationList[index].create_at, 6)">{{filterFormDate(i.create_at, 6)}}</div>
                   <cpt-feedback-part :key="index" :data="i" :adminAvatar="adminAvatar"></cpt-feedback-part>
                 </template>
               </div>
@@ -53,9 +53,9 @@
           <div class="fb-dialog-footer">
             <div class="fb-dialog-composer">
               <pre>{{composerContent}}<br></pre>
-              <textarea placeholder="写出你想说的话" spellcheck="false" v-model="composerContent" @keydown="keydown" ref="composer"></textarea>
+              <textarea placeholder="请尽可能详细的描述你的问题" spellcheck="false" v-model="composerContent" @keydown="keydown" ref="composer"></textarea>
               <div class="send">
-                <cpt-icon-button icon="optimization-fill" :iconSize="20" @click="sendMsg"></cpt-icon-button>
+                <cpt-icon-button icon="screenshot-fill" :iconSize="20" @click="uploadImage"></cpt-icon-button>
               </div>
             </div>
           </div>
@@ -66,6 +66,8 @@
 </template>
 
 <script>
+import { UploaderBuilder, Uploader } from 'qiniu4js'
+
 import cptFeedbackPart from './feedback-part'
 
 export default {
@@ -112,9 +114,8 @@ export default {
         this.loading = true
         const url = '/bbs/app/feedback/list'
         const options = {
-          withCredentials: false,
           params: {
-            'os_type': 'win',
+            'os_type': 'pc',
             'heybox_id': this.$store.state.accountInfo.uid,
             'offset': 0,
             'limit': 30
@@ -148,21 +149,49 @@ export default {
         }
       }
     },
-    sendMsg () {
+    sendMsg (imgUrl) {
       const msg = this.composerContent
-      if (msg === '') return
+      if (!imgUrl && msg === '') return
+
+      const timeStamp = new Date().getTime() / 1000
+      let item = {}
+      if (imgUrl) {
+        item = {
+          info_type: "image",
+          create_at: timeStamp,
+          is_user: 1,
+          text: msg,
+          img: {
+            url: imgUrl
+          },
+        }
+      } else {
+        item = {
+          info_type: "text",
+          create_at: timeStamp,
+          is_user: 1,
+          text: msg
+        }
+      }
+      this.conversationList.push(item)
+      console.log(item)
 
       const url = '/bbs/app/feedback/post'
-      const timeStamp = new Date().getTime() / 1000
-      const data = this.qs.stringify({
-        'text': msg,
-        // 'send_timestamp': timeStamp
-      })
+      let data = ''
+      if (imgUrl) {
+        data = this.qs.stringify({
+          'img_str': imgUrl
+        })
+      } else {
+        data = this.qs.stringify({
+          'text': msg,
+          // 'send_timestamp': timeStamp
+        })
+      }
       const options = {
         method: 'post',
-        withCredentials: false,
         params: {
-          'os_type': 'win',
+          'os_type': 'pc',
           'heybox_id': this.$store.state.accountInfo.uid
         },
         data: data
@@ -171,13 +200,7 @@ export default {
         console.log(res)
         const data = res.data
         if (data.status === 'ok') {
-          const item = {
-            create_at: timeStamp,
-            is_user: 1,
-            text: msg
-          }
-          this.conversationList.push(item)
-          console.log(item)
+          
         } else {
 
         }
@@ -189,10 +212,113 @@ export default {
     },
     scrollHandler () {
       this.$refs.scroll.scrollTop = this.$refs.wrap.clientHeight
+    },
+    uploadInit () {
+      const self = this
+      this.uploader = new UploaderBuilder()
+      .debug(true)//开启debug，默认false
+      .domain({http: "http://upload.qiniu.com", https: "https://up.qbox.me"})//默认为{http: "http://upload.qiniu.com", https: "https://up.qbox.me"}
+      .scheme("https")//默认从 window.location.protocol 获取，可以通过指定域名为 "http://img.yourdomain.com" 来忽略域名选择。
+      .retry(0)//设置重传次数，默认0，不重传
+      //.compress(0.5)//默认为1,范围0-1
+      //.scale([200,0])//第一个参数是宽度，第二个是高度,[200,0],限定高度，宽度等比缩放.[0,100]限定宽度,高度等比缩放.[200,100]固定长宽
+      .size(1024*1024)//分片大小，最多为4MB,单位为字节,默认3MB
+      .chunk(true)//是否分块上传，默认true，当chunk=true并且文件大于4MB才会进行分块上传
+      .auto(true)//选中文件后立即上传，默认true
+      .multiple(true)//是否支持多文件选中，默认true
+      .accept(['image/jpeg','image/png','image/gif'])//过滤文件，默认无，详细配置见http://www.w3schools.com/tags/att_input_accept.asp
+      .tokenShare(false)//在一次上传队列中，是否分享token,如果为false每上传一个文件都需要请求一次Token，默认true
+      .tokenFunc(function (setToken,task) {
+        //token获取函数，token获取完成后，必须调用`setToken(token);`不然上传任务不会执行。
+        //为每一个上传的文件指定key,如果不指定则由七牛服务器自行处理
+        const getTokenUrl = self.$store.state.origin[self.$store.state.config.env] + '/bbs/qiniu/web/token'
+        const data = self.qs.stringify({
+          'heybox_id': self.$store.state.accountInfo.uid
+        })
+        const options = {
+          method: 'post',
+          params: {
+            'os_type': 'web',
+            'app_id': 'heybox_web',
+            'heybox_id': self.$store.state.accountInfo.uid
+          },
+          data
+        }
+        self.$ajax(getTokenUrl, options).then((res) => {
+          console.log(res)
+          setToken(res.data.uptoken)
+        }).catch((res) => {
+          console.log(res)
+        })
+      })
+      // .saveKey(true)
+      //任务拦截器
+      .interceptor({
+        //拦截任务,返回true，任务将会从任务队列中剔除，不会被上传
+        onIntercept: function (task) {
+          console.log(task.file.size)
+          return task.file.size > 1024 * 1024 * 3;
+          // 最大3M
+        },
+        //中断任务，返回true，任务队列将会在这里中断，不会执行上传操作。
+        onInterrupt: function (task) {
+          if (this.onIntercept(task)) {
+            self.contentMsgUpdate("请上传小于3M的文件");
+            return true;
+          } else {
+            return false;
+          }
+        },
+      })
+      //你可以添加多个任务拦截器
+      //.interceptor({...})
+      .listener({
+        onReady (tasks) {
+          //该回调函数在图片处理前执行,也就是说task.file中的图片都是没有处理过的
+          //选择上传文件确定后,该生命周期函数会被回调。
+          // console.log(tasks)
+          console.log('upload ready')
+
+        }, onStart (tasks) {
+          //所有内部图片任务处理后执行
+          //开始上传
+          console.log('upload start')
+        }, onTaskGetKey (task,key) {
+          self.contentMsg = '图片上传中'          
+          // return
+        }, onTaskProgress (task) {
+          //每一个任务的上传进度,通过`task.progress`获取
+          console.log(task.progress);
+
+        }, onTaskSuccess (task) {
+          //一个任务上传成功后回调
+          //console.log(task.result.key);//文件的key
+          //console.log(task.result.hash);//文件hash
+          // self.contentMsgUpdate('上传成功')
+          console.log(task.result)
+          const res = task.result
+          // self.readFile(res.url, res.width, res.height)
+          self.sendMsg(res.url)
+
+        }, onTaskFail (task) {
+          //一个任务在经历重传后依然失败后回调此函数
+          self.contentMsgUpdate('上传失败')
+        }, onTaskRetry (task) {
+          //开始重传
+          console.log('upload retry')
+        }, onFinish (tasks) {
+          //所有任务结束后回调，注意，结束不等于都成功，该函数会在所有HTTP上传请求响应后回调(包括重传请求)。
+          console.log('upload finish')
+        }
+      }).build()
+    },
+    uploadImage () {
+      this.uploader.chooseFile()
     }
   },
   created () {
     // this.getConversationList()
+    this.uploadInit()
   },
   mounted () {
 
