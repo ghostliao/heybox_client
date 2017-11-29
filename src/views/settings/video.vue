@@ -47,7 +47,7 @@
         </cpt-set-block>  -->
 
         <cpt-set-block v-if="gameOverlaySettings.length > 0" title="游戏内浮窗开关">
-          <cpt-set-switch :label="i.gameName" v-for="i in gameOverlaySettings" :key="i.gameId" v-if="i.overlayEnabled" :data="i" :switch="i.overlayEnabled" @input="setGameOverlaySwitch">
+          <cpt-set-switch :label="i.gameName" v-for="i in gameOverlaySettings" :key="i.gameId" :data="i" :switch="i.overlayEnabled" @input="setGameOverlaySwitch">
             <!-- <span slot="desc">desc</span> -->
           </cpt-set-switch>
         </cpt-set-block>
@@ -56,6 +56,11 @@
           <div class="setting-row info">
             <div class="label-wrap">
               <span class="label">当前版本：Heybox v{{clientVersion}}</span>
+            </div>
+          </div>
+          <div class="setting-row info" v-if="$store.state.config.env === 'test'">
+            <div class="label-wrap">
+              <span class="label">WEB测试版本：{{ $store.state.config.ver }}</span>
             </div>
           </div>
         </cpt-set-block>
@@ -143,12 +148,12 @@ export default {
     // 是否启动overlay
     getGameOverlaySettings () {
       maxjia.settings.getGameOverlaySettings((data) => {
-        // console.log(data)
+        console.log(data)
         this.gameOverlaySettings = data.gameOverlaySettings
       })
     },
     setGameOverlaySwitch (params) {
-      // console.log(params)
+      console.log(params)
       maxjia.settings.setGameOverlaySwitch(params[1], params[2], params[0])
     },
     settingsInit () {

@@ -37,13 +37,15 @@
         </div>
 
         <div class="tab-btn" v-if="$store.state.config.dev">
-          <cpt-icon-button icon="message-fill" :iconSize="20" @click="$router.push({ name: 'message'})"></cpt-icon-button>
+          <div class="tab-btn-wrap">
+            <div class="notify" v-show="$store.state.newMessage"></div>
+            <cpt-icon-button icon="message-fill" :iconSize="20" @click="$router.push({ name: 'message'})"></cpt-icon-button>
+          </div>
         </div>
         <template v-if="$store.state.config.env === 'test'">
           <!-- <div class="tab-btn">
             <cpt-icon-button icon="previous-thin" :iconSize="20" @click="$router.go(-1)"></cpt-icon-button>
           </div> -->
-          <div class="tab-btn" v-if="$store.state.config.env === 'test'">{{ $store.state.config.ver }}</div>
           <div class="tab-btn" v-if="$store.state.config.dev">
             <cpt-icon-button icon="reload-thin" :iconSize="20" @click="routeReload"></cpt-icon-button>
           </div>
@@ -281,6 +283,20 @@ export default {
         align-items: center;
         width: 20px;
         margin-right: 20px;
+        .tab-btn-wrap {
+          position: relative;
+          font-size: 0;
+          .notify {
+            position: absolute;
+            z-index: 1;
+            top: 1px;
+            right: -2px;
+            width: 6px;
+            height: 6px;
+            background: @dangerColor;
+            border-radius: 50%;
+          }
+        }
       }
       .tabs-wrap {
         position: relative;

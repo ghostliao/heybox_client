@@ -70,6 +70,7 @@ import hotkeys from '@/components/hotkeys'
 import cptImageChecker from '@/components/image-checker'
 import cptMsgDialog from '@/components/msg-dialog'
 import cptFeedback from '@/components/feedback'
+import Bus from '@/components/bus'
 
 export default {
   name: 'app',
@@ -141,6 +142,17 @@ export default {
       // seek to 10s
       player.currentTime(0)
       // console.log('example 01: the player is readied', player)
+    },
+    // 新消息推送
+    notifyMessageArrived () {
+      console.log(this.$router)
+      console.log(this.$route)
+      maxjia.user.notifyMessageArrived.addListener(data => {
+        Bus.$emit('notifyMessageArrived')
+        if (this.$route.name !== 'message') {
+          this.$store.state.newMessage = true
+        }
+      })
     }
   },
   created () {
@@ -153,9 +165,10 @@ export default {
         eval("vm." + func + "(" + JSON.stringify(param) + ")")
       }
     }
-
     const routeName = this.$route.name.split('-')[0]
     this.$store.state.routerName = routeName
+
+    this.notifyMessageArrived()
   },
   mounted () {
     // console.log('this is current player instance object', this.player)

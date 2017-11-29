@@ -25,7 +25,8 @@
 </template>
 
 <script>
-import {cptSetBlock, cptSetBlockHead} from "@/components/set-block"
+import {cptSetBlock, cptSetBlockHead} from '@/components/set-block'
+import Bus from '@/components/bus'
 
 export default {
   name: "view-message",
@@ -57,6 +58,9 @@ export default {
   },
   created () {
     this.getMessageList()
+    Bus.$on('notifyMessageArrived', data => {
+      this.getMessageList()      
+    })
   }
 }
 </script>
