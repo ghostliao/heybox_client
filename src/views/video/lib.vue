@@ -8,7 +8,10 @@
         </div>
         <div v-if="!loading && mediaList.length <= 0" key="notice" class="notice">暂无媒体文件</div>
         <div v-if="!loading && mediaList.length > 0" key="list" class="list">
-          <cpt-media-item v-for="(i, index) of mediaList" :data="i" :key="i.localId" mediaItemStyle="line" :manageBar="hasManageBar(mediaList, index)" @firstUpload="firstUpload"></cpt-media-item>
+          <template v-for="(i, index) of mediaList">
+            <cpt-manage-bar :key="index" :data="i" v-if="hasManageBar(mediaList, index)"></cpt-manage-bar>
+            <cpt-media-item :key="index" :data="i" :index="index" :mediaItemStyle="$store.state.mediaListShowType" @firstUpload="firstUpload"></cpt-media-item>
+          </template>
         </div>
       </transition>
     </div>
@@ -16,7 +19,7 @@
     <cpt-dialog :open="firstUploadNoticeDialog" title="" @close="closeFirstUploadNoticeDialog" @hide="closeFirstUploadNoticeDialog" dialogClass="msg-dialog" :overlayOpacity="0.8" cornerClose>
       <div class="first-upload-notice-dialog">
         <cpt-mark success large></cpt-mark>
-        <div class="msg">上传成功！</div>
+        <div class="msg">上传成功</div>
         <div class="desc">审核通过后将会同步至您的小黑盒账号中</div>
         <cpt-button label="知道了" @click="closeFirstUploadNoticeDialog" secondary />
       </div>
@@ -33,7 +36,7 @@
 
 import cptCircularProgress from '@/components/circularProgress'
 import mediaFileMan from '@/components/media-file-man'
-import cptMediaItem from '@/components/media-item'
+import {cptManageBar, cptMediaItem} from '@/components/media-item'
 import videoFile from '@/components/videoFile'
 import imageFile from '@/components/imageFile'
 
@@ -43,6 +46,7 @@ export default {
   components: {
     'cpt-circular-progress': cptCircularProgress,
     'media-file-man': mediaFileMan,
+    'cpt-manage-bar': cptManageBar,
     'cpt-media-item': cptMediaItem
   },
   data () {
@@ -148,8 +152,6 @@ export default {
 .view-video-lib {
   .media-list {
     position: relative;
-    display: flex;
-    flex-wrap: wrap;
     // max-width: 1072px;
     margin: auto;
     .progress {
@@ -176,6 +178,8 @@ export default {
       color: @secondaryTextColor;
     }
     .list {
+      display: flex;
+      flex-wrap: wrap;
       width: 100%;
     }
   }

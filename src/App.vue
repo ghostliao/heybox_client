@@ -169,6 +169,11 @@ export default {
     this.$store.state.routerName = routeName
 
     this.notifyMessageArrived()
+
+    const mediaListShowType = localStorage.getItem('mediaListShowType')
+    if (mediaListShowType) {
+      this.$store.state.mediaListShowType = mediaListShowType
+    }
   },
   mounted () {
     // console.log('this is current player instance object', this.player)
