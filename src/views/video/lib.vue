@@ -1,7 +1,7 @@
 <template>
   <div class="view-video-lib">
     <media-file-man @updateVideoList="updateVideoList"></media-file-man>
-    <div class="media-list">
+    <div class="media-list" :class="filterClass">
       <transition name="fade" mode="out-in">
         <div v-if="loading" key="loading" class="progress">
           <cpt-circular-progress :size="40" />
@@ -10,7 +10,7 @@
         <div v-if="!loading && mediaList.length > 0" key="list" class="list">
           <template v-for="(i, index) of mediaList">
             <cpt-manage-bar :key="index" :data="i" v-if="hasManageBar(mediaList, index)"></cpt-manage-bar>
-            <cpt-media-item :key="index" :data="i" :index="index" :mediaItemStyle="$store.state.mediaListShowType" @firstUpload="firstUpload"></cpt-media-item>
+            <cpt-media-item :key="index" :data="i" :index="index" :mediaItemStyle="$store.state.mediaListShowType" @firstUpload="firstUpload" :mediaItemShow="mediaItemShow(i)"></cpt-media-item>
           </template>
         </div>
       </transition>
@@ -56,8 +56,22 @@ export default {
       firstUploadNoticeDialog: false
     }
   },
+  props: {
+    viewParams: {
+      type: Object
+    }
+  },
   computed: {
-    
+    filterClass () {
+      return {
+        'file-type-all': this.viewParams.fileType === 'all',
+        'file-type-video': this.viewParams.fileType === 'video',
+        'file-type-image': this.viewParams.fileType === 'image',
+        'moment-all': this.viewParams.moment === 'all',
+        'moment-kill': this.viewParams.moment === 'kill',
+        'moment-dead': this.viewParams.moment === 'dead'
+      }
+    }
   },
   methods: {
     getMediaList () {
@@ -68,6 +82,7 @@ export default {
         this.mergeMediaList(array[0], array[1])
         // this.videoList = null
         // this.imageList = null
+        // console.log(this.mediaList)
       })
     },
     mergeMediaList (videoList, imageList) {
@@ -139,6 +154,28 @@ export default {
     },
     closeFirstUploadNoticeDialog () {
       this.firstUploadNoticeDialog = false
+    },
+    // 媒体文件列表过滤
+    mediaItemShow (data) {
+      const fileType = this.viewParams.fileType
+      let fileTypeShow
+      if (data.fileType === 'image') {
+        fileTypeShow = fileType === 'video' ? false : true
+      } else if (data.fileType === 'video') {
+        fileTypeShow = fileType === 'image' ? false : true
+      } else {
+        fileTypeShow = fileType === 'all' ? true : false
+      }
+      const moment = this.viewParams.moment
+      let momentShow
+      if (data.momentDescription && data.momentDescription.match(/Kill-CN|Kill-EN/)) {
+        momentShow = (moment === 'all' || moment === 'kill') ? true : false
+      } else if (data.momentDescription && data.momentDescription.match(/SoloDead-CN1|TeamDead-CN/)) {
+        momentShow = (moment === 'all' || moment === 'dead') ? true : false
+      } else {
+        momentShow = moment === 'all' ? true : false
+      }
+      return fileTypeShow && momentShow
     }
   },
   mounted () {

@@ -1,5 +1,5 @@
 <template>
-  <div class="cpt-media-item" :class="mediaItemStyle" v-show="manageBarOpen">
+  <div class="cpt-media-item" :class="mediaItemStyle" v-show="manageBarOpen && mediaItemShow">
     <div class="media-item list" v-show="mediaItemStyle === 'list'" @click="mediaAction(data.file)">
       <div class="col col-1">
         <!-- <div class="thumbnail" v-lazy:background-image="thumbnail"> -->
@@ -150,6 +150,10 @@ export default {
     manageBar: {
       type: Boolean,
       default: false
+    },
+    mediaItemShow: {
+      type: Boolean,
+      default: true
     }
   },
   data () {

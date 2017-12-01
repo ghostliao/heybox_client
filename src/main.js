@@ -36,6 +36,7 @@ import icon from '@/components/icon'
 import iconButton from '@/components/iconButton'
 import lazy from '@/components/lazy'
 import mark from '@/components/mark'
+import selectField from '@/components/select-field'
 import * as table from '@/components/table'
 import tooltip from '@/components/tooltip'
 const components = {
@@ -47,6 +48,7 @@ const components = {
   iconButton,
   lazy,
   mark,
+  selectField,
   ...table,
   tooltip
 }

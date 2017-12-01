@@ -26,22 +26,48 @@
         </div> -->
       </div>
     </div>
-    <ul class="nav-list">
-      <router-link v-for="(i, index) in navTabs" :to="{ name: i.name }" tag="li" :key="i.name">
-        <span :ref="`tab${index}`">{{i.label}}</span>
-      </router-link>
-      <!-- <router-link :to="{ name: 'video-desktop' }" tag="li">
-        <span ref="tab0">录像</span>
-      </router-link>
-      <router-link :to="{ name: 'video-screenshot' }" tag="li">
-        <span ref="tab1">截屏</span>
-      </router-link> -->
-      <span class="tab-link-highlight" ref="highlight"></span>
-    </ul>
+    <div class="nav-bar">
+      <ul class="nav-list">
+        <router-link v-for="(i, index) in navTabs" :to="{ name: i.name }" tag="li" :key="i.name">
+          <span :ref="`tab${index}`">{{i.label}}</span>
+        </router-link>
+        <!-- <router-link :to="{ name: 'video-desktop' }" tag="li">
+          <span ref="tab0">录像</span>
+        </router-link>
+        <router-link :to="{ name: 'video-screenshot' }" tag="li">
+          <span ref="tab1">截屏</span>
+        </router-link> -->
+        <span class="tab-link-highlight" ref="highlight"></span>
+      </ul>
+      <div class="media-list-filter">
+        <div class="media-list-filter-item">
+          <cpt-select-field :select="mediaListFilter.fileType.select.value === 'all' ? '分类' : mediaListFilter.fileType.select.label">
+            <cpt-menu>
+              <cpt-menu-item v-for="(key, value) in mediaListFilter.fileType.filter" :key="key" :title="key" :selectActive="mediaListFilter.fileType.select.value === value" @click="filterSelect('fileType', key, value)" />
+            </cpt-menu>
+          </cpt-select-field>
+        </div>
+        <!-- <div class="media-list-filter-item">
+          <cpt-select-field :select="mediaListFilter.moment.select.value === 'all' ? '时刻' : mediaListFilter.moment.select.label">
+            <cpt-menu>
+              <cpt-menu-item v-for="(key, value) in mediaListFilter.moment.filter" :key="key" :title="key" :selectActive="mediaListFilter.moment.select.value === value" @click="filterSelect('moment', key, value)" />
+            </cpt-menu>
+          </cpt-select-field>
+        </div> -->
+      </div>
+      <div class="show-type">
+        <div class="btn" :class="{ 'active': $store.state.mediaListShowType === 'list' }" @click.stop="changeShowType('list')">
+          <cpt-icon value="list-fill" :size="16"></cpt-icon>          
+        </div>
+        <div class="btn" :class="{ 'active': $store.state.mediaListShowType === 'grid' }" @click.stop="changeShowType('grid')">
+          <cpt-icon value="card-fill" :size="16"></cpt-icon>
+        </div>
+      </div>
+    </div>
     <div class="main">
       <lazy :time="300">
         <keep-alive>
-          <router-view></router-view>
+          <router-view :viewParams="viewParams"></router-view>
           <!-- <router-view v-if="$route.meta.keepAlive"></router-view> -->
         </keep-alive>
         <!-- <router-view v-if="!$route.meta.keepAlive"></router-view> -->
@@ -59,6 +85,9 @@ import cptBlockButton from '@/components/blockButton'
 import { mapState, mapActions } from 'vuex'
 import cptBackTop from '@/components/backTop'
 import tabHighlight from '@/components/tab-highlight'
+import {menu, menuItem} from '@/components/menu'
+import cptDivider from '@/components/divider'
+import Bus from '@/components/bus'
 
 export default {
   name: "view-video",
@@ -66,7 +95,10 @@ export default {
   components: {
     'cpt-button': cptButton,
     'cpt-block-button': cptBlockButton,
-    'cpt-back-top': cptBackTop
+    'cpt-back-top': cptBackTop,
+    'cpt-menu': menu,
+    'cpt-menu-item': menuItem,
+    'cpt-divider': cptDivider
   },
   data () {
     return {
@@ -84,7 +116,31 @@ export default {
         //   name: 'video-screenshot',
         //   label: '截屏'
         // }
-      ]
+      ],
+      mediaListFilter: {
+        fileType: {
+          select: {
+            label: '全部',
+            value: 'all'
+          },
+          filter: {
+            'all': '全部',
+            'video': '视频',
+            'image': '截图'
+          }
+        },
+        moment:{
+          select: {
+            label: '全部',
+            value: 'all'
+          },
+          filter: {
+            'all': '全部',
+            'kill': '击杀',
+            'dead': '死亡'
+          }
+        }
+      }
     }
   },
   computed: {
@@ -105,6 +161,12 @@ export default {
     },
     recordButtonTextClass () {
       return this.$store.state.recordingState === 'RS_Recording' ? 'time' : ''
+    },
+    viewParams () {
+      return {
+        'fileType': this.mediaListFilter.fileType.select.value,
+        'moment': this.mediaListFilter.moment.select.value
+      }
     }
   },
   methods: {
@@ -133,6 +195,18 @@ export default {
       maxjia.media.recordingSecondsChanged.addListener(data => {
         this.onRecordingSecondsChanged()
       })
+    },
+    // 改变媒体列表展示方式
+    changeShowType (type) {
+      console.log(type)
+      localStorage.setItem('mediaListShowType', type)
+      this.$store.state.mediaListShowType = type
+    },
+    // 媒体列表过滤器
+    filterSelect (type, key, value) {
+      this.mediaListFilter[type].select.label = key
+      this.mediaListFilter[type].select.value = value
+      Bus.$emit('closeMenu')
     }
   },
   mounted () {
@@ -162,56 +236,85 @@ export default {
       display: flex;
     }
   }
-  .nav-list {
-    position: relative;
+  .nav-bar {
     display: flex;
-    height: 54px;
     border-bottom: 1px solid @layoutBorderColor;
     margin-bottom: 2px;
-    > li {
+    .nav-list {
       position: relative;
-      top: 1px;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 18px;
-      font-weight: 300;
-      color: fade(@textColor, 40%);
-      border-bottom: 1px solid transparent;
-      cursor: pointer;
-      margin-right: 24px;
-      .common-transition;
-      // &:after {
-      //   content: '';
-      //   position: absolute;
-      //   top: 50%;
-      //   right: -12px;
-      //   width: 4px;
-      //   height: 4px;
-      //   background: fade(@textColor, 40%);
-      //   border-radius: 50%;
-      //   margin-top: -2px;
-      // }
-      // &:last-of-type:after {
-      //   content: none;
-      // }
-      &:hover {
-        color: @textColor;
+      height: 54px;
+      > li {
+        position: relative;
+        top: 1px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 300;
+        color: fade(@textColor, 40%);
+        border-bottom: 1px solid transparent;
+        cursor: pointer;
+        margin-right: 24px;
+        .common-transition;
+        // &:after {
+        //   content: '';
+        //   position: absolute;
+        //   top: 50%;
+        //   right: -12px;
+        //   width: 4px;
+        //   height: 4px;
+        //   background: fade(@textColor, 40%);
+        //   border-radius: 50%;
+        //   margin-top: -2px;
+        // }
+        // &:last-of-type:after {
+        //   content: none;
+        // }
+        &:hover {
+          color: @textColor;
+        }
+        &.active {
+          color: @textColor;
+          border-bottom: 1px solid @primaryColor;
+        }
       }
-      &.active {
-        color: @textColor;
-        border-bottom: 1px solid @primaryColor;
+      .tab-link-highlight {
+        position: absolute;
+        left: 0;
+        bottom: -1px;
+        height: 1px;
+        background-color: @primaryColor;
+        transition: all .3s;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
       }
     }
-    .tab-link-highlight {
-      position: absolute;
-      left: 0;
-      bottom: -1px;
-      height: 1px;
-      background-color: @primaryColor;
-      transition: all .3s;
-      transform: translate3d(0, 0, 0);
-      backface-visibility: hidden;
+    .media-list-filter {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+    }
+    .media-list-filter-item {
+      margin-right: 12px;
+    }
+    .show-type {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      .btn {
+        margin-left: 6px;
+        cursor: pointer;
+        .iconfont {
+          color: @lightIconColor;
+        }
+        &.active {
+          .iconfont {
+            color: @primaryColor;
+          }
+        }
+      }
     }
   }
 }
