@@ -4,15 +4,20 @@
       <!-- <cpt-set-block-head title="电脑概览"></cpt-set-block-head> -->
       <div class="overview">
         <transition name="fade" mode="out-in">
-          <div v-if="loading" key="loading" class="progress">
+          <div v-if="loading && !loadingFailed" key="loading" class="progress">
             <cpt-circular-progress :size="40" />
           </div>
         </transition>
+
+        <div v-if="loadingFailed && !loading" class="notice">
+          获取评分信息失败，<span @click="getHardwareEvalInfo">点击重试</span>
+        </div>
+        
         <!-- <div class="update">
           <cpt-icon value="reload-fill"></cpt-icon>
           <span class="label">2小时前更新</span>
         </div> -->
-        <template v-if="!loading">
+        <template v-if="!loading && !loadingFailed">
           <div class="row row-1">
             <span class="cpu">{{hardwareEvalInfo.cpu.show_key}}</span>
             <span class="gpu">{{hardwareEvalInfo.gpus.show_key}}</span>
@@ -30,19 +35,22 @@
       <div class="body">
         <template v-if="hardwareInfo.system">
           <cpt-set-block title="主要硬件">
-            <cpt-hd-info-bar label="CPU" :level="hardwareEvalInfo.cpu.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.cpu.score" rankList dropRow :dropRowData="hardwareEvalInfo.cpu.rank">
+            <cpt-hd-info-bar label="CPU" :level="hardwareEvalInfo.cpu.perf_level" :score="hardwareEvalInfo.cpu.score" :percentage="hardwareEvalInfo.cpu.percentage" rankList dropRow :dropRowData="hardwareEvalInfo.cpu.rank">
               <template slot="desc">
                 <div class="desc">{{hardwareInfo.cpu.name}} {{hardwareInfo.cpu.cores}}&nbsp;核</div>
               </template>
             </cpt-hd-info-bar>
 
-            <cpt-hd-info-bar label="显卡" :level="hardwareEvalInfo.gpus.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.gpus.score" rankList dropRow :dropRowData="hardwareEvalInfo.gpus.rank">
+            <cpt-hd-info-bar label="显卡" :level="hardwareEvalInfo.gpus.perf_level" :score="hardwareEvalInfo.gpus.score" :percentage="hardwareEvalInfo.gpus.percentage" rankList dropRow :dropRowData="hardwareEvalInfo.gpus.rank">
               <template slot="desc">
-                <div class="desc" v-for="(i, index) of hardwareInfo.gpus" :key="index">{{i.name}}（{{Math.round(i.memory_size / 1024)}} GB）</div>
+                <div class="desc" v-for="(i, index) of hardwareInfo.gpus" :key="index">
+                  <span>{{i.name}}</span>
+                  <span v-if="i.memory_size !== 0">（{{Math.round(i.memory_size / 1024)}} GB）</span>
+                </div>
               </template>
             </cpt-hd-info-bar>
 
-            <cpt-hd-info-bar label="硬盘" :level="hardwareEvalInfo.disks.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.disks.score" rankList dropRow :dropRowData="hardwareEvalInfo.disks.rank">
+            <cpt-hd-info-bar label="硬盘" :level="hardwareEvalInfo.disks.perf_level" :score="hardwareEvalInfo.disks.score" :percentage="hardwareEvalInfo.disks.percentage" rankList dropRow :dropRowData="hardwareEvalInfo.disks.rank">
               <template slot="desc">
                 <div class="desc" v-for="(i, index) of hardwareInfo.disks" :key="index">
                   {{i.name}}（{{Math.round(i.size / 1024 / 1024 / 1024)}} GB）
@@ -50,7 +58,7 @@
               </template>
             </cpt-hd-info-bar>
 
-            <cpt-hd-info-bar label="内存" :level="hardwareEvalInfo.memory.perf_level" :point="14232" :pointPercent="hardwareEvalInfo.memory.score" rankList>
+            <cpt-hd-info-bar label="内存" :level="hardwareEvalInfo.memory.perf_level" :score="hardwareEvalInfo.memory.score" :percentage="hardwareEvalInfo.memory.percentage" rankList>
               <template slot="desc">
                 <div class="desc">
                   {{Math.round(hardwareInfo.memory.memory_size / 1024)}} GB（{{hardwareInfo.memory.vendor}} {{hardwareInfo.memory.type_name}} {{hardwareInfo.memory.clock_speed}}MHz）
@@ -63,37 +71,37 @@
 
         <template v-if="hardwareInfo.system">
           <cpt-set-block title="基本信息">
-            <cpt-hd-info-bar label="系统" :point="14232" :dropRowData="cpuDetail">
+            <cpt-hd-info-bar label="系统" :score="0" :dropRowData="cpuDetail">
               <template slot="desc">
                 <div class="label">{{hardwareInfo.system.name}}</div>
               </template>
             </cpt-hd-info-bar>
 
-            <cpt-hd-info-bar label="主板" :point="14232" :dropRowData="cpuDetail">
+            <cpt-hd-info-bar label="主板" :score="0" :dropRowData="cpuDetail">
               <template slot="desc">
                 <div class="label">{{hardwareInfo.board.name}}</div>
               </template>
             </cpt-hd-info-bar>
 
-            <!-- <cpt-hd-info-bar label="内存" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
+            <!-- <cpt-hd-info-bar label="内存" :score="0" :percentage="88" :dropRowData="cpuDetail">
               <template slot="desc">
                 <div class="label">{{Math.round(hardwareInfo.memory.memory_size / 1024)}} GB（{{hardwareInfo.memory.vendor}} {{hardwareInfo.memory.type_name}} {{hardwareInfo.memory.clock_speed}}MHz）</div>
               </template>
             </cpt-hd-info-bar> -->
 
-            <!-- <cpt-hd-info-bar v-for="(i, index) of hardwareInfo.disks" :key="index" label="硬盘" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
+            <!-- <cpt-hd-info-bar v-for="(i, index) of hardwareInfo.disks" :key="index" label="硬盘" :score="0" :percentage="88" :dropRowData="cpuDetail">
               <template slot="desc">
                 <div class="label">{{i.name}}（{{Math.round(i.size / 1024 / 1024 / 1024)}} GB）</div>
               </template>
             </cpt-hd-info-bar> -->
 
-            <!-- <cpt-hd-info-bar v-for="(i, index) of hardwareInfo.gpus" :key="index" label="显卡" :point="14232" :pointPercent="88" :dropRowData="cpuDetail">
+            <!-- <cpt-hd-info-bar v-for="(i, index) of hardwareInfo.gpus" :key="index" label="显卡" :score="0" :percentage="88" :dropRowData="cpuDetail">
               <template slot="desc">
                 <div class="label">{{i.name}}（{{Math.round(i.memory_size / 1024)}} GB）</div>
               </template>
             </cpt-hd-info-bar> -->
 
-            <cpt-hd-info-bar v-for="(i, index) of hardwareInfo.displays" :key="index" v-if="index === 0" label="显示器" :point="14232" :dropRowData="cpuDetail">
+            <cpt-hd-info-bar v-for="(i, index) of hardwareInfo.displays" :key="index" v-if="index === 0" label="显示器" :score="0" :dropRowData="cpuDetail">
               <template slot="desc">
                 <div class="label">{{i.name}}</div>
               </template>
@@ -123,6 +131,7 @@ export default {
   data () {
     return {
       loading: true,
+      loadingFailed: false,
       hardwareInfo: {},
       hardwareEvalInfo: {
         cpu: {
@@ -148,7 +157,7 @@ export default {
       return [
         {
           level: '-',
-          pointPercent: 50,
+          percentage: 50,
           desc: `${this.hardwareInfo.cpu.name} ${this.hardwareInfo.cpu.cores} 核`
         }
       ]
@@ -166,16 +175,18 @@ export default {
     ]),
     getPreviewHardwareInfo () {
       maxjia.hardware.getPreviewHardwareInfo((data) => {
-        console.log(data)
+        // console.table(data)
         this.hardwareInfo = data
       })
     },
     getHardwareEvalInfo () {
+      this.loadingFailed = false
+      this.loading = true
       const url = '/pc/hardware_info/web/'
-      // const url = '/tools/games/pc_info/v2/'
       const options = {
         params: {
-          'heybox_id': this.$store.state.accountInfo.uid
+          'heybox_id': this.$store.state.accountInfo.uid,
+          'os_type': 'pc'
         }
       }
       this.$ajax.get(url, options).then(res => {
@@ -183,10 +194,20 @@ export default {
         if (res.data.status === 'ok') {
           this.hardwareEvalInfo = res.data.result
           console.log(this.hardwareEvalInfo)
+        } else {
+          this.getEvalInfoFailed()
         }
       }, res => {
-        console.log(res)
+        this.getEvalInfoFailed()
       })
+    },
+    getEvalInfoFailed () {
+      // this.openMsgDialog({
+      //   msg: '获取评分信息失败',
+      //   markType: 'fail'
+      // })
+      this.loadingFailed = true
+      this.loading = false
     }
   },
   created () {
@@ -205,7 +226,7 @@ export default {
         }
       } else {
         this.openMsgDialog({
-          msg: '请求评分信息失败',
+          msg: '请求账号信息失败',
           markType: 'fail'
         })
       }
@@ -226,6 +247,23 @@ export default {
       position: relative;
       padding: 20px 0;
       min-height: 121px;
+      .notice {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 400;
+        color: fade(@textColor, 60%);
+        span {
+          color: @primaryColor;
+          // text-decoration: underline;
+          cursor: pointer;
+        }
+      }
       .progress {
         position: absolute;
         top: 0;
