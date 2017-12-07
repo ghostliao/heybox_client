@@ -1,0 +1,1 @@
+export {default} from './moment-dialog-media-item'

@@ -17,14 +17,38 @@
     </div>
     <!-- S first upload notice dialog -->
     <cpt-dialog :open="firstUploadNoticeDialog" title="" @close="closeFirstUploadNoticeDialog" @hide="closeFirstUploadNoticeDialog" dialogClass="msg-dialog" :overlayOpacity="0.8" cornerClose>
-      <div class="first-upload-notice-dialog">
+      <div slot="title">上传成功</div>
+      <!-- <div class="first-upload-notice-dialog">
         <cpt-mark success large></cpt-mark>
         <div class="msg">上传成功</div>
         <div class="desc">审核通过后将会同步至您的小黑盒账号中</div>
-        <cpt-button label="知道了" @click="closeFirstUploadNoticeDialog" secondary />
+      </div> -->
+      <div class="content">
+        <cpt-mark success large></cpt-mark>
+        <div class="desc">审核通过后将会同步至您的小黑盒账号中</div>        
       </div>
+      <cpt-button slot="actions" label="知道了" @click="closeFirstUploadNoticeDialog" secondary long />
+      
     </cpt-dialog>
     <!-- E first upload notice dialog -->
+
+    <!-- S moment dialog -->
+    <cpt-dialog :open="momentDialog" title="" @close="closeMomentDialog" @hide="closeMomentDialog" dialogClass="moment-dialog" :overlayOpacity="0.8" cornerClose>
+      <div class="moment-dialog-wrap">
+        <div class="moment-dialog-head">
+          <div class="title">本次游戏精彩时刻</div>
+        </div>
+        <div class="moment-dialog-body" ref="momentList">
+          <div class="moment-dialog-body-container">
+            <cpt-moment-dialog-media-item v-for="(i, index) in mediaList" :key="index" :data="i" :index="index"></cpt-moment-dialog-media-item>
+
+            
+
+          </div>
+        </div>
+      </div>
+    </cpt-dialog>
+    <!-- E moment dialog -->
   </div>
 </template>
 
@@ -39,6 +63,7 @@ import mediaFileMan from '@/components/media-file-man'
 import {cptManageBar, cptMediaItem} from '@/components/media-item'
 import videoFile from '@/components/videoFile'
 import imageFile from '@/components/imageFile'
+import momentDialogMediaItem from '@/components/moment-dialog-media-item'
 
 export default {
   name: "view-video-lib",
@@ -47,13 +72,15 @@ export default {
     'cpt-circular-progress': cptCircularProgress,
     'media-file-man': mediaFileMan,
     'cpt-manage-bar': cptManageBar,
-    'cpt-media-item': cptMediaItem
+    'cpt-media-item': cptMediaItem,
+    'cpt-moment-dialog-media-item': momentDialogMediaItem
   },
   data () {
     return {
       loading: true,
       mediaList: [],
-      firstUploadNoticeDialog: false
+      firstUploadNoticeDialog: false,
+      momentDialog: true
     }
   },
   props: {
@@ -82,7 +109,7 @@ export default {
         this.mergeMediaList(array[0], array[1])
         // this.videoList = null
         // this.imageList = null
-        // console.log(this.mediaList)
+        console.log(this.mediaList)
       })
     },
     mergeMediaList (videoList, imageList) {
@@ -176,6 +203,15 @@ export default {
         momentShow = moment === 'all' ? true : false
       }
       return fileTypeShow && momentShow
+    },
+    openMomentDialog () {
+      this.momentDialog = true
+    },
+    closeMomentDialog () {
+      this.momentDialog = false
+    },
+    momentListScroll () {
+
     }
   },
   mounted () {
@@ -239,5 +275,27 @@ export default {
     margin-top: 10px;
     margin-bottom: 12px;
   }
+}
+
+.moment-dialog-wrap {
+  height: 100%;
+}
+.moment-dialog-head {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  padding: 0 24px;
+  border-bottom: 1px solid @layoutBorderColor;
+  .title {
+    font-size: 16px;
+    color: @textColor;
+  }
+}
+.moment-dialog-body {
+  height: calc(~"100% - 50px");
+  overflow-y: scroll;
+}
+.moment-dialog-body-container {
+  // height: 100%;
 }
 </style>
