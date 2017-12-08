@@ -4,7 +4,7 @@
       <div class="mu-dialog-wrapper" @click="handleWrapperClick" v-if="open" ref="popup" :style="{'z-index': zIndex}">
         <div class="mu-dialog" ref="dialog" :class="dialogClass">
           <div class="mu-dialog-close" v-if="cornerClose" @click="hide()">
-            <cpt-icon-button icon="close" :iconSize="iconSize"></cpt-icon-button>
+            <cpt-icon-button icon="close" :iconSize="closeIconSize"></cpt-icon-button>
             <!-- <cpt-icon value="close-thin" :size="24"></cpt-icon> -->
           </div>
           <h3 class="mu-dialog-title" v-if="showTitle" ref="title" :class="headerClass">
@@ -62,7 +62,7 @@ export default {
   },
   data () {
     return {
-      iconSize: 24
+
     }
   },
   computed: {
@@ -90,6 +90,13 @@ export default {
       const classNames = []
       if (scrollable) classNames.push('scrollable')
       return classNames.concat(convertClass(this.actionsContainerClass))
+    },
+    closeIconSize () {
+      if (this.dialogClass === 'delete-dialog' || this.dialogClass === 'msg-dialog') {
+        return 16
+      } else {
+        return 24
+      }
     }
   },
   mounted () {
@@ -174,17 +181,50 @@ export default {
       padding: 0;
     }
   }
+  &.video-player {
+    border: none;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    .mu-dialog-close {
+      top: 60px;
+    }
+    .mu-dialog-body {
+      padding: 0;
+    }
+  }
   &.image-checker {
     width: auto;
     background: transparent;
     border: none;
   }
   &.msg-dialog {
-    width: 400px;
-  }
-  &.delete-dialog {
-    width: 400px;
+    width: 360px;
     min-height: 170px;
+    .mu-dialog-title {
+      justify-content: center;
+    }
+    .mu-dialog-body {
+      .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        text-align: center;
+        .cpt-mark {
+          margin-bottom: @dialogPadding;
+        }
+      }
+    }
+  }
+  &.moment-dialog {
+    width: 900px;
+    height: 80%;
+    .mu-dialog-body {
+      padding: 0;
+      height: 100%;
+    }
   }
 }
 .mu-dialog-close {
@@ -196,7 +236,7 @@ export default {
   color: fade(@textColor, 60%);
 }
 
-@dialogPadding: 16px;
+@dialogPadding: 24px;
 .mu-dialog-title {
   display: flex;
   align-items: center;
@@ -228,12 +268,12 @@ export default {
   padding: @dialogPadding;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   .mu-raised-button + .mu-raised-button{
     margin-left: 10px;
   }
   .cpt-button + .cpt-button {
-    margin-left: @dialogPadding;
+    margin-left: 12px;
   }
   &.scrollable{
     border-top: 1px solid @lightBorderColor;

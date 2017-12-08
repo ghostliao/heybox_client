@@ -41,9 +41,10 @@
         <div class="moment-dialog-body" ref="momentList">
           <div class="moment-dialog-body-container">
             <cpt-moment-dialog-media-item v-for="(i, index) in mediaList" :key="index" :data="i" :index="index"></cpt-moment-dialog-media-item>
-
-            
-
+          </div>
+          <div class="moment-dialog-upload-all">
+            <div class="txt">精彩的游戏！赶快分享给大家吧~</div>
+            <cpt-button label="全部上传" icon="upload-fill" long primary @click="uploadAllMoment" />
           </div>
         </div>
       </div>
@@ -64,6 +65,7 @@ import {cptManageBar, cptMediaItem} from '@/components/media-item'
 import videoFile from '@/components/videoFile'
 import imageFile from '@/components/imageFile'
 import momentDialogMediaItem from '@/components/moment-dialog-media-item'
+import Bus from '@/components/bus'
 
 export default {
   name: "view-video-lib",
@@ -210,8 +212,9 @@ export default {
     closeMomentDialog () {
       this.momentDialog = false
     },
-    momentListScroll () {
-
+    // 本次游戏精彩时刻全部上传
+    uploadAllMoment () {
+      Bus.$emit('uploadAll')
     }
   },
   mounted () {
@@ -284,7 +287,7 @@ export default {
   display: flex;
   align-items: center;
   height: 50px;
-  padding: 0 24px;
+  padding: 0 16px;
   border-bottom: 1px solid @layoutBorderColor;
   .title {
     font-size: 16px;
@@ -296,6 +299,19 @@ export default {
   overflow-y: scroll;
 }
 .moment-dialog-body-container {
-  // height: 100%;
+  padding: 8px 16px;
+}
+.moment-dialog-upload-all {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 120px;
+  padding-bottom: 30px;
+  .txt {
+    font-size: 12px;
+    font-weight: 400;
+    margin-bottom: 20px;
+  }
 }
 </style>
