@@ -18,13 +18,18 @@
         </div>
       </div>
       <div class="col col-3">
-        <cpt-linear-progress v-if="pointPercent" mode="determinate" :value="pointPercent"/>
-        <!-- <span>{{point}}分，超越</span>
-        <span class="percent wf-din">{{pointPercent}}%</span>
+        <!-- <div class="score">
+          <span v-if="score !== 0">{{score}}</span>
+        </div> -->
+        <div class="rate">
+          <cpt-linear-progress v-if="percentage" mode="determinate" :value="percentage"/>
+        </div>
+        <!-- <span>{{score}}分，超越</span>
+        <span class="percent wf-din">{{percentage}}%</span>
         <span>的电脑</span> -->
       </div>
       <div class="col col-4">
-        <div class="switch" v-if="dropRow" v-show="pointPercent" @click="dropRowSwitch">
+        <div class="switch" v-if="dropRow" v-show="percentage" @click="dropRowSwitch">
           <span class="label" v-if="rankList">排名</span>
           <span class="label" v-if="!rankList">详情</span>
           <icon value="arrow-down" v-if="!dropRowShow"></icon>
@@ -34,7 +39,7 @@
     </div>
     <div class="drop-row-rank" v-if="rankList" v-show="dropRowShow">
       <div class="box">
-        <div class="unit" v-for="(i, index) of dropRowData" :key="index">
+        <div class="unit" v-for="(i, index) of dropRowData" :key="index" v-show="showAll || index < 5">
           <div class="col col-1">
             <div>{{ index + 1 }}</div>
           </div>
@@ -42,9 +47,17 @@
             <span class="desc">{{i.name}}</span>
           </div>
           <div class="col col-3">
-            <cpt-linear-progress mode="determinate" :value="i.percentage" light/>
+            <!-- <div class="score">
+              <span>{{i.score}}</span>
+            </div> -->
+            <div class="rate">
+              <cpt-linear-progress mode="determinate" :value="i.percentage" light/>
+            </div>
           </div>
           <div class="col col-4"></div>
+        </div>
+        <div class="more" v-show="!showAll" @click="showAllRank">
+          查看完整排行
         </div>
       </div>
     </div>
@@ -62,15 +75,12 @@
 <script>
 import icon from '@/components/icon'
 import cptTextField from '@/components/text-field'
-import linearProgress from '@/components/linearProgress'
-
 
 export default {
   name: "cpt-hd-info-bar",
   components: {
     'icon': icon,
-    'cpt-text-field': cptTextField,
-    'cpt-linear-progress': linearProgress
+    'cpt-text-field': cptTextField
   },
   props: {
     label: {
@@ -84,11 +94,11 @@ export default {
     data: {
       type: [Object, Array]
     },
-    point: {
+    score: {
       type: Number,
       default: 0
     },
-    pointPercent: {
+    percentage: {
       type: Number,
       default: 0
     },
@@ -110,7 +120,8 @@ export default {
   data () {
     return {
       level_: '',
-      dropRowShow: false
+      dropRowShow: false,
+      showAll: false
     }
   },
   computed: {
@@ -134,7 +145,11 @@ export default {
   },
   methods: {
     dropRowSwitch () {
+      this.dropRowShow && (this.showAll = false)
       this.dropRowShow = !this.dropRowShow
+    },
+    showAllRank () {
+      this.showAll = true
     }
   },
   mounted () {
@@ -178,6 +193,7 @@ export default {
         .label {
           flex: 1;
           min-width: 0;
+          line-height: 16px;
         }
       }
       &.col-2 {
@@ -186,11 +202,21 @@ export default {
         > div {
           display: flex;
           justify-content: center;
-          width: 12px;
+          // width: 12px;
         }
       }
       &.col-3 {
         .row-col-3-style;
+        display: flex;
+        .score {
+          width: 30px;
+          text-align: right;
+        }
+        .rate {
+          flex: 1;
+          min-width: 0;
+          padding-left: 12px;
+        }
         .percent {
           font-size: 18px;
           margin: 0 4px;
@@ -203,6 +229,8 @@ export default {
         .switch {
           display: flex;
           align-items: center;
+          font-weight: 400;
+          line-height: 16px;
           cursor: pointer;
           .iconfont {
             color: fade(@textColor, 60%);
@@ -269,10 +297,34 @@ export default {
           }
           &.col-3 {
             .row-col-3-style;
+            display: flex;
+            .score {
+              width: 30px;
+              text-align: right;
+            }
+            .rate {
+              flex: 1;
+              min-width: 0;
+              padding-left: 12px;
+            }
           }
           &.col-4 {
             width: @colUnitWidth;
           }
+        }
+      }
+      .more {
+        color: fade(@textColor, 40%);
+        font-size: 12px;
+        font-weight: 400;
+        width: 120px;
+        line-height: 28px;
+        border-radius: 2px;
+        margin: auto;
+        text-align: center;
+        cursor: pointer;
+        &:hover {
+          background: fade(#000, 40%);
         }
       }
     }
