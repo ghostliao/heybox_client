@@ -46,8 +46,8 @@
           </cpt-set-switch>
         </cpt-set-block>  -->
 
-        <cpt-set-block v-if="gameOverlaySettings.length > 0" title="游戏内浮窗开关">
-          <cpt-set-switch :label="i.gameName" v-for="i in gameOverlaySettings" :key="i.gameId" :data="i" :switch="i.overlayEnabled" @input="setGameOverlaySwitch">
+        <cpt-set-block v-if="gameOverlaySettings.length > 1" title="游戏内浮窗开关">
+          <cpt-set-switch :label="i.gameName" v-for="i in gameOverlaySettings" :key="i.gameId" v-if="i.overlaySupport" :data="i" :switch="i.overlayEnabled" @input="setGameOverlaySwitch">
             <!-- <span slot="desc">desc</span> -->
           </cpt-set-switch>
         </cpt-set-block>
