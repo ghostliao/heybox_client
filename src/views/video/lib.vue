@@ -32,24 +32,6 @@
     </cpt-dialog>
     <!-- E first upload notice dialog -->
 
-    <!-- S moment dialog -->
-    <cpt-dialog :open="momentDialog" title="" @close="closeMomentDialog" @hide="closeMomentDialog" dialogClass="moment-dialog" :overlayOpacity="0.8" cornerClose>
-      <div class="moment-dialog-wrap">
-        <div class="moment-dialog-head">
-          <div class="title">本次游戏精彩时刻</div>
-        </div>
-        <div class="moment-dialog-body" ref="momentList">
-          <div class="moment-dialog-body-container">
-            <cpt-moment-dialog-media-item v-for="(i, index) in mediaList" :key="index" :data="i" :index="index"></cpt-moment-dialog-media-item>
-          </div>
-          <div class="moment-dialog-upload-all">
-            <div class="txt">精彩的游戏！赶快分享给大家吧~</div>
-            <cpt-button label="全部上传" icon="upload-fill" long primary @click="uploadAllMoment" />
-          </div>
-        </div>
-      </div>
-    </cpt-dialog>
-    <!-- E moment dialog -->
   </div>
 </template>
 
@@ -64,8 +46,6 @@ import mediaFileMan from '@/components/media-file-man'
 import {cptManageBar, cptMediaItem} from '@/components/media-item'
 import videoFile from '@/components/videoFile'
 import imageFile from '@/components/imageFile'
-import momentDialogMediaItem from '@/components/moment-dialog-media-item'
-import Bus from '@/components/bus'
 
 export default {
   name: "view-video-lib",
@@ -74,15 +54,13 @@ export default {
     'cpt-circular-progress': cptCircularProgress,
     'media-file-man': mediaFileMan,
     'cpt-manage-bar': cptManageBar,
-    'cpt-media-item': cptMediaItem,
-    'cpt-moment-dialog-media-item': momentDialogMediaItem
+    'cpt-media-item': cptMediaItem
   },
   data () {
     return {
       loading: true,
       mediaList: [],
-      firstUploadNoticeDialog: false,
-      momentDialog: true
+      firstUploadNoticeDialog: false
     }
   },
   props: {
@@ -205,17 +183,11 @@ export default {
         momentShow = moment === 'all' ? true : false
       }
       return fileTypeShow && momentShow
-    },
-    openMomentDialog () {
-      this.momentDialog = true
-    },
-    closeMomentDialog () {
-      this.momentDialog = false
-    },
-    // 本次游戏精彩时刻全部上传
-    uploadAllMoment () {
-      Bus.$emit('uploadAll')
     }
+  },
+  created () {
+    this.videoInitConnect()
+    this.imageInitConnect()
   },
   mounted () {
     this.getMediaList()
@@ -280,38 +252,5 @@ export default {
   }
 }
 
-.moment-dialog-wrap {
-  height: 100%;
-}
-.moment-dialog-head {
-  display: flex;
-  align-items: center;
-  height: 50px;
-  padding: 0 16px;
-  border-bottom: 1px solid @layoutBorderColor;
-  .title {
-    font-size: 16px;
-    color: @textColor;
-  }
-}
-.moment-dialog-body {
-  height: calc(~"100% - 50px");
-  overflow-y: scroll;
-}
-.moment-dialog-body-container {
-  padding: 8px 16px;
-}
-.moment-dialog-upload-all {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 120px;
-  padding-bottom: 30px;
-  .txt {
-    font-size: 12px;
-    font-weight: 400;
-    margin-bottom: 20px;
-  }
-}
+
 </style>

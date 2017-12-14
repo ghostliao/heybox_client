@@ -6,26 +6,40 @@ export default {
     }
   },
   methods: {
-    imageInitConnect () {
+    imageInitConnect (isMoment = false) {
       maxjia.media.file.newImageAdded.addListener((data) => {
-        this.onImageFileAdded(data)
+        if (isMoment) { // 精彩时刻总结
+          if (data.gameId === this.currentOverlayGameId) {
+            this.onImageFileAdded(data, true)
+          } 
+        } else {
+          this.onImageFileAdded(data)
+        }
       })
       maxjia.media.file.imageDeleted.addListener(() => {
-        this.onImageFileDeleted()
+        !isMoment && this.onImageFileDeleted()
       })
       maxjia.media.file.imageFileStatusChanged.addListener((data) => {
         this.onImageFileStatusChanged(data)
       })
     },
-    _addImageItem (imageItem) {
+    addImageItem (imageItem) {
       this.$set(imageItem, 'fileType', 'image')
       this.imageList.unshift(imageItem)
       // console.log(imageItem.createTimeStamp)
     },
-    onImageFileAdded (imageItem) {
+    addImageItemToMomentList (imageItem) {
+      this.$set(imageItem, 'fileType', 'image')
+      this.mediaList.push(imageItem)
+    },
+    onImageFileAdded (imageItem, isMoment = false) {
       // console.log('onImageFileAdded')
-      this._addImageItem(imageItem)
-      this.mergeMediaList(this.videoList, this.imageList)
+      if (isMoment) {
+        this.addImageItemToMomentList(imageItem)
+      } else {
+        this.addImageItem(imageItem)
+        this.mergeMediaList(this.videoList, this.imageList)
+      }
     },
     onImageFileDeleted () {
       // console.log('onImageFileDeleted')
@@ -52,14 +66,14 @@ export default {
       // })
     },
     getImageList () {
-      console.log('getImageList')
+      console.log('get image list')
       return new Promise((resolve, reject) => {
         maxjia.media.file.getImageList((data) => {
           // console.log(data)
           if (data && data['images']) {
             this.imageList = []
             for (let imageItem of data['images']) {
-              this._addImageItem(imageItem)
+              this.addImageItem(imageItem)
             }
             resolve(this.imageList)
           } else {
@@ -87,7 +101,7 @@ export default {
     }
   },
   mounted () {
-    this.imageInitConnect()
+    // this.imageInitConnect()
     // this.getImageList()
   }
 }

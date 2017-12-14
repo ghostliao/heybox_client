@@ -10,11 +10,16 @@ const v = Vue.prototype
 
 const state = {
   config: {
-    ver: 'BETA 0.1.1d',
+    ver: 'Alpha 0.1.6',
     env: 'test', // test | prod
     dev: true
   },
+  origin: {
+    test: 'http://heybox.test.maxjia.com:58888',
+    prod: 'https://api.xiaoheihe.cn'
+  },
 
+  mainWindowId: null, // 主窗体id
   routerName: 'game',
   routerVideoName: '',
   routerSettingsName: '',
@@ -52,7 +57,9 @@ const state = {
     uid: 999999,
     userName: '匿名',
     avatarUrl: '../../assets/default_avatar.png'
-  }
+  },
+  newMessage: false,
+  mediaListShowType: 'list'
 }
 
 const getters = {

@@ -53,6 +53,10 @@
       </cpt-msg-dialog>
     </cpt-dialog>
     <!-- E msg dialog -->
+
+    <!-- S moment dialog -->
+    <cpt-moment-dialog></cpt-moment-dialog>
+    <!-- E moment dialog -->
     
     <cpt-feedback></cpt-feedback>
 
@@ -71,6 +75,7 @@ import cptImageChecker from '@/components/image-checker'
 import cptMsgDialog from '@/components/msg-dialog'
 import cptFeedback from '@/components/feedback'
 import Bus from '@/components/bus'
+import cptMomentDialog from '@/components/moment-dialog'
 
 export default {
   name: 'app',
@@ -81,7 +86,8 @@ export default {
     'app-header': appHeader,
     'cpt-image-checker': cptImageChecker,
     'cpt-msg-dialog': cptMsgDialog,
-    'cpt-feedback': cptFeedback
+    'cpt-feedback': cptFeedback,
+    'cpt-moment-dialog': cptMomentDialog
   },
   data () {
     return {
@@ -145,13 +151,26 @@ export default {
     },
     // 新消息推送
     notifyMessageArrived () {
-      console.log(this.$router)
-      console.log(this.$route)
-      maxjia.user.notifyMessageArrived.addListener(data => {
-        Bus.$emit('notifyMessageArrived')
-        if (this.$route.name !== 'message') {
-          this.$store.state.newMessage = true
-        }
+      if (maxjia.user.notifyMessageArrived) {
+        maxjia.user.notifyMessageArrived.addListener(data => {
+          Bus.$emit('notifyMessageArrived')
+          if (this.$route.name !== 'message') {
+            this.$store.state.newMessage = true
+          }
+        })
+      }
+    },
+    // 获取当前窗体id
+    getCurrentWindow () {
+      return new Promise((resolve, reject) => {
+        maxjia.windows.getCurrentWindow(data => {
+          resolve(data.id)
+        })
+      })
+    },
+    saveMainWindowId () {
+      this.getCurrentWindow().then(id => {
+        this.$store.state.mainWindowId = id
       })
     }
   },

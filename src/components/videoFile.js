@@ -1,37 +1,50 @@
 export default {
   data () {
     return {
-      // videoList: new Map(),
       videoList: [],
       videoFile: false
     }
   },
   methods: {
-    videoInitConnect () {
+    videoInitConnect (isMoment = false) {
       maxjia.media.file.newVideoAdded.addListener((data) => {
-        this.onVideoFileAdded(data)
+        if (isMoment) { // 精彩时刻总结
+          if (data.gameId === this.currentOverlayGameId) {
+            this.onVideoFileAdded(data, true)
+          }
+        } else {
+          this.onVideoFileAdded(data)
+        }        
       })
       maxjia.media.file.videoDeleted.addListener(() => {
-        this.onVideoFileDeleted()
+        !isMoment && this.onVideoFileDeleted()
       })
       maxjia.media.file.videoFileStatusChanged.addListener((data) => {
         this.onVideoFileStatusChanged(data)
       })
     },
-    _addVideoItem (videoItem) {
+    addVideoItem (videoItem) {
       // console.log('addVideoItem')
       this.$set(videoItem, 'fileType', 'video')
       // console.log(this.videoList)
       this.videoList.unshift(videoItem)
       // console.log(videoItem)
     },
-    onVideoFileAdded (videoItem) {
+    addVideoItemToMomentList (videoItem) {
+      this.$set(videoItem, 'fileType', 'video')
+      this.mediaList.push(videoItem)
+    },
+    onVideoFileAdded (videoItem, isMoment = false) {
       // console.log('onVideoFileAdded')
-      this._addVideoItem(videoItem)
-      // BUG: 新增文件列表显示两个
-      this.getVideoList().then(data => {
-        this.mergeMediaList(this.videoList, this.imageList)
-      })
+      if (isMoment) {
+        this.addVideoItemToMomentList(videoItem)
+      } else {
+        this.addVideoItem(videoItem)
+        // BUG: 新增文件列表显示两个
+        this.getVideoList().then(data => {
+          this.mergeMediaList(this.videoList, this.imageList)
+        })
+      }
     },
     onVideoFileDeleted () {
       // console.log('onVideoFileDeleted')
@@ -58,14 +71,14 @@ export default {
       // })
     },
     getVideoList () {
-      console.log('getVideoList')
+      console.log('get video list')
       return new Promise((resolve, reject) => {
         maxjia.media.file.getVideoList((data) => {
           if (data && data['videos']) {
             this.videoList = []
             // console.log('getVideoList')
             for (let videoItem of data['videos']) {
-              this._addVideoItem(videoItem)
+              this.addVideoItem(videoItem)
             }
             resolve(this.videoList)
           } else {
@@ -110,7 +123,7 @@ export default {
     // }
   },
   mounted () {
-    this.videoInitConnect()
+    // this.videoInitConnect()
     // this.getVideoList()
   }
 }
