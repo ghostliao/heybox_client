@@ -32,7 +32,8 @@ export default {
     if (obj.local) {
       state.imageCheckerOptions.src = 'max-file://' + obj.file.replace(':', '')
     } else {
-      state.imageCheckerOptions.src = obj.file
+      const isUrl = /^http/.test(obj.file)
+      state.imageCheckerOptions.src = (isUrl ? '' : 'max-file://') + obj.file
     }
     state.imageChecker = true
   },
