@@ -51,9 +51,10 @@ export default {
   a {
     display: flex;
     align-items: center;
-    height: 40px;
+    height: 46px;
     color: fade(@textColor, 60%);
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: 400;
     padding-left: 16px;
     cursor: pointer;
     &.active {
@@ -62,6 +63,8 @@ export default {
       background-image: linear-gradient(to right, rgba(241, 242, 243, 0.16) 0%, rgba(241, 242, 243, 0.0) 50%);
     }
     .label {
+      position: relative;
+      top: -1px;
       margin-left: 10px;
     }
   }

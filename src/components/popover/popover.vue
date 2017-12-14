@@ -207,7 +207,8 @@ export default {
 @import "../../styles/import.less";
 .mu-popover{
   position: fixed;
-  background: @dialogBackgroundColor;
+  background: rgba(41, 44, 52, 0.96);
+  border: 1px solid @darkDialogBorderColor;
   border-radius: 2px;
   max-height: 100%;
   overflow: visible;

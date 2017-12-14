@@ -171,6 +171,7 @@ export default {
     saveMainWindowId () {
       this.getCurrentWindow().then(id => {
         this.$store.state.mainWindowId = id
+        console.log('main window id: ' + id)
       })
     }
   },
@@ -201,6 +202,8 @@ export default {
       this.player.muted(false)
     }, 2000)
     // console.log(this)
+
+    this.saveMainWindowId()
   }
 }
 </script>

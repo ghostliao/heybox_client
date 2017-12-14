@@ -10,7 +10,7 @@ const v = Vue.prototype
 
 const state = {
   config: {
-    ver: 'Alpha 0.1.6',
+    ver: 'Alpha 0.1.7',
     env: 'test', // test | prod
     dev: true
   },
@@ -19,7 +19,7 @@ const state = {
     prod: 'https://api.xiaoheihe.cn'
   },
 
-  mainWindowId: null, // 主窗体id
+  mainWindowId: -1, // 主窗体id
   routerName: 'game',
   routerVideoName: '',
   routerSettingsName: '',

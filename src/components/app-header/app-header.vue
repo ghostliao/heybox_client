@@ -36,10 +36,10 @@
           <div class="drag" ref="drag"></div>
         </div>
 
-        <div class="tab-btn" v-if="$store.state.config.dev">
+        <div class="tab-btn">
           <div class="tab-btn-wrap">
             <div class="notify" v-show="$store.state.newMessage"></div>
-            <cpt-icon-button icon="message-fill" :iconSize="20" @click="$router.push({ name: 'message'})"></cpt-icon-button>
+            <cpt-icon-button icon="message-fill" :iconSize="20" @click="pageToMessage"></cpt-icon-button>
           </div>
         </div>
         <template v-if="$store.state.config.env === 'test'">
@@ -213,6 +213,10 @@ export default {
           maxjia.windows.dragWindow(id)
         }
       }
+    },
+    pageToMessage () {
+      this.$router.push({ name: 'message'})
+      this.$store.state.newMessage = false
     }
   },
   created () {

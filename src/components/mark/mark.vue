@@ -50,7 +50,7 @@ export default {
     },
     iconSize () {
       if (this.large) {
-        return 32
+        return 28
       } else if (this.small) {
         return 12
       } else {
@@ -74,6 +74,10 @@ export default {
     height: 30px;
     border-radius: 50%;
     color: #fff;
+    .iconfont {
+      position: relative;
+      top: 1px;
+    }
     &.success {
       background-color: @successColor; 
     }
@@ -81,8 +85,8 @@ export default {
       background-color: @dangerColor;
     }
     &.large {
-      width: 48px;
-      height: 48px;
+      width: 42px;
+      height: 42px;
     }
     &.small {
       width: 18px;

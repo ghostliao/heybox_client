@@ -1,28 +1,30 @@
 <template>
   <div class="cpt-game-item">
-    <div class="game-item">
-      <div class="layer" :class="{ 'launching': launching }">
-        <div class="wrap progress" v-show="launching">
-          <div class="msg">启动中</div>
-          <cpt-linear-progress :size="2" />
+    <div class="stage" ref="stage">
+      <div class="game-item" ref="layer">
+        <div class="layer" :class="{ 'launching': launching }">
+          <div class="wrap progress" v-show="launching">
+            <div class="msg">启动中</div>
+            <cpt-linear-progress :size="2" />
+          </div>
+          <div class="wrap options" v-show="!launching">
+            <cpt-button label="启动" icon="start-fill" @click="launchGame" :param1="data.gameId" primary />
+            <cpt-button v-if="data.supportOptimize" label="优化" icon="optimization-fill" @click="openOptDialog" />
+          </div>
         </div>
-        <div class="wrap options" v-show="!launching">
-          <cpt-button label="启动" icon="start-fill" @click="launchGame" :param1="data.gameId" primary />
-          <cpt-button v-if="data.supportOptimize" label="优化" icon="optimization-fill" @click="openOptDialog" />
+        <div class="game-img">
+          <transition name="fade" mode="out-in">
+            <img v-if="data.gameHeaderImage" :src="data.gameHeaderImage" alt="">
+          </transition>
+          <img v-if="!data.gameHeaderImage" :src="'max-file:\\' + data.gameIcon" alt="">
         </div>
-      </div>
-      <div class="game-img">
-        <transition name="fade" mode="out-in">
-          <img v-if="data.gameHeaderImage" :src="data.gameHeaderImage" alt="">
-        </transition>
-        <img v-if="!data.gameHeaderImage" :src="'max-file:\\' + data.gameIcon" alt="">
-      </div>
-      <div class="info-bar">
-        <div class="name">
-          <img :src="'max-file:\\' + data.gameIcon" alt="">
-          <span>{{ data.gameName }}</span>
+        <div class="info-bar">
+          <div class="name">
+            <img :src="'max-file:\\' + data.gameIcon" alt="">
+            <span>{{ data.gameName }}</span>
+          </div>
+          <!-- <div class="duration">已玩 2324 h</div> -->
         </div>
-        <!-- <div class="duration">已玩 2324 h</div> -->
       </div>
     </div>
     <cpt-dialog :open="optDialog" title="" @close="closeOptDialog" @hide="closeOptDialog" dialogClass="opt-dialog" :overlayOpacity="0.7" optDialog cornerClose>
@@ -39,13 +41,15 @@
           </div>
           <div class="opt-intro-box-mask"></div>
           <div class="opt-intro-box">
-            <div class="layer loading" v-if="optState === 1">
-              <div class="msg">优化中</div>
+            <div class="layer loading" v-if="optState === 1 || optState === 3">
+              <div class="msg" v-show="optState === 1">优化中</div>
+              <div class="msg" v-show="optState === 3">还原中</div>
               <cpt-linear-progress :size="2" />
             </div>
-            <div class="layer result" v-if="optState === 2">
+            <div class="layer result" v-if="optState === 2 || optState === 4">
               <cpt-mark success></cpt-mark>
-              <div class="msg">优化成功</div>
+              <div class="msg" v-show="optState === 2">优化成功</div>
+              <div class="msg" v-show="optState === 4">还原成功</div>
               <cpt-button label="启动游戏" primary @click="launchGame" :param1="data.gameId"></cpt-button>
             </div>
             <template v-if="optState === 0">
@@ -55,10 +59,10 @@
                 <cpt-button v-if="currentOptLevel === Number(i.configLevel)" label="已优化" secondary disabled small></cpt-button>
                 <cpt-button v-else label="开始优化" primary small @click="optimizeConfirm(Number(i.configLevel))"></cpt-button>
               </div>
-              <div class="layer opt" v-if="optRecommandLevel">
+              <div class="layer opt" v-if="optRecommendLevel">
                 <div class="title">{{ data.supportLevels[1].levelName }}</div>
                 <div class="desc">{{ data.supportLevels[1].levelDesc }}</div>
-                <cpt-button v-if="currentOptRecommandLevel" label="已优化" secondary disabled small></cpt-button>
+                <cpt-button v-if="currentOptRecommendLevel" label="已优化" secondary disabled small></cpt-button>
                 <cpt-button v-else label="开始优化" primary small @click="optimizeConfirm(data.recommand_level)"></cpt-button>
               </div>
             </template>
@@ -85,35 +89,31 @@
             @click="changeOptType({ level: Number(i.configLevel) })">
           </cpt-button>
           <cpt-button v-if="data.recommand_level"
-            label="推荐配置" 
-            :secondary="!optRecommandLevel" 
-            :primary="optRecommandLevel" 
-            small 
-            :success="currentOptRecommandLevel" 
-            :icon="currentOptRecommandLevel ? 'check-fill' : ''"
-            @click="changeOptType({ level: data.recommand_level, recommand: true })">
+            label="推荐配置"
+            :secondary="!optRecommendLevel"
+            :primary="optRecommendLevel"
+            small
+            :success="currentOptRecommendLevel"
+            :icon="currentOptRecommendLevel ? 'check-fill' : ''"
+            @click="changeOptType({ level: data.recommand_level, recommend: true })">
           </cpt-button>
 
-          <!-- <cpt-button v-show="currentOptLevel !== 0" label="还原设置" primary small></cpt-button> -->
+          <cpt-button v-show="currentOptLevel !== 0 || currentOptRecommendLevel" label="还原配置" secondary small @click="restoreOptConfig"></cpt-button>
         </div>
       </div>
-      <!-- <mu-flat-button slot="actions" @click="closeOptDialog" primary label="取消"/> -->
-      <!-- <mu-flat-button slot="actions" primary @click="closeOptDialog" label="确定"/> -->
     </cpt-dialog>
   </div>
 </template>
 
 <script>
 import dialog from '@/components/dialog'
-import linearProgress from '@/components/linearProgress'
 import readFile from '@/components/readFile'
 
 export default {
   name: "cpt-video-item",
   mixins: [readFile],
   components: {
-    'cpt-dialog': dialog,
-    'cpt-linear-progress': linearProgress
+    'cpt-dialog': dialog
   },
   props: {
     data: {
@@ -123,10 +123,10 @@ export default {
   data () {
     return {
       launching: false,
-      launchingTime: 5000,
+      launchingTime: 10000,
       optDialog: false,
-      previewAfterImg: require('../../assets/opt_after.png'),
-      previewBeforeImg: require('../../assets/opt_before.jpg'),
+      previewAfterImg: require('../../assets/default_opt_preview.jpg'),
+      previewBeforeImg: require('../../assets/default_opt_preview.jpg'),
       diffLineWidth: 50,
       optLevelData: [
         {
@@ -151,10 +151,10 @@ export default {
         }
       ],
       optLevel: 1, // 选中的优化level
-      optRecommandLevel: false, // 选中推荐的level
+      optRecommendLevel: false, // 选中推荐的level
       currentOptLevel: 0, // 已优化的level
-      currentOptRecommandLevel: false, // 已优化的是否为推荐level
-      optState: 0, // opt state 0 -> 默认, 1 -> 优化中, 2 -> 优化结束
+      currentOptRecommendLevel: false, // 已优化的是否为推荐level
+      optState: 0, // opt state 0 -> 默认, 1 -> 优化中, 2 -> 优化结束, 3 -> 还原中， 4 -> 还原结束
       optimizing: false
     }
   },
@@ -175,11 +175,11 @@ export default {
       }
     }
   },
-  watch: {
-    data (value) {
-      this.pubgFullscreenHandler()
-    }
-  },
+  // watch: {
+  //   data (value) {
+  //     this.pubgFullscreenHandler()
+  //   }
+  // },
   methods: {
     launchGame (gameId) {
       this.launching = true
@@ -195,7 +195,7 @@ export default {
       if (this.data.recommand_level) {
         this.changeOptType({
           level: this.data.recommand_level,
-          recommand: true
+          recommend: true
         })
       } else {
         this.optLevel = 1
@@ -225,9 +225,20 @@ export default {
       percent = percent > 90 ? 90 : percent
       this.diffLineWidth = percent
     },
+    // 优化游戏
     optimizeGame (gameId, optLevel) {
       this.optimizing = true
       console.log(gameId, optLevel)
+
+      // 记录用户上次选择的优化方案
+      let gameJSON = JSON.parse(localStorage.getItem(this.data.gameId))
+      if (this.optRecommendLevel) {
+        gameJSON.recommend = true
+      } else {
+        gameJSON.optLevel = this.optLevel
+        gameJSON.recommend = false
+      }
+      localStorage.setItem(this.data.gameId, JSON.stringify(gameJSON))
 
       // engine
       this.gameOptimize({
@@ -252,85 +263,128 @@ export default {
       })
     
       setTimeout(() => {
-        if (this.optRecommandLevel) {
-          this.currentOptRecommandLevel = true
+        if (this.optRecommendLevel) {
+          this.currentOptRecommendLevel = true
           this.currentOptLevel = 0
         } else {
           this.currentOptLevel = this.optLevel
-          this.currentOptRecommandLevel = false
+          this.currentOptRecommendLevel = false
         }
         this.optState = 2
         this.optimizing = false
       }, 1000)
 
     },
+    // 选择优化方案
     changeOptType (config) {
-      // console.log(config.recommand)
-      if (!this.optimizing) {
-        // for (let [index, i] of this.data.supportLevels) {
-        //   if (i.configLevel === level) {
-        //     this.previewAfterImg = this.data.supportLevels[index].image
-        //   }
-        // }
-        for (let i = 0; i < this.data.supportLevels.length; i++) {
-          const el = this.data.supportLevels[i]
-          if (Number(el.configLevel) === Number(config.level)) {
-            this.previewAfterImg = this.data.supportLevels[i].image
-            this.previewBeforeImg = this.data.supportLevels[i].originalImage
-          }
+      if (this.optimizing) return
+      // for (let [index, i] of this.data.supportLevels) {
+      //   if (i.configLevel === level) {
+      //     this.previewAfterImg = this.data.supportLevels[index].image
+      //   }
+      // }
+      for (let i = 0; i < this.data.supportLevels.length; i++) {
+        const el = this.data.supportLevels[i]
+        if (Number(el.configLevel) === Number(config.level)) {
+          this.previewAfterImg = this.data.supportLevels[i].image
+          this.previewBeforeImg = this.data.supportLevels[i].originalImage
         }
-
-        // 记录用户上次选择的优化方案
-        let gameJSON = JSON.parse(localStorage.getItem(this.data.gameId))
-        if (config.recommand) {
-          this.optRecommandLevel = true
-          this.optLevel = 0
-          gameJSON.recommend = true
-        } else {
-          this.optLevel = config.level
-          this.optRecommandLevel = false
-          gameJSON.optLevel = Number(config.level)
-          gameJSON.recommend = false          
-        }
-        localStorage.setItem(this.data.gameId, JSON.stringify(gameJSON))
-        this.optState = 0
       }
+
+      if (config.recommend) { // 选中推荐配置
+        this.optRecommendLevel = true
+        this.optLevel = 0
+      } else {
+        this.optLevel = Number(config.level)
+        this.optRecommendLevel = false
+      }      
+
+      this.optState = 0
     },
     optimizeConfirm (level) {
       this.optState = 1
       this.optimizeGame(this.data.gameId, level)
     },
     // pubg强制设置全屏
-    pubgFullscreenHandler () {
-      if (this.data.gameId === 10410005 && this.data.gameUserSettingsPath) {
-        const filePath = this.data.gameUserSettingsPath
-        // this._readFile(filePath).then(data => {
-        //   // console.log(data)
-        //   const str = data.content
-        //   console.log(str.match(/FullscreenMode=\d/))
-        // })
-        this.readINI(filePath).then(data => {
-          data['/Script/TslGame.TslGameUserSettings']['FullscreenMode'][0].v = '1'
-          this._writeFile(data, filePath)
-          console.log('全屏参数设置项更改')
-        })
+    // pubgFullscreenHandler () {
+    //   if (this.data.gameId === 10410005 && this.data.gameUserSettingsPath) {
+    //     const filePath = this.data.gameUserSettingsPath
+    //     this.readINI(filePath, true).then(data => {
+    //       data['/Script/TslGame.TslGameUserSettings']['FullscreenMode'][0].v = '1'
+    //       this._writeFile(data, filePath)
+    //       console.log('全屏参数设置项更改')
+    //     })
+    //   }
+    // },
+    // 显示用户上次选择的优化方案
+    loadLastOptLevel () {
+      const local = localStorage.getItem(this.data.gameId)
+      if (local) {
+        const gameJSON = JSON.parse(local)
+        // console.log(gameJSON)
+        if (gameJSON.recommend) {
+          this.currentOptRecommendLevel = true
+        } else if (gameJSON.optLevel) {
+          console.log('last optimize level: ' + gameJSON.optLevel)
+          this.currentOptLevel = gameJSON.optLevel
+          this.currentOptRecommendLevel = false
+        }
       }
+    },
+    // 还原配置
+    restoreOptConfig () {
+      this.optState = 3
+      this.optimizing = true
+      this.restoreConfigFile('engine.ini', this.data.enginePath)
+      this.restoreConfigFile('gameUserSettings.ini', this.data.gameUserSettingsPath)
+      const local = localStorage.getItem(this.data.gameId)
+      const gameJSON = JSON.parse(local)
+      gameJSON.optLevel = 0
+      gameJSON.recommend = false
+      localStorage.setItem(this.data.gameId, JSON.stringify(gameJSON))
+
+      setTimeout(() => {
+        this.currentOptLevel = 0
+        this.currentOptRecommendLevel = false
+        this.optState = 4
+        this.optimizing = false
+      }, 1000)
+    },
+    restoreConfigFile (fileName, filePath) {
+      const iniStr = localStorage.getItem(filePath)
+      this.writeFile({
+        path: filePath,
+        mode: 'w+', // w -> 部分替换, w+ -> 全覆盖, a -> 追加
+        content: iniStr,
+        callback: (res) => {
+          console.log(fileName + ' restored')
+        }
+      })
+    },
+    // 板块透视动效
+    perspective () {
+      const stage = this.$refs.stage
+      const layer = this.$refs.layer
+      layer.addEventListener('mousemove', function (e) {
+        const centerX = layer.offsetWidth / 2
+        const centerY = layer.offsetHeight / 2
+        const x = e.pageX - layer.offsetLeft
+        const y = e.pageY - layer.offsetTop
+        const deltaX = x - centerX
+        const deltaY = y - centerY
+        const percentageX = deltaX / centerX
+        const percentageY = deltaY / centerY
+        const deg = 10
+        // debugger
+        this.style.transform = 'rotateX(' + percentageY * -deg + 'deg)' + 'rotateY(' + percentageX * deg + 'deg)'
+      })
+      layer.addEventListener('mouseleave', function (e) {
+        this.style.transform = ''
+      })  
     }
   },
   created () {
-    // 显示用户上次选择的优化方案
-    const local = localStorage.getItem(this.data.gameId)
-    if (local) {
-      const gameJSON = JSON.parse(local)
-      // console.log(gameJSON)
-      if (gameJSON.recommend) {
-        this.currentOptRecommandLevel = true
-      } else if (gameJSON.optLevel) {
-        this.currentOptLevel = gameJSON.optLevel
-        this.currentOptRecommandLevel = false        
-      }
-    }
-
+    this.loadLastOptLevel()
   },
   mounted () {
     // this.gameOptimize({
@@ -338,6 +392,7 @@ export default {
     //   level: optLevel,
     //   callback: () => {}
     // })
+    this.perspective()
   }
 }
 
@@ -348,11 +403,12 @@ export default {
   width: 25%;
   padding: 0 20px 20px 0;
   .common-transition;
-  @media (max-width: 900px) {
-    width: 50%;
-  }
-  @media (max-width: 1200px) {
+  transition-delay: .3s;
+  @media (max-width: 1280px) {
     width: 33.333333%;
+  }
+  .stage {
+    perspective: 1000px;
   }
   .game-item {
     position: relative;
@@ -361,6 +417,7 @@ export default {
     background-color: fade(@alternateTextColor, 80%);
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    transition: transform .3s;
     &:hover {
       .layer {
         opacity: 1;
@@ -379,7 +436,7 @@ export default {
       background: fade(@alternateTextColor, 80%);
       opacity: 0;
       // .common-transition;
-      transition-property: opacity;
+      // transition-property: opacity;
       &.launching {
         opacity: 1;
       }
@@ -566,10 +623,10 @@ export default {
     font-size: 0;
     .cpt-button {
       margin-right: 16px;
-      // &:last-of-type {
-      //   margin-right: 0;
-      //   float: right;
-      // }
+      &:last-of-type {
+        margin-right: 0;
+        float: right;
+      }
     }
   }
 }

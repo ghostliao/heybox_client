@@ -24,6 +24,10 @@
           <cpt-icon value="capture-fill" :size="24"></cpt-icon>
           <span class="txt">精彩时刻已关闭</span>
         </div> -->
+
+        <cpt-block-button v-if="$store.state.config.dev" :text="'start'" icon="set-fill" @click="momentStart"></cpt-block-button>
+        <cpt-block-button v-if="$store.state.config.dev" :text="'stop'" icon="set-fill" @click="momentStop"></cpt-block-button>
+        
       </div>
     </div>
     <div class="nav-bar">
@@ -47,13 +51,13 @@
             </cpt-menu>
           </cpt-select-field>
         </div>
-        <!-- <div class="media-list-filter-item">
+        <div class="media-list-filter-item">
           <cpt-select-field :select="mediaListFilter.moment.select.value === 'all' ? '时刻' : mediaListFilter.moment.select.label">
             <cpt-menu>
               <cpt-menu-item v-for="(key, value) in mediaListFilter.moment.filter" :key="key" :title="key" :selectActive="mediaListFilter.moment.select.value === value" @click="filterSelect('moment', key, value)" />
             </cpt-menu>
           </cpt-select-field>
-        </div> -->
+        </div>
       </div>
       <div class="show-type">
         <div class="btn" :class="{ 'active': $store.state.mediaListShowType === 'list' }" @click.stop="changeShowType('list')">
@@ -207,6 +211,12 @@ export default {
       this.mediaListFilter[type].select.label = key
       this.mediaListFilter[type].select.value = value
       Bus.$emit('closeMenu')
+    },
+    momentStart () {
+      Bus.$emit('start')
+    },
+    momentStop () {
+      Bus.$emit('stop')
     }
   },
   mounted () {

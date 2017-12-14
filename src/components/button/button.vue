@@ -51,7 +51,15 @@ export default {
       type: Boolean,
       default: false
     },
+    danger: {
+      type: Boolean,
+      default: false
+    },
     small: {
+      type: Boolean,
+      default: false
+    },
+    long: {
       type: Boolean,
       default: false
     },
@@ -70,7 +78,9 @@ export default {
         'primary': this.primary,
         'secondary': this.secondary,
         'success': this.success,
+        'danger': this.danger,
         'small': this.small,
+        'long': this.long,
         'narrow': this.narrow
       }
     }
@@ -150,6 +160,18 @@ export default {
         opacity: .4;
       }
     }
+    &.danger {
+      color: @textColor;      
+      background: fade(@dangerColor, 80%);
+      border-color: transparent;
+      &:hover {
+        color: @textColor;
+        background: fade(@dangerColor, 100%);
+      }
+      &:active {
+        opacity: .4;
+      }
+    }
     &.small {
       min-width: 80px;
       height: 28px;
@@ -157,6 +179,10 @@ export default {
       .iconfont {
         font-size: 14px;
       }
+    }
+    &.long {
+      width: 134px;
+      font-size: 14px;
     }
     &.narrow {
       min-width: 68px;

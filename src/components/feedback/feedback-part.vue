@@ -17,6 +17,7 @@
           <img :src="data.img.url" @load="onImageLoaded" @click="checkImage(data.img.url)" ref="image">
         </div>
       </div>
+      <div class="fb-dialog-conversation-fail" v-if="data.fail && data.is_user === 1">发送失败</div>
     </div>
   </div>
 </template>
@@ -45,8 +46,8 @@ export default {
     ]),
     onImageLoaded () {
       const h = this.$refs.image.naturalHeight
-      if (h < 138) {
-        this.$refs.imageWrap.style.height = h + 'px'
+      if (h < 134) {
+        this.$refs.imageWrap.style.height = h + 4 + 'px'
       }
       this.imageLoaded = true
     },
@@ -137,7 +138,13 @@ export default {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: 2px;
   }
+}
+.fb-dialog-conversation-fail {
+  font-size: 12px;
+  color: #e62a32;
+  line-height: 24px;
+  text-align: right;
 }
 </style>

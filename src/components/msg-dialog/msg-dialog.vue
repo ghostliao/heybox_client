@@ -39,7 +39,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 216px;
+  height: @dialogHeight;
   // border: 1px solid #000;
   // box-shadow: 0 0 0 1px @layoutBorderColor inset;
   

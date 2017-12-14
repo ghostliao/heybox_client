@@ -36,7 +36,7 @@
       <div class="col col-5">
         <div class="btn-group">              
           <div class="btn">
-            <cpt-icon-button icon="delete-fill" :iconSize="16" @click.stop="deleteVideo(data.localId)" danger></cpt-icon-button>
+            <cpt-icon-button icon="delete-fill" :iconSize="16" @click.stop="deleteVideo" danger></cpt-icon-button>
           </div>
           <div class="btn">
             <cpt-icon-button icon="upload-fill" :disabled="!(data.isMomentCapture && !data.uploadFinished && !data.uploading)" @click.stop="uploadVideo(data.localId)"></cpt-icon-button>              
@@ -47,6 +47,14 @@
         </div>
       </div>
     </div>
+    <!-- S delete confirm dialog -->
+    <cpt-dialog :open="deleteDialog" title="" @close="closeDeleteDialog" @hide="closeDeleteDialog" dialogClass="delete-dialog" :overlayOpacity="0.8" cornerClose>
+      <div slot="title" class="title">删除</div>
+      <div class="content">确认删除所选文件/分组吗？</div>
+      <cpt-button slot="actions" label="取消" @click="closeDeleteDialog" secondary narrow />
+      <cpt-button slot="actions" label="确认" @click="_deleteVideo" :param1="data.localId" primary narrow />
+    </cpt-dialog>
+    <!-- E delete confirm dialog -->
   </div>
 </template>
 
@@ -64,6 +72,7 @@ export default {
   },
   data () {
     return {
+      deleteDialog: false
     }
   },
   computed: {
@@ -76,6 +85,12 @@ export default {
       'playVideoFile',
       'locateFileInExplorer'
     ]),
+    openDeleteDialog () {
+      this.deleteDialog = true
+    },
+    closeDeleteDialog () {
+      this.deleteDialog = false
+    },
     // 播放视频
     playVideo (url) {
       // console.log('play')
@@ -96,9 +111,13 @@ export default {
       // console.log('upload')
       maxjia.media.file.uploadVideo(localId)
     },
-    deleteVideo (localId) {
-      // console.log('delete')
+    deleteVideo () {
+      this.openDeleteDialog()
+    },
+    _deleteVideo (localId) {
+      console.log('delete ' + localId)
       maxjia.media.file.deleteVideo(localId)
+      this.closeDeleteDialog()
     }
   },
   mounted () {
@@ -122,11 +141,12 @@ export default {
     background: @blockBackgroundColor;
     // background-image: linear-gradient(to bottom, #2a2e34, #30343a);
     // box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
-    box-shadow: inset 0 0 0 1px #151A20;
+    // box-shadow: inset 0 0 0 1px #151A20;
     cursor: pointer;
     overflow: hidden;
     &:hover {
-      background: #292D34;
+      // background: #292D34;
+      background: fade(#fff, 10%);
       box-shadow: none;
     }
     // &:after {
@@ -217,19 +237,17 @@ export default {
       }
       .duration {
         font-size: 12px;
-        color: fade(@textColor, 20%);
+        color: fade(@textColor, 40%);
       }
     }
     > .col-3 {
       width: 12.5%;
-      // width: 150px;
-      color: fade(@textColor, 20%);
+      color: fade(@textColor, 40%);
       font-size: 12px;
     }
     > .col-4 {
       width: 20%;
-      // width: 150px;
-      color: fade(@textColor, 20%);
+      color: fade(@textColor, 60%);
       font-size: 12px;
       .size {
         .upload-size {

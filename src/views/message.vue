@@ -9,7 +9,7 @@
           </div>
           <div class="setting-row" v-for="(i, index) of messageList" :key="index">
             <div class="view-msg-item-info">
-              <div class="view-msg-item-type">{{i.msg_type}}</div>
+              <div class="view-msg-item-type" v-text="i.msg_type === 'system' ? '小黑盒' : i.msg_type"></div>
               <div class="view-msg-item-time">{{i.time}}</div>
             </div>
             <div class="view-msg-item-content">
@@ -44,7 +44,8 @@ export default {
       const url = '/pc/get_sys_msg'
       const options = {
         params: {
-          heybox_id: this.$store.state.accountInfo.uid
+          heybox_id: this.$store.state.accountInfo.uid,
+          os_type: 'pc'
         }
       }
       this.$ajax.get(url, options).then(res => {
@@ -105,6 +106,7 @@ export default {
 .view-msg-item-content {}
 .view-msg-item-content-wrap {
   font-size: 14px;
+  color: fade(@textColor, 80%);
   line-height: 20px;
   a {
     color: @primaryColor;

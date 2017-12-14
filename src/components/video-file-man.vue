@@ -1,7 +1,5 @@
 <template>
-  <div class="cpt-video-file-man">
-    <!-- <div class="json">{{videoList}}</div> -->
-  </div>
+  <div class="cpt-video-file-man"></div>
 </template>
 
 <script>

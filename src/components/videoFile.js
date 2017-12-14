@@ -36,7 +36,7 @@ export default {
     },
     onVideoFileAdded (videoItem, isMoment = false) {
       // console.log('onVideoFileAdded')
-      if (isMoment) {
+      if (isMoment && videoItem.isMomentCapture) {
         this.addVideoItemToMomentList(videoItem)
       } else {
         this.addVideoItem(videoItem)

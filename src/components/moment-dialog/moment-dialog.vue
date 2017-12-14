@@ -8,13 +8,13 @@
         <div class="moment-dialog-body-container">
           <cpt-moment-dialog-media-item v-for="(i, index) in mediaList" :key="index" :data="i" :index="index" :itemCount="mediaList.length"></cpt-moment-dialog-media-item>
         </div>
-        <lazy :time="300">
-          <div class="moment-dialog-upload-all">
-            <div class="txt">精彩的游戏！赶快分享给大家吧~</div>
-            <cpt-button label="全部上传" icon="upload-fill" long primary @click="uploadAllMoment" />
-          </div>
-        </lazy>
       </div>
+      <!-- <transition name="fade"> -->
+        <div class="moment-dialog-upload-all">
+          <!-- <div class="txt">精彩的游戏！赶快分享给大家吧~</div> -->
+          <cpt-button label="全部上传" icon="upload-fill" long primary @click="uploadAllMoment" />
+        </div>
+      <!-- </transition> -->
     </div>
   </cpt-dialog>
 </template>
@@ -125,23 +125,33 @@ export default {
   }
 }
 .moment-dialog-body {
+  position: relative;
   height: calc(~"100% - 50px");
   overflow-y: scroll;
 }
 .moment-dialog-body-container {
-  padding: 8px 16px;
+  padding: 8px 16px 48px;
 }
 .moment-dialog-upload-all {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 120px;
-  padding-bottom: 30px;
-  .txt {
-    font-size: 12px;
-    font-weight: 400;
-    margin-bottom: 20px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 20px;
+  margin: auto;
+  width: 134px;
+  // display: flex;
+  // flex-direction: column;
+  // justify-content: center;
+  // align-items: center;
+  // height: 120px;
+  // padding-bottom: 30px;
+  // .txt {
+  //   font-size: 12px;
+  //   font-weight: 400;
+  //   margin-bottom: 20px;
+  // }
+  .cpt-button {
+    .depth(1);
   }
 }
 

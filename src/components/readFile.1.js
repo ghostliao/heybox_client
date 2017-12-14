@@ -136,22 +136,13 @@ export default {
         resolve(xmlDoc)
       })
     },
-    readINI (path, noBackup) {
+    readINI (path) {
       console.log(path)
       const _this = this
       return new Promise((resolve, reject) => {        
         this._readFile(path).then(function (data) {
           console.log(data)
           if (data.result) {
-            // 原文件备份
-            if (!noBackup) {
-              const bac = localStorage.getItem(path)
-              if (!bac) {
-                localStorage.setItem(path, data.content)
-              }
-            }
-
-            // 解析.ini
             let iniJSON = _this.parseINIString(data.content)
             const pathArray = data.path.split('/')
             const fileName = pathArray[pathArray.length - 1]

@@ -32,7 +32,7 @@
                   <div>小黑妹</div>
                 </div>
                 <div class="fb-dialog-admin-desc">
-                  <div>通常在几小时内回复</div>
+                  <div>我们将会在第一时间为您解决问题</div>
                 </div>
               </div>
             </div>
@@ -41,6 +41,7 @@
           <div class="fb-dialog-body" ref="scroll" v-show="!loading">
             <div class="fb-dialog-conversation" ref="wrap">
               <div class="fb-dialog-conversation-wrap">
+                <div class="fb-dialog-conversation-notice" v-if="conversationList.length >= 30">仅展示最近30条信息</div>
                 <template v-for="(i, index) of conversationList">
                   <div class="fb-dialog-conversation-time" :key="index" v-if="index === 0">{{filterFormDate(conversationList[0].create_at, 6)}}</div>
                   <div class="fb-dialog-conversation-time" :key="index" v-if="conversationList[index - 1] && filterFormDate(conversationList[index - 1].create_at, 6) !== filterFormDate(conversationList[index].create_at, 6)">{{filterFormDate(i.create_at, 6)}}</div>
@@ -50,12 +51,24 @@
             </div>
           </div>
 
+          <transition name="fade">
+            <div class="fb-dialog-upload-status" v-if="uploadStatus">
+              <div class="fb-dialog-upload-status-wrap">
+                <div v-show="uploadStatus === 'uploading'">正在发送图片</div>
+                <div v-show="uploadStatus === 'success'">图片发送成功</div>
+                <div v-show="uploadStatus === 'imgFail'">图片发送失败</div>
+                <div v-show="uploadStatus === 'msgFail'">消息发送失败</div>
+                <div v-show="uploadStatus === 'sizeLimit'">请发送小于3M的文件</div>
+              </div>
+            </div>
+          </transition>
+
           <div class="fb-dialog-footer">
             <div class="fb-dialog-composer">
               <pre>{{composerContent}}<br></pre>
               <textarea placeholder="请尽可能详细的描述你的问题" spellcheck="false" v-model="composerContent" @keydown="keydown" ref="composer"></textarea>
               <div class="send">
-                <cpt-icon-button icon="screenshot-fill" :iconSize="20" @click="uploadImage"></cpt-icon-button>
+                <cpt-icon-button icon="picture-fill" :iconSize="20" @click="uploadImage"></cpt-icon-button>
               </div>
             </div>
           </div>
@@ -83,6 +96,8 @@ export default {
       fbDialog: false,
       loading: true,
       conversationList: [],
+      uploadStatus: '', // uploading, success, fail
+      postMsg: '',
       adminAvatar: '',
       composerContent: ''
     }
@@ -145,14 +160,12 @@ export default {
           return
         } else {
           e.preventDefault()
-          this.sendMsg()
+          // this.addConversationItem()
+          this.postFeedback()
         }
       }
     },
-    sendMsg (imgUrl) {
-      const msg = this.composerContent
-      if (!imgUrl && msg === '') return
-
+    addConversationItem (imgUrl) {
       const timeStamp = new Date().getTime() / 1000
       let item = {}
       if (imgUrl) {
@@ -160,7 +173,7 @@ export default {
           info_type: "image",
           create_at: timeStamp,
           is_user: 1,
-          text: msg,
+          text: this.postMsg,
           img: {
             url: imgUrl
           },
@@ -170,11 +183,15 @@ export default {
           info_type: "text",
           create_at: timeStamp,
           is_user: 1,
-          text: msg
+          text: this.postMsg
         }
       }
       this.conversationList.push(item)
       console.log(item)
+    },
+    postFeedback (imgUrl) {
+      this.postMsg = this.composerContent
+      if (!imgUrl && this.postMsg === '') return
 
       const url = '/bbs/app/feedback/post'
       let data = ''
@@ -184,7 +201,7 @@ export default {
         })
       } else {
         data = this.qs.stringify({
-          'text': msg,
+          'text': this.postMsg,
           // 'send_timestamp': timeStamp
         })
       }
@@ -200,18 +217,44 @@ export default {
         console.log(res)
         const data = res.data
         if (data.status === 'ok') {
-          
+          if (imgUrl) {
+            this.uploadStatusUpdate('success')
+            this.addConversationItem(imgUrl)
+          } else {
+            this.addConversationItem()
+            this.composerContent = ''            
+          }
         } else {
-
+          if (imgUrl) {
+            this.uploadStatusUpdate('imgFail')
+          } else {
+            this.uploadStatusUpdate('msgFail')
+          }
         }
-      }, res => {})
+      }, res => {
+        if (imgUrl) {
+          this.uploadStatusUpdate('imgFail')
+        } else {
+          this.uploadStatusUpdate('msgFail')
+        }
+      })
 
 
-      this.composerContent = ''
-      console.log(msg)
+      // this.composerContent = ''
+      console.log(this.postMsg)
     },
     scrollHandler () {
       this.$refs.scroll.scrollTop = this.$refs.wrap.clientHeight
+    },
+    uploadStatusUpdate (status) {
+      this.uploadStatus = status
+      if (status === 'uploading') {
+        return
+      } else {
+        setTimeout(() => {
+          this.uploadStatus = ''
+        }, 3000)
+      }
     },
     uploadInit () {
       const self = this
@@ -225,10 +268,13 @@ export default {
       .size(1024*1024)//分片大小，最多为4MB,单位为字节,默认3MB
       .chunk(true)//是否分块上传，默认true，当chunk=true并且文件大于4MB才会进行分块上传
       .auto(true)//选中文件后立即上传，默认true
-      .multiple(true)//是否支持多文件选中，默认true
-      .accept(['image/jpeg','image/png','image/gif'])//过滤文件，默认无，详细配置见http://www.w3schools.com/tags/att_input_accept.asp
+      .multiple(false)//是否支持多文件选中，默认true
+      .accept(['image/png','image/jpeg','image/gif'])//过滤文件，默认无，详细配置见http://www.w3schools.com/tags/att_input_accept.asp
       .tokenShare(false)//在一次上传队列中，是否分享token,如果为false每上传一个文件都需要请求一次Token，默认true
-      .tokenFunc(function (setToken,task) {
+      .tokenFunc(function (setToken, task) {
+        self.uploadStatusUpdate('uploading')
+        
+
         //token获取函数，token获取完成后，必须调用`setToken(token);`不然上传任务不会执行。
         //为每一个上传的文件指定key,如果不指定则由七牛服务器自行处理
         const getTokenUrl = self.$store.state.origin[self.$store.state.config.env] + '/bbs/qiniu/web/token'
@@ -238,15 +284,16 @@ export default {
         const options = {
           method: 'post',
           params: {
-            'os_type': 'web',
-            'app_id': 'heybox_web',
+            'os_type': 'pc',
             'heybox_id': self.$store.state.accountInfo.uid
           },
           data
         }
-        self.$ajax(getTokenUrl, options).then((res) => {
+        self.$ajax(getTokenUrl, options).then(res => {
           console.log(res)
           setToken(res.data.uptoken)
+        }, res => {
+          self.uploadStatusUpdate('imgFail')
         }).catch((res) => {
           console.log(res)
         })
@@ -256,14 +303,14 @@ export default {
       .interceptor({
         //拦截任务,返回true，任务将会从任务队列中剔除，不会被上传
         onIntercept: function (task) {
-          console.log(task.file.size)
+          // console.log(task.file.size)
           return task.file.size > 1024 * 1024 * 3;
           // 最大3M
         },
         //中断任务，返回true，任务队列将会在这里中断，不会执行上传操作。
         onInterrupt: function (task) {
           if (this.onIntercept(task)) {
-            self.contentMsgUpdate("请上传小于3M的文件");
+            self.uploadStatusUpdate('sizeLimit')
             return true;
           } else {
             return false;
@@ -294,15 +341,19 @@ export default {
           //一个任务上传成功后回调
           //console.log(task.result.key);//文件的key
           //console.log(task.result.hash);//文件hash
-          // self.contentMsgUpdate('上传成功')
-          console.log(task.result)
-          const res = task.result
-          // self.readFile(res.url, res.width, res.height)
-          self.sendMsg(res.url)
+
+          // self.uploadStatusUpdate('success')
+          // 将文件以Data URL形式进行读入页面
+          // const reader = new FileReader()
+          // reader.readAsDataURL(task.file)
+          // reader.onload = function (e) {
+          //   self.addConversationItem(this.result)
+          // }
+          self.postFeedback(task.result.url)
 
         }, onTaskFail (task) {
           //一个任务在经历重传后依然失败后回调此函数
-          self.contentMsgUpdate('上传失败')
+          self.uploadStatusUpdate('imgFail')
         }, onTaskRetry (task) {
           //开始重传
           console.log('upload retry')
@@ -410,12 +461,14 @@ export default {
   .fb-dialog-admin-name {
     font-size: 14px;
     line-height: 20px;
+    font-weight: 400;    
     color: #fff;
     .ellipsis;
   }
   .fb-dialog-admin-desc {
     font-size: 12px;
     line-height: 16px;
+    font-weight: 400;
     color: fade(#fff, 60%);
     .ellipsis;    
   }
@@ -444,6 +497,13 @@ export default {
     padding: 18px;
     font-weight: 400;
   }
+  .fb-dialog-conversation-notice {
+    font-size: 12px;
+    color: @secondaryTextColor;
+    line-height: 24px;
+    font-weight: 300;
+    text-align: center;
+  }  
   .fb-dialog-conversation-part {
     .clearfix;
     margin-bottom: 10px;
@@ -493,6 +553,26 @@ export default {
     border-radius: 4px;
     word-wrap: break-word;
   }
+  .fb-dialog-upload-status {
+    position: absolute;
+    z-index: 2;
+    margin: auto;
+    left: 0;
+    right: 0;
+    bottom: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 24px;
+  }
+  .fb-dialog-upload-status-wrap {
+    font-size: 12px;
+    text-align: center;
+    background: fade(@fullBlack, 80%);
+    border-radius: 4px;
+    padding: 4px 10px;
+    .depth(1);
+  }  
   .fb-dialog-footer {
     position: absolute;
     z-index: 2;

@@ -79,6 +79,10 @@ export default {
     success: {
       type: Boolean,
       default: false
+    },
+    active: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -93,6 +97,7 @@ export default {
       if (this.danger) classNames.push('danger')
       if (this.success) classNames.push('success')
       if (this.disabled) classNames.push('disabled')
+      if (this.active) classNames.push('active')
       if (!this.disabled && (this.hover || this.isKeyboardFocused)) classNames.push('hover')
       return classNames.join(' ')
     }

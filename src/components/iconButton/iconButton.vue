@@ -2,7 +2,7 @@
 <abstract-button @click="handleClick"
   @hover="handleHover" @hoverExit="handleHoverExit" @keyboardFocus="handleKeyboardFocus"
   :to="to" :tag="tag" :activeClass="activeClass" :event="event" :exact="exact" :append="append" :replace="replace"
-  :type="type" :href="href" :target="target" :disabled="disabled" :keyboardFocused="keyboardFocused" wrapperClass="icon-wrap" :style="buttonStyle" class="mu-icon-button" :danger="danger" :success="success">
+  :type="type" :href="href" :target="target" :disabled="disabled" :keyboardFocused="keyboardFocused" wrapperClass="icon-wrap" :style="buttonStyle" class="cpt-icon-button" :danger="danger" :success="success">
   <slot>
     <icon :value="icon" :class="iconClass" :size="iconSize"></icon>
   </slot>
@@ -123,7 +123,7 @@ export default {
 
 <style lang="less">
 @import "../../styles/import.less";
-.mu-icon-button {
+.cpt-icon-button {
   position: relative;
   display: inline-block;
   overflow: visible;
@@ -136,7 +136,8 @@ export default {
   border: none;
   appearance: none;
   background: none;
-  color: inherit;
+  // color: inherit;
+  color: @lightIconColor;
   text-decoration: none;
   .common-transition;
   .flex-shrink(0);
@@ -171,6 +172,9 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .mu-dialog-close & {
+    text-shadow: 0 1px 1px fade(@fullBlack, 60%);
   }
 }
 </style>

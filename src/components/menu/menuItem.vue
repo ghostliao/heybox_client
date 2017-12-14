@@ -1,9 +1,9 @@
 <template>
 <div>
-   <abstract-button  class="mu-menu-item-wrapper" :class="{'active': active}"
+   <abstract-button class="mu-menu-item-wrapper" :class="{'active': active}"
       :href="href" :target="target" ref="button" :centerRipple="false"
       :to="to" :tag="tag" :activeClass="activeClass" :event="event" :exact="exact" :append="append" :replace="replace"
-      :disableFocusRipple="disableFocusRipple" :disabled="disabled" containerElement="div"
+      :disableFocusRipple="disableFocusRipple" :disabled="disabled" :active="selectActive" containerElement="div"
       @click="handleClick" @keyboardFocus="handleKeyboardFocus" @hover="handleHover" @hoverExit="handleHoverExit">
      <div class="mu-menu-item" :class="{'have-left-icon': leftIcon || inset}">
        <icon v-if="leftIcon !== 'img'" :value="leftIcon" :size="12" :style="{'color': filterColor(leftIconColor)}" class="mu-menu-item-left-icon" :class="leftIconClass"/>
@@ -97,7 +97,11 @@ export default {
       type: [String, Object, Array]
     },
     value: {},
-    nestedMenuValue: {}
+    nestedMenuValue: {},
+    selectActive: {
+      type: Boolean,
+      default: false
+    }
   },
   computed: {
     showAfterText () {
@@ -189,7 +193,7 @@ export default {
   height: 32px;
   line-height: 32px;
   transition: all .45s @easeOutFunction;
-  color: fade(#f1f2f3, 50%);
+  color: fade(@textColor, 50%);
   position: relative;
   cursor: pointer;
   user-select: none;
@@ -199,7 +203,7 @@ export default {
     font-size: 15px;
   }
   &.hover {
-    color: #f1f2f3;
+    color: @textColor;
     // background-color: @dialogHoverBackgroundColor;
   }
   // &:active {
@@ -209,6 +213,9 @@ export default {
   &.disabled {
     color: @disabledColor;
     cursor: not-allowed;
+  }
+  &.active {
+    color: @primaryColor;
   }
 }
 

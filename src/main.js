@@ -35,6 +35,7 @@ import dialog from '@/components/dialog'
 import icon from '@/components/icon'
 import iconButton from '@/components/iconButton'
 import lazy from '@/components/lazy'
+import linearProgress from '@/components/linearProgress'
 import mark from '@/components/mark'
 import selectField from '@/components/select-field'
 import * as table from '@/components/table'
@@ -47,6 +48,7 @@ const components = {
   icon,
   iconButton,
   lazy,
+  linearProgress,
   mark,
   selectField,
   ...table,
@@ -70,7 +72,7 @@ Vue.prototype.getParameterByName = function (name, url) {
 
 Vue.filter('fileSize', (t) => (t / 1024 /1024).toFixed(1) + 'M')
 Vue.filter('fileName', (t) => {
-  const array = t.split('/')
+  const array = decodeURIComponent(t).split('/')
   const fileName = array[array.length - 1]
   return fileName
 })
@@ -128,7 +130,7 @@ Vue.prototype.filterDuration = function (t) {
 }
 Vue.filter('formDate', function (t, type = 1) {
   // filter type
-  // 1 日期带时分秒
+  // 1 日期带时分
   // 2 距离现在过去多久
   // 3 24小时显示内距离现在过去多久，24小时以上显示日期不带时分秒
   // 4 年月日
@@ -142,8 +144,8 @@ Vue.filter('formDate', function (t, type = 1) {
   const day = dateTime.getDate()
   const hour = dateTime.getHours()
   let minute = dateTime.getMinutes()
-  minute < 10 && (minute = "0" + minute)
-  // const second = dateTime.getSeconds()
+  minute < 10 && (minute = '0' + minute)
+  // let second = dateTime.getSeconds()
 
   if (type === 1) {
     return year + '-' + month + '-' + day + ' ' + hour + ':' + minute
@@ -190,12 +192,13 @@ Vue.filter('formDate', function (t, type = 1) {
 })
 Vue.prototype.filterFormDate = function (t, type = 1) {
   // filter type
-  // 1 日期带时分秒
+  // 1 日期带时分
   // 2 距离现在过去多久
   // 3 24小时显示内距离现在过去多久，24小时以上显示日期不带时分秒
   // 4 年月日
   // 5 年月日，当天日期显示“今天”
   // 6 月日
+  // 7 时分秒
 
   const timeSpan = t * 1000
   const dateTime = new Date(parseInt(timeSpan))
@@ -205,13 +208,16 @@ Vue.prototype.filterFormDate = function (t, type = 1) {
   const day = dateTime.getDate()
   const hour = dateTime.getHours()
   let minute = dateTime.getMinutes()
-  minute < 10 && (minute = "0" + minute)
-  // const second = dateTime.getSeconds()
+  minute < 10 && (minute = '0' + minute)
+  let second = dateTime.getSeconds()
+  second < 10 && (second = '0' + second)
 
   if (type === 1) {
     return year + '-' + month + '-' + day + ' ' + hour + ':' + minute
   } else if (type === 6) {
     return month + '月' + day + '日'
+  } else if (type === 7) {
+    return hour + ':' + minute + ':' + second
   } else if (type === 4) {
     return year + '-' + month + '-' + day
   } else if (type === 5) {

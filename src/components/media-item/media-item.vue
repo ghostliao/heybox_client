@@ -57,66 +57,64 @@
           <div class="thumbnail">
             <img v-lazy="thumbnail">
           </div>
-          <div class="layer" v-show="!data.uploading">
-            <div class="play">
-              <cpt-icon v-if="data.fileType === 'video'" value="start-fill" :size="24"></cpt-icon>
-              <cpt-icon v-if="data.fileType === 'image'" value="fullscreen-fill" :size="24"></cpt-icon>
-            </div>
-          </div>
-          <div class="upload-info" v-show="data.uploading">
-            <div v-if="data.fileType === 'video'" class="size">
-              <span class="upload-size" v-show="data.uploading">{{ data.fileSize * data.uploadProgress | fileSize }}</span>
-              <span v-show="data.uploading">/</span>
-              <span class="full-size">{{ data.fileSize | fileSize }}</span>
+          <div class="layer" :class="{ 'hover': data.uploading }">
+            <div class="name">{{ data.file | fileName }}</div>
+            <div class="upload-status">
+              <div class="icon-fail" v-show="data.uploadFailed">
+                <cpt-icon value="warning-fill" :size="12"></cpt-icon>
+              </div>
+              <div class="msg" v-show="data.uploadFailed">上传失败</div>
             </div>
             <div class="progress-bar" v-show="data.uploading">
               <div class="value" :style="{ width: data.uploadProgress * 100 + '%' }"></div>
             </div>
-          </div>
-          <div class="size" :class="{ 'upload-failed': data.uploadFailed }">
-            <div class="size-wrap">
-              <span class="full-size" v-if="data.fileType === 'video'">{{ data.fileSize | fileSize }}</span>
-              <span class="upload-status" v-if="data.uploadFailed">上传失败</span>
+            <div class="size">
+              <template v-if="data.fileType === 'video'">
+                <span class="upload-size" v-show="data.uploading">{{ data.fileSize * data.uploadProgress | fileSize }}</span>
+                <span class="upload-size" v-show="data.uploading">/</span>
+                <span class="full-size">{{ data.fileSize | fileSize }}</span>
+              </template>
+            </div>
+            <div class="btn-group">
+              <div class="btn">
+                <cpt-icon-button icon="delete-fill" :iconSize="16" @click.stop="deleteMedia" danger></cpt-icon-button>
+              </div>
+              <div class="btn">
+                <cpt-icon-button v-if="data.uploadFinished" icon="check-fill" success></cpt-icon-button>
+                <!-- <cpt-mark v-if="data.uploadFinished" success small></cpt-mark> -->
+                <cpt-icon-button v-else icon="upload-fill" :disabled="uploadDisabled" @click.stop="uploadMedia(data.localId)"></cpt-icon-button>
+              </div>
+              <div class="btn">
+                <cpt-icon-button icon="search-file-fill" @click.stop="locateFileInExplorer({ url: data.file })"></cpt-icon-button>
+              </div>
             </div>
           </div>
           <div class="duration" v-if="data.fileType === 'video'">
             <span>{{ data.duration | duration }}</span>
           </div>
-        </div>
-        <div class="row row-2">
-          <div class="name">{{ data.file | fileName }}</div>
-          <div class="btn-group">
-            <div class="btn">
-              <cpt-icon-button icon="delete-fill" :iconSize="16" @click.stop="deleteMedia" danger></cpt-icon-button>
-            </div>
-            <div class="btn">
-              <cpt-icon-button v-if="data.uploadFinished" icon="check-fill" success></cpt-icon-button>
-              <!-- <cpt-mark v-if="data.uploadFinished" success small></cpt-mark> -->
-              <cpt-icon-button v-else icon="upload-fill" :disabled="uploadDisabled" @click.stop="uploadMedia(data.localId)"></cpt-icon-button>
-            </div>
-            <div class="btn">
-              <cpt-icon-button icon="search-file-fill" @click.stop="locateFileInExplorer({ url: data.file })"></cpt-icon-button>
-            </div>
-          </div>
+          <div class="bottom-mask" v-if="data.fileType === 'video'"></div>
         </div>
       </div>
     </div>
 
     <!-- S delete confirm dialog -->
-    <cpt-dialog :open="deleteDialog" title="" @close="closeDeleteDialog" @hide="closeDeleteDialog" dialogClass="delete-dialog" :overlayOpacity="0.8" cornerClose>
-      <div slot="title" class="title">删除</div>
-      <div class="content">确认删除所选文件吗？</div>
-      <cpt-button slot="actions" label="取消" @click="closeDeleteDialog" secondary />
-      <cpt-button slot="actions" label="确认" @click="_deleteMedia" :param1="data.localId" primary />
+    <cpt-dialog :open="deleteDialog" title="" @close="closeDeleteDialog" @hide="closeDeleteDialog" dialogClass="msg-dialog" :overlayOpacity="0.8" cornerClose>
+      <div slot="title" class="title">删除所选文件</div>
+      <div class="content">该项目将被立即删除，您不能撤销此操作</div>
+      <cpt-button slot="actions" label="取消" @click="closeDeleteDialog" secondary long />
+      <cpt-button slot="actions" label="删除" @click="_deleteMedia" :param1="data.localId" danger long />
     </cpt-dialog>
     <!-- E delete confirm dialog -->
 
     <!-- S upload guide toast -->
     <transition name="fade">
-      <div v-if="index === 0 && guideToast" class="guide-toast" ref="toast" v-clickoutside="closeGuideToast">
+      <div v-if="index === 0 && guideToast" class="guide-toast" :class="{ 'hide': mediaItemStyle !== 'list' }" ref="toast">
         <div class="wrap">
-          <div class="msg">点击上传，同步精彩时刻至小黑盒APP</div>
-          <cpt-icon-button icon="close" @click="closeGuideToast"></cpt-icon-button>
+          <div class="msg">
+            <span>点击上传，同步精彩时刻至小黑盒APP~</span>
+            <span class="never" @click="closeGuideToast(true)">不再提示</span>
+          </div>
+          <cpt-icon-button icon="close" @click="closeGuideToast(false)"></cpt-icon-button>
         </div>
       </div>
     </transition>
@@ -225,6 +223,7 @@ export default {
       } else if (this.data.fileType === 'image') {
         maxjia.media.file.uploadImage(localId)
       }
+      this.firstUploadNotice()
     },
     deleteMedia () {
       this.openDeleteDialog()
@@ -256,9 +255,11 @@ export default {
         })
       }
     },
-    closeGuideToast () {
+    closeGuideToast (neverShow) {
       this.guideToast = false
-      localStorage.setItem('uploadGuide', 1)
+      if (neverShow) {
+        localStorage.setItem('uploadGuide', 1)
+      }
     },
     uploadGuide () { // 上传引导
       if (localStorage.getItem('uploadGuide') !== '1') {
@@ -268,7 +269,6 @@ export default {
   },
   created () {
     this.uploadGuide()
-    this.firstUploadNotice()
     Bus.$on('toggleManageBar', data => {
       if (this.formDate(data[0]) === this.formDate(this.data.createTimeStamp)) {
         this.manageBarOpen = !this.manageBarOpen
@@ -290,8 +290,16 @@ export default {
     width: 100%;
   }
   &.grid {
-    width: 20%;
+    width: 16.666667%;
     padding-right: 20px;
+    // .common-transition;
+    // transition-delay: .3s;
+    @media (max-width: 1600px) {
+      width: 20%;
+    }
+    @media (max-width: 1280px) {
+      width: 25%;
+    }
   }
   .media-item {
     &.list {
@@ -461,7 +469,7 @@ export default {
       }
     }
     &.grid {
-      margin-bottom: 8px;
+      margin-bottom: 20px;
       cursor: pointer;
       .media-item-wrap {
         > .row-1 {
@@ -491,47 +499,50 @@ export default {
             right: 0;
             bottom: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
             background: fade(#14191e, 80%);
+            padding: 0 8px;
             opacity: 0;
             // .common-transition;
-            .play {
-              position: relative;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              width: 36px;
-              height: 28px;
-              font-size: 14px;
-              color: fade(#fff, 80%);
+            &.hover {
+              opacity: 1;
             }
-          }
-          .upload-info {
-            position: absolute;
-            z-index: 2;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: fade(#14191e, 80%);
-            color: fade(@textColor, 60%);
-            font-size: 12px;
-            .size {
-              .upload-size {
-                color: fade(@textColor, 60%);
+            .name {
+              font-size: 14px;
+              line-height: 20px;
+              padding: 5px 0;
+              display: -webkit-box;
+              -webkit-line-clamp: 3;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+            }
+            .upload-status {
+              flex: 1;
+              min-height: 0;
+              display: flex;
+              font-size: 14px;
+              .icon-fail {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: @dangerColor;
+                font-size: 0;
+                font-weight: 300;
+              }
+              .msg {
+                line-height: 16px;
+                height: 16px;
+                padding-left: 8px;
               }
             }
             .progress-bar {
-              width: 80%;
               height: 2px;
               border-radius: 2px;
               background-color: fade(#fff, 20%);
-              margin-top: 6px;
+              margin-bottom: 8px;
               .value {
                 position: relative;
                 height: 2px;
@@ -551,73 +562,65 @@ export default {
                 }
               }
             }
-          }
-          > .size {
-            position: absolute;
-            z-index: 3;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            color: @textColor;
-            .size-wrap {
-              position: absolute;
-              left: 0;
-              right: 0;
-              bottom: 0;
-              height: 58px;
+            .size {
+              color: fade(@textColor, 60%);
               font-size: 12px;
-              font-weight: 400;
-              line-height: 1;
-              padding: 40px 4px 6px;
-              background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.6));
+              line-height: 12px;
+              height: 12px;
+              text-align: right;
+              .upload-size {
+                color: @textColor;
+              }
             }
-            &.upload-failed {
-              color: @dangerColor;
-              border: 1px solid @dangerColor;
+            .btn-group {
+              display: flex;
+              align-items: center;
+              height: 32px;
+              padding: 8px 0;
+              .btn {
+                position: relative;
+                // width: 14px;
+                // height: 14px;
+                margin-right: 6px;
+                color: @lightIconColor;
+                &.disabled {
+                  color: fade(@textColor, 10%);
+                  cursor: not-allowed;
+                }
+              }
             }
           }
           .duration {
             position: absolute;
-            z-index: 4;
+            z-index: 3;
+            right: 0;
+            bottom: 0;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 32px;
+            text-align: right;
+            padding: 0 8px;
+            span {
+              position: relative;
+              &:before {
+                content: '';
+                position: absolute;
+                top: 3px;
+                left: -14px;
+                border-left: 8px solid fade(@textColor, 60%);
+                border-top: 5px solid transparent;
+                border-bottom: 5px solid transparent;
+              }
+            }
+          }
+          .bottom-mask {
+            position: absolute;
+            z-index: 1;
             left: 0;
             right: 0;
             bottom: 0;
             height: 58px;
-            font-size: 12px;
-            font-weight: 400;
-            line-height: 1;
-            padding: 40px 4px 6px;
-            text-align: right;
-            // background: @tooltipBackgroundColor;
-          }
-        }
-        > .row-2 {
-          display: flex;
-          height: 36px;
-          .name {
-            flex: 1;
-            min-width: 0;
-            font-size: 14px;
-            line-height: 36px;
-            .ellipsis;
-          }
-          .btn-group {
-            display: none;
-            justify-content: flex-end;
-            align-items: center;
-            padding-left: 10px;
-            .btn {
-              position: relative;
-              // width: 14px;
-              // height: 14px;
-              margin-left: 6px;
-              color: @lightIconColor;
-              &.disabled {
-                color: fade(@textColor, 10%);
-                cursor: not-allowed;
-              }
-            }
+            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.6));
           }
         }
         &:hover {
@@ -641,10 +644,14 @@ export default {
   }
   .guide-toast {
     position: absolute;
+    z-index: 1;
     right: 31px;
     bottom: 54px;
     width: 400px;
     height: 56px;
+    &.hide {
+      display: none !important;
+    }
     .wrap {
       position: relative;
       width: 100%;
@@ -667,6 +674,14 @@ export default {
     .msg {
       flex: 1;
       min-width: 0;
+      .never {
+        text-decoration: underline;
+        cursor: pointer;
+        margin-left: 10px;
+        &:hover {
+          opacity: .6;
+        }
+      }
     }
     .cpt-icon-button {
       color: fade(@textColor, 60%);
