@@ -238,6 +238,7 @@ export default {
 <style lang="less">
 @import "../../styles/import.less";
 .view-hardware-info {
+  .view-scroller;
   .content {
     max-width: 1040px;
     // width: 808px;

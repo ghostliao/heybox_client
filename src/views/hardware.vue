@@ -51,8 +51,8 @@ export default {
     position: fixed;
     top: @navHeight + 1px;
     left: @sideBarOffset;
+    bottom: 0;
     width: @sideBarWidth;
-    height: 100%;
     background: rgba(0, 0, 0, .2);
     border-right: 1px solid fade(@textColor, 10%);
   }

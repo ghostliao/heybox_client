@@ -225,8 +225,6 @@ export default {
 
 .app-content {
   height: 100%;
-  overflow-y: scroll;
-  margin-right: 2px;
 }
 
 // .video-close-button {

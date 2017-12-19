@@ -1,50 +1,51 @@
 <template>
   <div class="view-game">
-    <template v-if="$store.state.config.dev">
+    <div class="content">
+      <template v-if="$store.state.config.dev">
 
-    <div class="toolbar">
-      <div class="wrap">
-        <cpt-block-button :text="'亚洲服务器'" ref="acceleratorMenuButton" @click="acceleratorMenuToggle">
-          <div slot="icon" class="icon">
-            <img src="max-file:\C:\Users\max\AppData\Local\Qingfeng\Heybox\game\icon\10400000.png" alt="">
+      <div class="toolbar">
+        <div class="wrap">
+          <cpt-block-button :text="'亚洲服务器'" ref="acceleratorMenuButton" @click="acceleratorMenuToggle">
+            <div slot="icon" class="icon">
+              <img src="max-file:\C:\Users\max\AppData\Local\Qingfeng\Heybox\game\icon\10400000.png" alt="">
+            </div>
+          </cpt-block-button>
+          <cpt-popover :trigger="acceleratorMenuTrigger" :popoverClass="[ 'left', 'main-popover' ]" :open="acceleratorMenuOpen" @close="acceleratorMenuClose">
+            <cpt-menu width="160" :autoWidth="menuAutoWidth">
+              <cpt-menu-item v-for="(i, index) in 3" :key="index" title="Steam" leftIcon="img" rightIcon="arrow-right">
+                <img slot="leftIcon" src="max-file:\C:\Users\max\AppData\Local\Qingfeng\Heybox\game\icon\10400000.png" alt="">
+                <cpt-menu-item title="AS亚洲" />
+                <cpt-menu-item title="NA北美" />
+                <cpt-menu-item title="EU欧洲" />
+                <cpt-menu-item title="KR/JR日韩" />
+              </cpt-menu-item>
+            </cpt-menu>
+          </cpt-popover>
+
+          <cpt-block-button icon="accelerator-fill" text="一键加速"></cpt-block-button>
+          <cpt-block-button buttonClass="set" icon="set-fill" @click="$router.push({ name: 'settings-accelerator' })"></cpt-block-button>
+
+        </div>
+      </div>
+
+      </template>
+      <div class="title-bar">
+        <div class="title">游戏库</div>
+        <!-- <cpt-button icon="add-fill" label="添加游戏" secondary small @click="manuallySelectGameDir"></cpt-button> -->
+      </div>
+      <div class="games-list">
+        <!-- <div class="add-game">
+          <div class="game-item add-game" @click="manuallySelectGameDir">
+            <div class="layer add-game">
+              <cpt-icon value="add-thin" :size="42"></cpt-icon>
+              <span>添加游戏</span>
+            </div>
           </div>
-        </cpt-block-button>
-        <cpt-popover :trigger="acceleratorMenuTrigger" :popoverClass="[ 'left', 'main-popover' ]" :open="acceleratorMenuOpen" @close="acceleratorMenuClose">
-          <cpt-menu width="160" :autoWidth="menuAutoWidth">
-            <cpt-menu-item v-for="(i, index) in 3" :key="index" title="Steam" leftIcon="img" rightIcon="arrow-right">
-              <img slot="leftIcon" src="max-file:\C:\Users\max\AppData\Local\Qingfeng\Heybox\game\icon\10400000.png" alt="">
-              <cpt-menu-item title="AS亚洲" />
-              <cpt-menu-item title="NA北美" />
-              <cpt-menu-item title="EU欧洲" />
-              <cpt-menu-item title="KR/JR日韩" />
-            </cpt-menu-item>
-          </cpt-menu>
-        </cpt-popover>
-
-        <cpt-block-button icon="accelerator-fill" text="一键加速"></cpt-block-button>
-        <cpt-block-button buttonClass="set" icon="set-fill" @click="$router.push({ name: 'settings-accelerator' })"></cpt-block-button>
-
+        </div> -->
+        <cpt-game-item v-for="i in installedGames" :data="i" :key="i.gameId"></cpt-game-item>
+        
       </div>
     </div>
-
-    </template>
-    <div class="title-bar">
-      <div class="title">游戏库</div>
-      <!-- <cpt-button icon="add-fill" label="添加游戏" secondary small @click="manuallySelectGameDir"></cpt-button> -->
-    </div>
-    <div class="games-list">
-      <!-- <div class="add-game">
-        <div class="game-item add-game" @click="manuallySelectGameDir">
-          <div class="layer add-game">
-            <cpt-icon value="add-thin" :size="42"></cpt-icon>
-            <span>添加游戏</span>
-          </div>
-        </div>
-      </div> -->
-      <cpt-game-item v-for="i in installedGames" :data="i" :key="i.gameId"></cpt-game-item>
-      
-    </div>
-    
   </div>
 </template>
 <script>
@@ -266,76 +267,79 @@ export default {
 <style lang="less">
 @import "../styles/import.less";
 .view-game {
-  padding: 6px 40px 24px;
-  .toolbar {
-    margin-bottom: 16px;
-    > .wrap {
+  .view-scroller;
+  > .content {
+    padding: 6px 40px 24px;
+    .toolbar {
+      margin-bottom: 16px;
+      > .wrap {
+        display: flex;
+      }
+    }
+    .title-bar {
       display: flex;
+      align-items: center;
+      height: 54px;
+      .title {
+        font-size: 18px;
+        margin-right: 16px;
+      }
     }
-  }
-  .title-bar {
-    display: flex;
-    align-items: center;
-    height: 54px;
-    .title {
-      font-size: 18px;
-      margin-right: 16px;
+    .games-list {
+      display: flex;
+      flex-wrap: wrap;
+      margin-right: -20px;
+      // > .add-game {
+      //   width: 25%;
+      //   padding: 0 20px 20px 0;
+      //   .common-transition;
+      //   @media (max-width: 900px) {
+      //     width: 50%;
+      //   }
+      //   @media (max-width: 1200px) {
+      //     width: 33.333333%;
+      //   }
+      //   .game-item {
+      //     position: relative;
+      //     padding-top: 50%;
+      //     border-radius: 2px;
+      //     background-color: fade(@textColor, 10%);
+      //     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
+      //     &:hover {
+      //       background-color: fade(@textColor, 20%);
+      //     }
+      //     &.active {
+      //       background-color: fade(@textColor, 10%);
+      //     }
+      //     .layer {
+      //       position: absolute;
+      //       z-index: 1;
+      //       top: 0;
+      //       left: 0;
+      //       right: 0;
+      //       bottom: 0;
+      //       display: flex;
+      //       flex-direction: column;
+      //       justify-content: center;
+      //       align-items: center;
+      //       opacity: 1;
+      //       color: fade(@textColor, 20%);
+      //       cursor: pointer;
+      //       &:hover {
+      //         color: fade(@textColor, 60%);
+      //       }
+      //       &:active {
+      //         color: fade(@textColor, 20%);
+      //       }
+      //       span {
+      //         font-size: 12px;
+      //         line-height: 1;
+      //         margin-top: 8px;
+      //       }
+      //     }
+      //   }
+      // }
     }
-  }
-  .games-list {
-    display: flex;
-    flex-wrap: wrap;
-    margin-right: -20px;
-    // > .add-game {
-    //   width: 25%;
-    //   padding: 0 20px 20px 0;
-    //   .common-transition;
-    //   @media (max-width: 900px) {
-    //     width: 50%;
-    //   }
-    //   @media (max-width: 1200px) {
-    //     width: 33.333333%;
-    //   }
-    //   .game-item {
-    //     position: relative;
-    //     padding-top: 50%;
-    //     border-radius: 2px;
-    //     background-color: fade(@textColor, 10%);
-    //     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
-    //     &:hover {
-    //       background-color: fade(@textColor, 20%);
-    //     }
-    //     &.active {
-    //       background-color: fade(@textColor, 10%);
-    //     }
-    //     .layer {
-    //       position: absolute;
-    //       z-index: 1;
-    //       top: 0;
-    //       left: 0;
-    //       right: 0;
-    //       bottom: 0;
-    //       display: flex;
-    //       flex-direction: column;
-    //       justify-content: center;
-    //       align-items: center;
-    //       opacity: 1;
-    //       color: fade(@textColor, 20%);
-    //       cursor: pointer;
-    //       &:hover {
-    //         color: fade(@textColor, 60%);
-    //       }
-    //       &:active {
-    //         color: fade(@textColor, 20%);
-    //       }
-    //       span {
-    //         font-size: 12px;
-    //         line-height: 1;
-    //         margin-top: 8px;
-    //       }
-    //     }
-    //   }
-    // }
   }
 }
 
