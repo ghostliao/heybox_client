@@ -72,6 +72,7 @@ export default {
   flex: 1;
   min-width: 0;
   padding: 16px 36px 16px;
+  .view-scroller;
   .wrapper {
     max-width: 500px;
     margin: auto;

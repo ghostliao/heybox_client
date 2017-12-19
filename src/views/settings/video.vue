@@ -183,6 +183,7 @@ export default {
   min-width: 0;
   // padding: 16px 36px 16px 236px;
   padding: 16px 36px;
+  .view-scroller;
   .wrapper {
     max-width: 500px;
     margin: auto;
