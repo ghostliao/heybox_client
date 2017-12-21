@@ -10,6 +10,9 @@ import viewVideoScreenshot from '@/views/video/screenshot'
 import viewHardware from '@/views/hardware'
 import viewHardwareInfo from '@/views/hardware/info'
 import viewHardwareStatus from '@/views/hardware/status'
+import viewWallpaper from '@/views/wallpaper'
+import viewWallpaperStore from '@/views/wallpaper/store'
+import viewWallpaperLocal from '@/views/wallpaper/local'
 import viewSettings from '@/views/settings'
 import viewSettingsAccount from '@/views/settings/account'
 import viewSettingsVideo from '@/views/settings/video'
@@ -122,6 +125,39 @@ export default new Router({
       redirect: to => {
         let name = store.state.routerHardwareName
         if (!name) name = 'hardware-info'
+        return {
+          name: name
+        }
+      },
+      meta: {
+        keepAlive: true
+      }
+    },
+    {
+      path: '/wallpaper',
+      name: 'wallpaper',
+      component: viewWallpaper,
+      children: [
+        {
+          path: 'store',
+          name: 'wallpaper-store',
+          component: viewWallpaperStore,
+          meta: {
+            keepAlive: true
+          }
+        },
+        {
+          path: 'local',
+          name: 'wallpaper-local',
+          component: viewWallpaperLocal,
+          meta: {
+            keepAlive: true
+          }
+        }
+      ],
+      redirect: to => {
+        let name = store.state.routerWallpaperName
+        if (!name) name = 'wallpaper-store'
         return {
           name: name
         }

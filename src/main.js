@@ -38,6 +38,7 @@ import lazy from '@/components/lazy'
 import linearProgress from '@/components/linearProgress'
 import mark from '@/components/mark'
 import selectField from '@/components/select-field'
+import slider from '@/components/slider'
 import * as table from '@/components/table'
 import tooltip from '@/components/tooltip'
 const components = {
@@ -51,6 +52,7 @@ const components = {
   linearProgress,
   mark,
   selectField,
+  slider,
   ...table,
   tooltip
 }

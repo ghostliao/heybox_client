@@ -135,6 +135,10 @@ export default {
         {
           name: 'hardware',
           label: '我的设备'
+        },
+        {
+          name: 'wallpaper',
+          label: '动态桌面'
         }
       ]
     }

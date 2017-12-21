@@ -7,7 +7,7 @@
           <cpt-circular-progress :size="40" />
         </div>
         <div v-if="!loading && mediaList.length <= 0" key="notice" class="notice">暂无媒体文件</div>
-        <div v-if="!loading && mediaList.length > 0" key="list" class="list">
+        <div v-if="!loading && mediaList.length > 0" key="list" class="media-list-wrap" :class="{ 'grid': $store.state.mediaListShowType === 'grid' }">
           <template v-for="(i, index) of mediaList">
             <cpt-manage-bar :key="index" :data="i" v-if="hasManageBar(mediaList, index)"></cpt-manage-bar>
             <cpt-media-item :key="index" :data="i" :index="index" :mediaItemStyle="$store.state.mediaListShowType" @firstUpload="firstUpload" :mediaItemShow="mediaItemShow(i)"></cpt-media-item>
@@ -225,10 +225,12 @@ export default {
       font-size: 14px;
       color: @secondaryTextColor;
     }
-    .list {
+    .media-list-wrap {
       display: flex;
       flex-wrap: wrap;
-      margin-right: -20px;
+      &.grid {
+        margin-right: -20px;
+      }
     }
   }
 }

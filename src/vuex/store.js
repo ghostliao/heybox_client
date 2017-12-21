@@ -10,7 +10,7 @@ const v = Vue.prototype
 
 const state = {
   config: {
-    ver: 'Alpha 0.1.7',
+    ver: 'Alpha 0.2.0',
     env: 'test', // test | prod
     dev: true
   },
@@ -24,6 +24,7 @@ const state = {
   routerVideoName: '',
   routerSettingsName: '',
   routerHardwareName: '',
+  routerWallpaperName: '',
   recordingState: 'RS_Stop',
   recordingSeconds: 0,
   videoPlayer: false,

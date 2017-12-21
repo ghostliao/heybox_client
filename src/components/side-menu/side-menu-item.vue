@@ -39,6 +39,8 @@ export default {
         this.$store.state.routerSettingsName = name
       } else if (viewType === 'hardware') {
         this.$store.state.routerHardwareName = name
+      } else if (viewType === 'wallpaper') {
+        this.$store.state.routerWallpaperName = name
       }
     }
   }
