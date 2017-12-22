@@ -7,7 +7,7 @@
           <div v-if="loading" key="loading" class="loading">
             <cpt-circular-progress :size="40" />
           </div>
-          <div v-if="!loading && wallpaperList.length <= 0" key="notice" class="notice">暂无媒体文件</div>
+          <div v-if="!loading && wallpaperList.length <= 0" key="notice" class="notice">暂无桌面文件</div>
           <div v-if="!loading && wallpaperList.length > 0" key="list" class="wp-list">
             <cpt-store-wallpaper-item v-for="(i, index) in wallpaperList" :key="index" :index="index" :data="i" :current="current" :margin="previewHeight"></cpt-store-wallpaper-item>
           </div>
@@ -76,10 +76,11 @@ export default {
       return new Promise((resolve, reject) => {
         const url = '/pc/wallpaper/'
         const options = {
-          withCredentials: false,
           params: {
             // offset: 0,
-            // limit: 9999
+            // limit: 9999,
+            'heybox_id': this.$store.state.accountInfo.uid,
+            'os_type': 'pc'
           }
         }
         this.$ajax(url, options).then(res => {
@@ -105,7 +106,7 @@ export default {
       this.$nextTick(() => {
         this.$refs.scroller.scrollTop = data.position.top
       })
-      console.log(this.wallpaperList[this.current])
+      // console.log(this.wallpaperList[this.current])
     })
     
   },

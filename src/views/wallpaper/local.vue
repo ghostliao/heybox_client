@@ -1,14 +1,5 @@
 <template>
   <div class="view-wallpaper-local" ref="scroller">
-    <div class="tool-bar">
-      <cpt-button label="移除壁纸" small primary @click="removeWallpaper" />
-      <cpt-button label="播放" small primary @click="wallpaperPlayerSwitch(1)" />
-      <cpt-button label="暂停" small primary @click="wallpaperPlayerSwitch(0)" />
-      <cpt-button label="静音" small primary @click="removeWallpaper" />
-      <div class="wallpaper-volume">
-        <cpt-slider v-model="volumeSize" :step="1" @input="setVideoVolumeSize"></cpt-slider>
-      </div>
-    </div>
     <div class="content">
       <cpt-set-block-head title="本地桌面"></cpt-set-block-head>
       <div class="body" ref="body">
@@ -16,12 +7,26 @@
           <div v-if="loading" key="loading" class="loading">
             <cpt-circular-progress :size="40" />
           </div>
-          <div v-if="!loading && wallpaperList.length <= 0" key="notice" class="notice">暂无媒体文件</div>
+          <div v-if="!loading && wallpaperList.length <= 0" key="notice" class="notice">暂无桌面文件</div>
           <div v-if="!loading && wallpaperList.length > 0" key="list" class="wp-list">
             <cpt-local-wallpaper-item v-for="(i, index) in wallpaperList" :key="index" :index="index" :data="i" :current="current" :margin="previewHeight"></cpt-local-wallpaper-item>
           </div>
         </transition>
         <cpt-wallpaper-preview v-if="wallpaperPreview" :from="page" :previewStyle="previewStyle" :data="wallpaperList[current]" @close="closePreview" @delete="closePreview" @setWallpaper="_setWallpaper"></cpt-wallpaper-preview>
+      </div>
+    </div>
+
+    <div v-show="wallpaperControler" class="wallpaper-controler">
+      <div class="wallpaper-controler-wrap">
+        <cpt-button label="还原壁纸" small primary @click="removeWallpaper" />
+        <cpt-button v-show="!playing" label="播放" icon="start-fill" small primary @click="_wallpaperPlayerSwitch(1)" />
+        <cpt-button v-show="playing" label="暂停" icon="pause-fill" small primary @click="_wallpaperPlayerSwitch(0)" />
+
+        <div class="wallpaper-volume">
+          <cpt-icon-button v-show="volumeSize !== 0" :icon="'volume'" @click="volumeMuted"></cpt-icon-button>
+          <cpt-icon-button v-show="volumeSize === 0" :icon="'volume-mute'" @click="resetVolumeSize"></cpt-icon-button>
+          <cpt-slider v-model="volumeSize" :step="1" @input="setVideoVolumeSize"></cpt-slider>
+        </div>
       </div>
     </div>
   </div>
@@ -55,7 +60,10 @@ export default {
       previewStyle: {}, // wallpaper 位置信息
       previewHeight: 0, // 预览区域高度
       wallpaperList: [],
-      volumeSize: 100
+      wallpaperControler: false,
+      volumeSize: 100,
+      volumeSizeStore: 0,
+      playing: true // 播放、暂停
     }
   },
   computed: {
@@ -87,6 +95,17 @@ export default {
         // this.wallpaperList[this.current].isCurrent = false
         this.$set(this.wallpaperList[this.current], 'isCurrent', false)
       }
+    },
+    _wallpaperPlayerSwitch (val) {
+      this.wallpaperPlayerSwitch(val)
+      this.playing = !this.playing
+    },
+    volumeMuted () {
+      this.volumeSizeStore = this.volumeSize
+      this.volumeSize = 0
+    },
+    resetVolumeSize () {
+      this.volumeSize = this.volumeSizeStore
     }
   },
   created () {
@@ -94,6 +113,9 @@ export default {
 
     Bus.$on('wallpaperPreview', data => {
       if (data.from !== 'local') return
+      if (!data.fileData.isCurrent) {
+        this.setWallpaper(data.fileData.ID)
+      }
       this.current = data.index
       this.previewStyle = {
         top: data.position.top + data.itemHeight + 10 + 'px',
@@ -165,8 +187,34 @@ export default {
   }
 }
 
+.wallpaper-controler {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 15px;
+  width: 340px;
+  margin: auto;
+}
+.wallpaper-controler-wrap {
+  display: flex;
+  align-items: center;
+  background: rgba(0,0,0,.75);
+  padding: 0 15px;
+  border-radius: 2px;
+  .cpt-button {
+    margin-right: 15px;
+  }
+}
 .wallpaper-volume {
-  width: 200px;
-  padding: 10px 20px;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  width: 150px;
+  padding: 15px 15px 15px 0;
+  .cpt-slider {
+    margin-left: 10px;
+  }
 }
 </style>

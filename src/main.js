@@ -261,6 +261,14 @@ Vue.prototype.filterFormDate = function (t, type = 1) {
     return timeSpanStr
   }
 }
+Vue.prototype.compareVersion = function (currentVersion, refVersion) {
+  function calc(str) {
+    const a = str.split('.')
+    const v = a[0] * 10000 + a[1] * 100 + a[2] * 1
+    return v
+  }
+  return calc(currentVersion) >= calc(refVersion)
+}
 
 // router.beforeEach((to, from, next) => { 
 //   clearInterval(window.hardwarePerfInfoTimer)

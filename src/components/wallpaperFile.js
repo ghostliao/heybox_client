@@ -2,7 +2,9 @@
 export default {
   data () {
     return {
-      itemList: []
+      itemList: [],
+      statusUpdateLock: false, // 视图更新锁
+      statusUpdateFrequency: 500 // 更新频率（ms）
     }
   },
   methods: {
@@ -14,7 +16,17 @@ export default {
         this.onWallpaperFileDeleted(data)
       })
       maxjia.wallpaper.wallPaperFileStatusChanged.addListener((data) => {
-        this.onWallpaperFileStatusChanged(data)
+        if (data.downloadAborted || data.downloadFailed || (!data.downloading && data.downloadFinished)) {
+          this.onWallpaperFileStatusChanged(data)
+        } else {
+          if (!this.statusUpdateLock) {
+            this.onWallpaperFileStatusChanged(data)
+            this.statusUpdateLock = true
+            setTimeout(() => {
+              this.statusUpdateLock = false
+            }, this.statusUpdateFrequency)
+          }
+        }
       })
       maxjia.wallpaper.wallPaperChanged.addListener((data) => {
         this.onWallpaperChanged(data)
@@ -29,6 +41,7 @@ export default {
     onWallpaperFileDeleted (wallpaperItem) {
       // console.log('wallpaper file deleted')
       if (this.page === 'local') {
+        this.wallpaperControler = false
         this.getLocalWallpaperList().then(data => {
           this.wallpaperList = data
         })
@@ -45,7 +58,7 @@ export default {
       }
     },
     onWallpaperFileStatusChanged (wallpaperItem) {
-      // console.log('onWallpaperFileStatusChanged')
+      console.log('onWallpaperFileStatusChanged')
       // let list = this.wallpaperList
       // if (from === 'local') {
       //   list = this.itemList
@@ -80,14 +93,16 @@ export default {
       }
     },
     onWallpaperChanged (wallpaperItem) {
-      console.log('wallpaper changed', wallpaperItem)
+      // console.log('wallpaper changed', wallpaperItem)
       if (this.page === 'local') {
+        this.playing = true
+        this.wallpaperControler = !(wallpaperItem.ID === '')
         for (let i = 0, len = this.wallpaperList.length; i < len; i++) {
           let item = this.wallpaperList[i]
           if (item.ID === wallpaperItem.ID) {
             this.$set(item, 'isCurrent', true)
           } else {
-            this.$set(item, 'isCurrent', false)            
+            this.$set(item, 'isCurrent', false)
           }
         }
       }
@@ -104,6 +119,9 @@ export default {
           if (data && data['wallPapers']) {
             this.itemList = []
             for (let wallpaperItem of data['wallPapers']) {
+              if (this.page === 'local' && wallpaperItem.isCurrent) {
+                this.wallpaperControler = true
+              }
               this.addWallpaperItem(wallpaperItem)
             }
             resolve(this.itemList)

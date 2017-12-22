@@ -3,7 +3,7 @@
     <div class="view-wallpaper-sidebar">
       <cpt-side-menu>
         <cpt-side-menu-item label="桌面商城" icon="client-fill" :to="{ name: 'wallpaper-store' }"></cpt-side-menu-item>
-        <cpt-side-menu-item label="本地桌面" icon="scan-fill" :to="{ name: 'wallpaper-local' }"></cpt-side-menu-item>
+        <cpt-side-menu-item label="本地桌面" icon="download-fill" :to="{ name: 'wallpaper-local' }"></cpt-side-menu-item>
       </cpt-side-menu>
     </div>
     <div class="view-wallpaper-content">

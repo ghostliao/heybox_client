@@ -18,10 +18,10 @@
               <cpt-linear-progress mode="determinate" :size="2" :value="50"/>
             </div> -->
             <div class="info">
-              <span v-text="data.type === 1 ? '视频' : '图片'"></span> ( 
+              <!-- <span v-text="data.type === 1 ? '视频' : '图片'"></span>  -->
               <!-- <span class="download-size">2.8 M</span> -->
               <!-- <span class="download-size">/</span> -->
-              <span class="full-size">{{data.fileSize|fileSize}} )</span><br>
+              <span class="full-size">{{data.fileSize|fileSize}}</span><br>
               <span class="wh">{{data.width}} × {{data.height}}</span>
             </div>
             <div class="btn-group">
@@ -86,7 +86,7 @@ export default {
         },
         fileData: this.data
       }
-      // console.log(data)
+      console.log(data.index, data.position.top)
       Bus.$emit('wallpaperPreview', data)
     },
     getItemOffsetTop () {
@@ -101,6 +101,9 @@ export default {
     window.addEventListener('resize', () => {
       this.getItemOffsetTop()
     })
+  },
+  activated () {
+    this.getItemOffsetTop()
   }
 }
 

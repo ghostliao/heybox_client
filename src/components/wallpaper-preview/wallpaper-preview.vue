@@ -14,10 +14,10 @@
         <div class="info">
           <span class="wh">{{data.width}} × {{data.height}}</span>
           <br>
-          <span v-text="data.type === 1 ? '视频' : '图片'"></span> (
+          <!-- <span v-text="data.type === 1 ? '视频' : '图片'"></span> -->
           <span v-show="data.downloading" class="upload-size">{{ data.fileSize * data.downloadProgress | fileSize }}</span>
           <span v-show="data.downloading" class="upload-size">/</span>
-          <span class="full-size">{{data.fileSize|fileSize}} )</span>
+          <span class="full-size">{{data.fileSize|fileSize}}</span>
         </div>
         <div v-show="data.downloading" class="rate">
           <cpt-linear-progress mode="determinate" :size="2" :value="data.downloadProgress * 100"/>
@@ -26,11 +26,11 @@
           <!-- <cpt-button label="删除" icon="delete-fill" small danger /> -->
           <template v-if="from === 'store'">
             <cpt-button v-show="!data.downloadFinished" label="下载" icon="download-fill" small primary @click="downloadWallpaperRequest(data.ID)" />
-            <cpt-button v-show="data.downloadFinished && data.downloadProgress === 1" label="已下载" secondary disabled small></cpt-button>
+            <!-- <cpt-button v-show="data.downloadFinished && data.downloadProgress === 1" label="已下载" secondary disabled small></cpt-button> -->
+            <cpt-button v-show="data.downloadFinished" label="设为桌面" icon="client-fill" small primary @click="_setWallpaper(data.ID)" />
           </template>
           <template v-if="from === 'local'">
-            <cpt-button label="设为桌面" icon="client-fill" small primary @click="_setWallpaper(data.ID)" />
-            <cpt-button v-show="!data.isCurrent" label="删除" icon="delete-fill" small danger @click="deleteWallpaperConfirm" />
+            <cpt-button label="删除" icon="delete-fill" small danger @click="deleteWallpaperConfirm" />
           </template>
         </div>
       </div>
@@ -107,9 +107,10 @@ export default {
       return new Promise((resolve, reject) => {
         const url = '/pc/wallpaper_download/'
         const options = {
-          withCredentials: false,
           params: {
-            id: id
+            'id': id,
+            'heybox_id': this.$store.state.accountInfo.uid,
+            'os_type': 'pc'
           }
         }
         this.$ajax(url, options).then(res => {
@@ -190,9 +191,11 @@ export default {
         margin-bottom: 10px;
       }
       .info {
+        color: #969ba0;
         font-size: 12px;
         line-height: 20px;
         margin-bottom: 8px;
+        font-weight: 400;
       }
       .rate {
         margin-top: 2px;
