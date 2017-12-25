@@ -142,6 +142,9 @@ export default {
       this.bodyWidthDetect()
       this.closePreview()
     })
+  },
+  deactivated () {
+    this.closePreview()
   }
 }
 
