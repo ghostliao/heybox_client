@@ -48,14 +48,14 @@
           <div class="media-list-filter-item">
             <cpt-select-field :select="mediaListFilter.fileType.select.value === 'all' ? '分类' : mediaListFilter.fileType.select.label">
               <cpt-menu>
-                <cpt-menu-item v-for="(key, value) in mediaListFilter.fileType.filter" :key="key" :title="key" :selectActive="mediaListFilter.fileType.select.value === value" @click="filterSelect('fileType', key, value)" />
+                <cpt-menu-item v-for="(key, value) in mediaListFilter.fileType.filter" :key="key" :title="key" :selectActive="mediaListFilter.fileType.select.value === value" @click="filterSelectChanged('fileType', key, value)" />
               </cpt-menu>
             </cpt-select-field>
           </div>
           <div class="media-list-filter-item">
             <cpt-select-field :select="mediaListFilter.moment.select.value === 'all' ? '时刻' : mediaListFilter.moment.select.label">
               <cpt-menu>
-                <cpt-menu-item v-for="(key, value) in mediaListFilter.moment.filter" :key="key" :title="key" :selectActive="mediaListFilter.moment.select.value === value" @click="filterSelect('moment', key, value)" />
+                <cpt-menu-item v-for="(key, value) in mediaListFilter.moment.filter" :key="key" :title="key" :selectActive="mediaListFilter.moment.select.value === value" @click="filterSelectChanged('moment', key, value)" />
               </cpt-menu>
             </cpt-select-field>
           </div>
@@ -210,7 +210,7 @@ export default {
       this.$store.state.mediaListShowType = type
     },
     // 媒体列表过滤器
-    filterSelect (type, key, value) {
+    filterSelectChanged (type, key, value) {
       this.mediaListFilter[type].select.label = key
       this.mediaListFilter[type].select.value = value
       Bus.$emit('closeMenu')

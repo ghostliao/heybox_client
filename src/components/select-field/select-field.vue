@@ -1,6 +1,6 @@
 <template>
-  <div class="cpt-select-field">
-    <div class="select-field" :class="{ 'active': menuOpen }" ref="menuButton" @click="menuToggle">
+  <div class="cpt-select-field" :class="{ 'full-width': fullWidth }">
+    <div class="select-field" :class="{ 'active': menuOpen }" :style="selectFieldStyle" ref="menuButton" @click="menuToggle">
       <div>{{select}}</div>
     </div>
     <cpt-popover :trigger="menuTrigger" :popoverClass="['left']" :open="menuOpen" @close="menuHandleClose">
@@ -21,6 +21,13 @@ export default {
   props: {
     select: {
       type: String,
+    },
+    fullWidth: {
+      type: Boolean,
+      default: false
+    },
+    selectFieldStyle: {
+      type: Object
     }
   },
   data () {
@@ -54,6 +61,9 @@ export default {
 
 .cpt-select-field {
   display: inline-block;
+  &.full-width {
+    width: 100%;
+  }
   .select-field {
     position: relative;
     display: flex;

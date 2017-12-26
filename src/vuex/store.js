@@ -10,7 +10,7 @@ const v = Vue.prototype
 
 const state = {
   config: {
-    ver: 'Alpha 0.2.0',
+    ver: 'Alpha 0.2.2',
     env: 'test', // test | prod
     dev: true
   },

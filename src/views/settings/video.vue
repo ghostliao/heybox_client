@@ -41,10 +41,31 @@
           <cpt-set-switch label="录制精彩镜头" :switch="isVideoCaptureForMoment" @input="setIsVideoCaptureForMoment">
             <span slot="desc">desc</span>
           </cpt-set-switch>
-          <cpt-set-switch label="自动录屏" :switch="isAutoStartCaptureInGame" @input="setIsAutoStartCaptureInGame">
-            <span slot="desc">desc</span>
-          </cpt-set-switch>
         </cpt-set-block>  -->
+
+        <cpt-set-block title="录制设置">
+          <cpt-set-switch label="记录精彩时刻" :switch="isAutoStartCaptureInGame" @input="setIsAutoStartCaptureInGame">
+            <!-- <span slot="desc">desc</span> -->
+          </cpt-set-switch>
+          <cpt-set-slider label="精彩时刻时长" :initValue="captureMomentSeconds" :min="15" :max="30" :step="1" unit="s" @change="setCaptureMomentSeconds">
+            <!-- <span slot="desc">desc</span> -->
+          </cpt-set-slider>
+          <cpt-set-slider label="视频帧率" :initValue="videoFrameRate" :min="30" :max="60" :step="1" @change="setVideoFrameRate">
+            <!-- <span slot="desc">desc</span> -->
+          </cpt-set-slider>
+          <cpt-set-select label="视频质量" :selectList="videoQualitySelect" :currentSelectValue="videoQuality" @change="setVideoQuality">
+            <!-- <span slot="desc">desc</span> -->
+          </cpt-set-select>
+        </cpt-set-block>
+
+        <cpt-set-block title="游戏内浮窗设置">
+          <cpt-set-switch label="显示实时状态栏" :switch="showOverlayHeader" @input="setShowOverlayHeader">
+            <!-- <span slot="desc">desc</span> -->
+          </cpt-set-switch>
+          <cpt-set-select label="FPS显示" :selectList="FPSPositionSelect" :currentSelectValue="fpsPosition" @change="setFpsPosition">
+            <!-- <span slot="desc">desc</span> -->
+          </cpt-set-select>
+        </cpt-set-block>
 
         <cpt-set-block v-if="gameOverlaySettings.length > 1" title="游戏内浮窗开关">
           <cpt-set-switch :label="i.gameName" v-for="i in gameOverlaySettings" :key="i.gameId" v-if="i.overlaySupport" :data="i" :switch="i.overlayEnabled" @input="setGameOverlaySwitch">
@@ -75,6 +96,8 @@ import {cptSetBlock, cptSetBlockHead} from "@/components/set-block"
 import cptSetShortcut from '@/components/set-shortcut'
 import cptSetSwitch from '@/components/set-switch'
 import cptTextField from '@/components/text-field'
+import cptSetSlider from '@/components/set-slider'
+import cptSetSelect from '@/components/set-select'
 
 export default {
   name: "view-settings-video",
@@ -84,7 +107,9 @@ export default {
     'cpt-set-block-head': cptSetBlockHead,
     'cpt-set-shortcut': cptSetShortcut,
     'cpt-set-switch': cptSetSwitch,
-    'cpt-text-field': cptTextField
+    'cpt-text-field': cptTextField,
+    'cpt-set-slider': cptSetSlider,
+    'cpt-set-select': cptSetSelect
   },
   data () {
     return {
@@ -93,6 +118,25 @@ export default {
       isVideoCaptureForMoment: false,
       isAutoStartCaptureInGame: false,
       gameOverlaySettings: [],
+      showOverlayHeader: false,
+      captureMomentSeconds: 15,
+      FPSPositionSelect: {
+        'NoPosition': '隐藏',
+        'TopLeft': '左上角',
+        'TopRight': '右上角',
+        'BottomLeft': '左下角',
+        'BottomRight': '右下角'
+      },
+      fpsPosition: 'NoPosition',
+      videoFrameRate: 30,
+      videoQualitySelect: {
+        'Default': '默认',
+        'HD_Normal': '720P 普清',
+        'HD_High': '720P 高清',
+        'FHD_Normal': '1080P 普清',
+        'FHD_High': '1080P 高清'
+      },
+      videoQuality: 'Default',
       clientVersion: '999.0.0'
     }
   },
@@ -137,8 +181,7 @@ export default {
     },
     // 是否自动录屏
     getIsAutoStartCaptureInGame () {
-      maxjia.settings.getIsAutoStartCaptureInGame((data) => {
-        // console.log(data)
+      maxjia.settings.getIsAutoStartCaptureInGame(data => {
         this.isAutoStartCaptureInGame = data.isAutoStartCaptureInGame
       })
     },
@@ -156,12 +199,93 @@ export default {
       console.log(params)
       maxjia.settings.setGameOverlaySwitch(params[1], params[2], params[0])
     },
+    // overlay 状态栏显示
+    getShowOverlayHeader () {
+      maxjia.settings.getShowOverlayHeader(data => {
+        this.showOverlayHeader = data.showOverlayHeader
+      })
+    },
+    setShowOverlayHeader (bool) {
+      console.log('set show overlay header', bool)
+      maxjia.settings.setShowOverlayHeader(bool)
+    },
+    showOverlayHeaderChanged () {
+      maxjia.settings.showOverlayHeaderChanged.addListener(data => {
+        console.log('showOverlayHeaderChanged', data)
+      })
+    },
+    // 精彩时刻时长
+    getCaptureMomentSeconds () {
+      maxjia.settings.getCaptureMomentSeconds(data => {
+        this.captureMomentSeconds = data.captureMomentSeconds
+      })
+    },
+    setCaptureMomentSeconds (s) {
+      maxjia.settings.setCaptureMomentSeconds(s)
+    },
+    captureMomentSecondsChanged () {
+      maxjia.settings.captureMomentSecondsChanged.addListener(data => {
+        console.log('captureMomentSecondsChanged', data)
+      })
+    },
+    // 设置FPS显示位置
+    getFpsPosition () {
+      maxjia.settings.getFpsPosition(data => {
+        this.fpsPosition = data.fpsPosition
+      })
+    },
+    setFpsPosition (value) {
+      maxjia.settings.setFpsPosition(value)
+    },
+    fpsPositionChanged () {
+
+    },
+    // 设置视频帧率
+    getVideoFrameRate () {
+      maxjia.settings.getVideoFrameRate(data => {
+        console.log(data)
+        this.videoFrameRate = data.videoFrameRate
+      })
+    },
+    setVideoFrameRate (v) {
+      console.log(v)
+      maxjia.settings.setVideoFrameRate(v)
+    },
+    videoFrameRateChanged () {
+      maxjia.settings.videoFrameRateChanged.addListener(data => {
+        console.log('videoFrameRateChanged', data)
+      })
+    },
+    // 设置视频质量
+    getVideoQuality () {
+      maxjia.settings.getVideoQuality(data => {
+        console.log(data)
+        this.videoQuality = data.videoQuality
+      })
+    },
+    setVideoQuality (value) {
+      console.log(value)
+      maxjia.settings.setVideoQuality(value)
+    },
+    videoQualityChanged () {
+
+    },
     settingsInit () {
       this.getVideoDir()
       this.getImageDir()
       // this.getIsVideoCaptureForMoment()
       this.getIsAutoStartCaptureInGame()
       this.getGameOverlaySettings()
+      this.getShowOverlayHeader()
+      // this.showOverlayHeaderChanged()
+      this.getCaptureMomentSeconds()
+      // this.captureMomentSecondsChanged()
+      this.getFpsPosition()
+      // this.fpsPositionChanged()
+      this.getVideoFrameRate()
+      // this.videoFrameRateChanged()
+      this.getVideoQuality()
+      // this.videoQualityChanged()
     },
     getClientInfo () {
       this.clientVersion = maxjia.maxapi.version

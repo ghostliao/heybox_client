@@ -41,6 +41,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    noZero: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -69,7 +73,7 @@ export default {
     },
     sliderClass () {
       return {
-        zero: this.inputValue <= this.min,
+        zero: !this.noZero && this.inputValue <= this.min,
         active: this.active,
         disabled: this.disabled
       }

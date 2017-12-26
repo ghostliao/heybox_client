@@ -90,7 +90,7 @@ export default {
   .text-field-wrap {
     display: flex;
     justify-content: flex-end;
-    align-items: flex-end;
+    align-items: center;
     width: 150px;
     .text-field {
       position: relative;
