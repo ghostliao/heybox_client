@@ -25,9 +25,10 @@
         <div class="btn-group">
           <!-- <cpt-button label="删除" icon="delete-fill" small danger /> -->
           <template v-if="from === 'store'">
-            <cpt-button v-show="!data.downloadFinished" label="下载" icon="download-fill" small primary @click="downloadWallpaperRequest(data.ID)" />
+            <cpt-button v-show="!data.downloading && (data.downloadAborted || data.downloadFailed || !data.downloadFinished)" label="下载" icon="download-fill" small primary @click="downloadWallpaperRequest(data.ID)" />
+            <cpt-button v-show="data.downloading" label="取消下载" small primary @click="stopDownloadWallpaper(data.ID)" />
             <!-- <cpt-button v-show="data.downloadFinished && data.downloadProgress === 1" label="已下载" secondary disabled small></cpt-button> -->
-            <cpt-button v-show="data.downloadFinished" label="设为桌面" icon="client-fill" small primary @click="_setWallpaper(data.ID)" />
+            <cpt-button v-show="!data.downloading && !data.downloadAborted && !data.downloadFailed && data.downloadFinished" label="设为桌面" icon="client-fill" small primary @click="_setWallpaper(data.ID)" />
           </template>
           <template v-if="from === 'local'">
             <cpt-button label="删除" icon="delete-fill" small danger @click="deleteWallpaperConfirm" />
@@ -102,6 +103,7 @@ export default {
           type: 1,
         })
       })
+      this.__REPORT('view_wallpaper_download')
     },
     getDownloadUrl (id) {
       return new Promise((resolve, reject) => {
@@ -122,6 +124,12 @@ export default {
             console.log('failed')
           }
           
+        }, res => {
+          console.log('failed')
+          reject(res)
+          this.$store.state.msgDialogOptions.markType = 'fail'
+          this.$store.state.msgDialogOptions.msg = '下载失败'
+          this.$store.state.msgDialog = true
         })
       })
     },

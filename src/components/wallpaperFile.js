@@ -16,7 +16,7 @@ export default {
         this.onWallpaperFileDeleted(data)
       })
       maxjia.wallpaper.wallPaperFileStatusChanged.addListener((data) => {
-        if (data.downloadAborted || data.downloadFailed || (!data.downloading && data.downloadFinished)) {
+        if ((!data.downloading && data.downloadAborted) || (!data.downloading && data.downloadFailed) || (!data.downloading && data.downloadFinished)) {
           this.onWallpaperFileStatusChanged(data)
         } else {
           if (!this.statusUpdateLock) {
@@ -145,6 +145,9 @@ export default {
       const height = config.height
       const type = config.type || 1
       maxjia.wallpaper.downloadWallPaper(id, url, name, size, duration, thumb, width, height, type)
+    },
+    stopDownloadWallpaper (id) {
+      maxjia.wallpaper.stopDownload(id)
     },
     deleteWallpaper (id) {
       maxjia.wallpaper.deleteWallPaper(id)

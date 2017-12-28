@@ -9,10 +9,10 @@
           <div class="layer" :class="{ 'hover': data.downloading }">
             <div class="name">{{data.name}}</div>
             <div class="download-status">
-              <div v-show="data.downloadFailed" class="icon-fail">
+              <!-- <div v-show="data.downloadFailed" class="icon-fail">
                 <cpt-icon value="warning-fill" :size="12"></cpt-icon>
               </div>
-              <div v-show="data.downloadFailed" class="msg">下载失败</div>
+              <div v-show="data.downloadFailed" class="msg">下载失败</div> -->
             </div>
             <div v-show="data.downloading" class="progress-bar">
               <cpt-linear-progress mode="determinate" :size="2" :value="data.downloadProgress * 100"/>
@@ -30,12 +30,16 @@
               </div> -->
             </div>
           </div>
-          <div v-show="data.downloadFinished" class="owned">
+          <div v-show="!data.downloadAborted && !data.downloadFailed && data.downloadFinished" class="status">
             <cpt-mark success small></cpt-mark>
+          </div>
+          <div v-show="!data.downloading && data.downloadFailed" class="status">
+            <cpt-mark fail small></cpt-mark>
           </div>
         </div>
       </div>
     </div>
+    
   </div>
 </template>
 
@@ -251,7 +255,7 @@ export default {
             }
           }
         }
-        .owned {
+        .status {
           position: absolute;
           z-index: 3;
           left: 8px;

@@ -45,7 +45,7 @@ export default {
       if (this.success) {
         return 'success'
       } else if (this.fail) {
-        return 'close'
+        return 'warning-fill'
       }
     },
     iconSize () {
@@ -76,10 +76,13 @@ export default {
     color: #fff;
     .iconfont {
       position: relative;
-      top: 1px;
+      top: 0;
     }
     &.success {
-      background-color: @successColor; 
+      background-color: @successColor;
+      .iconfont {
+        top: 1px;
+      }
     }
     &.fail {
       background-color: @dangerColor;
