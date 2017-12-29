@@ -19,7 +19,7 @@
           <div v-if="!loading && wallpaperList.length <= 0" key="notice" class="notice">暂无桌面文件</div>
           <div v-if="!loading && getWallpaperListFailed" key="notice" class="notice">获取列表失败</div>
           <div v-if="!loading && wallpaperList.length > 0" key="list" class="wp-list">
-            <cpt-store-wallpaper-item v-for="(i, index) in wallpaperList" :key="index" :index="index" :data="i" :current="currentWallpaper" :margin="previewHeight"></cpt-store-wallpaper-item>
+            <cpt-store-wallpaper-item v-for="(i, index) in wallpaperList" :key="index" :index="index" :data="i" :current="currentWallpaper" :margin="previewHeight" @closePreview="closePreview"></cpt-store-wallpaper-item>
           </div>
           <!-- <cpt-pagination v-show="firstLoadFinished && !getWallpaperListFailed" key="pagination" :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination> -->
           
@@ -312,6 +312,8 @@ export default {
 }
 
 .wp-filter {
+  position: relative;
+  z-index: 1;
   font-weight: 400;
   padding-bottom: 8px;
   .wp-filter-type {

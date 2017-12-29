@@ -103,7 +103,10 @@ export default {
     
   },
   mounted () {
-    this.getItemOffsetTop()
+    this.$emit('closePreview')
+    this.$nextTick(() => {
+      this.getItemOffsetTop()
+    })
     window.addEventListener('resize', () => {
       this.getItemOffsetTop()
     })
