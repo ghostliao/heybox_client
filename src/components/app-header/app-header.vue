@@ -188,17 +188,6 @@ export default {
       maxjia.store.switchUser()
       this.accountMenuToggle()
     },
-    getAccountInfo () {
-      return new Promise((resolve, reject) => {
-        maxjia.user.getCurrentUser(data => {
-          // console.log(data)
-          data.avatarUrl && (this.$store.state.accountInfo.avatarUrl = data.avatarUrl)
-          data.uid && (this.$store.state.accountInfo.uid = data.uid)
-          data.userName && (this.$store.state.accountInfo.userName = data.userName)
-          resolve()
-        })
-      })
-    },
     getCurrentWindow () {
       return new Promise((resolve, reject) => {
         maxjia.windows.getCurrentWindow(data => {
@@ -221,7 +210,6 @@ export default {
     }
   },
   created () {
-    this.getAccountInfo().then(() => {})
     if (this.compareVersion(maxjia.maxapi.version, '0.1.16')) {
       this.navTabs.push({
         name: 'wallpaper',
