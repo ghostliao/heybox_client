@@ -2,7 +2,9 @@
 export default {
   data () {
     return {
-      imageList: []
+      imageList: [],
+      statusUpdateLock: false, // 视图更新锁
+      statusUpdateFrequency: 500 // 更新频率（ms）
     }
   },
   methods: {
@@ -20,7 +22,17 @@ export default {
         !isMoment && this.onImageFileDeleted()
       })
       maxjia.media.file.imageFileStatusChanged.addListener((data) => {
-        this.onImageFileStatusChanged(data)
+        if ((!data.uploading && data.uploadFailed) || (!data.uploading && data.uploadFinished)) {
+          this.onImageFileStatusChanged(data)
+        } else {
+          if (!this.statusUpdateLock) {
+            this.onImageFileStatusChanged(data)
+            this.statusUpdateLock = true
+            setTimeout(() => {
+              this.statusUpdateLock = false
+            }, this.statusUpdateFrequency)
+          }
+        }
       })
     },
     addImageItem (imageItem) {
@@ -48,7 +60,7 @@ export default {
       })
     },
     onImageFileStatusChanged (imageItem) {
-      // console.log('onImageFileStatusChanged')
+      console.log('onImageFileStatusChanged')
       const list = this.mediaList
       for (let i = 0, len = list.length; i < len; i++) {
         let mediaItem = list[i]
