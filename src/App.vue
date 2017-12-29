@@ -173,6 +173,59 @@ export default {
         this.$store.state.mainWindowId = id
         console.log('main window id: ' + id)
       })
+    },
+    // 定时上报
+    reportTimerInit () {
+      if (!this.$store.state.config.dev) {
+        setInterval(() => {
+          if (this.$store.state.reportDataUpdate) {
+            this.reportRequest()
+          }
+        }, 10000)
+      }
+    },
+    reportRequest () {
+      const reportData = this.$store.state.REPORTDATA
+      let reportDataPost = []
+      const time = parseInt(new Date().getTime() / 1000)
+      for (let i in reportData) {
+        reportDataPost.push({
+          'id': i,
+          'count': reportData[i],
+          'time': time
+        })
+      }
+      console.log('report data:', JSON.stringify(reportDataPost))
+
+      const url = this.$store.state.config.env === 'prod' ? 'https://pc.xiaoheihe.cn/pc/upload_user_click/' : 'http://heybox.tt.maxjia.com:58888/pc/upload_user_click'
+      const data = this.qs.stringify(reportDataPost)
+      const options = {
+        method: 'post',
+        // params: {
+        //   'os_type': 'pc',
+        //   'heybox_id': this.$store.state.accountInfo.uid
+        // },
+        data: JSON.stringify(reportDataPost)
+      }
+      this.$ajax(url, options).then(res => {
+        console.log('report success')
+        this.$store.state.REPORTDATA = {}
+      })
+      this.$store.state.reportDataUpdate = false
+    },
+    getWallpaperFilter () {
+      const url = '/pc/wallpaper_filter/'
+      const options = {
+        params: {
+          'os_type': 'pc',
+          'heybox_id': this.$store.state.accountInfo.uid
+        }
+      }
+      this.$ajax.get(url, options).then(res => {
+        if (res.data.status === 'ok') {
+          this.$store.state.wallpaperFilter = res.data.result.filter
+        }
+      })
     }
   },
   created () {
@@ -185,6 +238,9 @@ export default {
         eval("vm." + func + "(" + JSON.stringify(param) + ")")
       }
     }
+
+    this.reportTimerInit()
+
     const routeName = this.$route.name.split('-')[0]
     this.$store.state.routerName = routeName
 
@@ -204,6 +260,7 @@ export default {
     // console.log(this)
 
     this.saveMainWindowId()
+    this.getWallpaperFilter()
   }
 }
 </script>

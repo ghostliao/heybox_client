@@ -88,6 +88,7 @@ export default {
       } else if (this.data.fileType === 'image') {
         maxjia.media.file.uploadImage(localId)
       }
+      this.__REPORT('view_moment_dialog_upload')
     },
     uploadAllMoment () {
       Bus.$on('uploadAll', () => {

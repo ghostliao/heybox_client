@@ -15,7 +15,7 @@
               </div>
             </div>
             <cpt-divider light />
-            <cpt-menu-item title="设置" @click="mainGoToPage({ name: 'settings'})" />
+            <cpt-menu-item title="设置" @click="mainGoToPage({ name: 'settings'});__REPORT('view_settings')" />
             <cpt-menu-item title="召唤浮窗" @click="showDock" />
             <!-- <cpt-menu-item title="关于小黑盒" /> -->
             <cpt-divider light />
@@ -28,7 +28,7 @@
       <div class="navigation">
         <div class="tabs-wrap">
           <ul class="tabs">
-            <router-link v-for="(i, index) in navTabs" :to="{ name: i.name }" tag="li" :key="i.name">
+            <router-link v-for="(i, index) in navTabs" :to="{ name: i.name }" tag="li" :key="i.name" @click.native="__REPORT(`view_${i.name}`)">
               <span :ref="`tab${index}`">{{i.label}}</span>
             </router-link>
             <span class="tab-link-highlight" ref="highlight"></span>
@@ -217,6 +217,7 @@ export default {
     pageToMessage () {
       this.$router.push({ name: 'message'})
       this.$store.state.newMessage = false
+      this.__REPORT('view_system_message')
     }
   },
   created () {

@@ -31,6 +31,10 @@ export default {
       type: String,
       default: ''
     },
+    settingType: {
+      type: String,
+      default: ''
+    },
     selectList: {
       type: Object
     },
@@ -41,7 +45,7 @@ export default {
   data () {
     return {
       currentSelect: {
-        label: '',
+        label: '隐藏',
         value: this.currentSelectValue
       }
     }
@@ -58,6 +62,9 @@ export default {
       this.currentSelect.value = value
       Bus.$emit('closeMenu')
       this.$emit('change', value)
+      if (this.settingType === 'videoQuality') {
+        this.__REPORT(`view_settings_video_quality_${value}`)
+      }
     }
   },
   mounted () {

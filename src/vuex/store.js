@@ -10,7 +10,7 @@ const v = Vue.prototype
 
 const state = {
   config: {
-    ver: 'Alpha 0.2.2',
+    ver: 'Alpha 1.0.2',
     env: 'test', // test | prod
     dev: true
   },
@@ -60,7 +60,10 @@ const state = {
     avatarUrl: '../../assets/default_avatar.png'
   },
   newMessage: false,
-  mediaListShowType: 'list'
+  mediaListShowType: 'list',
+  REPORTDATA: {},
+  reportDataUpdate: false,
+  wallpaperFilter: [] // 壁纸过滤器数据
 }
 
 const getters = {

@@ -96,6 +96,7 @@ export default {
     .value {
       width: 24px;
       color: @labelColor;
+      text-align: right;
     }
     .cpt-slider {
       flex: 1;

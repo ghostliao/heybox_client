@@ -122,6 +122,9 @@ export default {
   },
   methods: {
     fbDialogToggle () {
+      if (!this.fbDialog) {
+        this.__REPORT('view_feedback')
+      }
       this.fbDialog = !this.fbDialog
     },
     getConversationList () {

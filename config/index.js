@@ -28,14 +28,14 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/tools':{
-        target: 'https://heybox.tt.maxjia.com',
-        // target: 'http://192.168.1.128:8080',
-        changeOrigin: true,
-        pathRewrite: {
-          // '^/api': ''
-        }
-      }
+      // '/tools':{
+      //   target: 'https://heybox.tt.maxjia.com',
+      //   // target: 'http://192.168.1.128:8080',
+      //   changeOrigin: true,
+      //   pathRewrite: {
+      //     // '^/api': ''
+      //   }
+      // }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

@@ -37,6 +37,7 @@ import iconButton from '@/components/iconButton'
 import lazy from '@/components/lazy'
 import linearProgress from '@/components/linearProgress'
 import mark from '@/components/mark'
+import msgDialog from '@/components/msg-dialog'
 import selectField from '@/components/select-field'
 import slider from '@/components/slider'
 import * as table from '@/components/table'
@@ -51,6 +52,7 @@ const components = {
   lazy,
   linearProgress,
   mark,
+  msgDialog,
   selectField,
   slider,
   ...table,
@@ -268,6 +270,17 @@ Vue.prototype.compareVersion = function (currentVersion, refVersion) {
     return v
   }
   return calc(currentVersion) >= calc(refVersion)
+}
+// 用户行为上报
+Vue.prototype.__REPORT = function (reportKey) {
+  // console.log(reportKey)
+  const data = store.state.REPORTDATA
+  if (data[reportKey]) {
+    data[reportKey] += 1
+  } else {
+    data[reportKey] = 1
+  }
+  store.state.reportDataUpdate = true
 }
 
 // router.beforeEach((to, from, next) => { 

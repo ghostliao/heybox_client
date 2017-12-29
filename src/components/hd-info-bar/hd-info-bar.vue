@@ -145,6 +145,9 @@ export default {
   },
   methods: {
     dropRowSwitch () {
+      if (!this.dropRowShow) {
+        this.__REPORT('view_hardware_info_rank')
+      }
       this.dropRowShow && (this.showAll = false)
       this.dropRowShow = !this.dropRowShow
     },

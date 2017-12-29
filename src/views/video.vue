@@ -208,12 +208,22 @@ export default {
       console.log(type)
       localStorage.setItem('mediaListShowType', type)
       this.$store.state.mediaListShowType = type
+      if (type === 'list') {
+        this.__REPORT('view_video_lib_show_type_list')
+      } else if (type === 'grid') {
+        this.__REPORT('view_video_lib_show_type_grid')
+      }
     },
     // 媒体列表过滤器
     filterSelectChanged (type, key, value) {
       this.mediaListFilter[type].select.label = key
       this.mediaListFilter[type].select.value = value
       Bus.$emit('closeMenu')
+      if (type === 'fileType') {
+        this.__REPORT('view_video_lib_filter_type')
+      } else if (type === 'moment') {
+        this.__REPORT('view_video_lib_filter_moment')
+      }
     },
     momentStart () {
       Bus.$emit('start')

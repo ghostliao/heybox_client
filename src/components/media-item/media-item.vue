@@ -224,9 +224,11 @@ export default {
         maxjia.media.file.uploadImage(localId)
       }
       this.firstUploadNotice()
+      this.__REPORT('view_video_lib_upload')
     },
     deleteMedia () {
       this.openDeleteDialog()
+      this.__REPORT('view_video_lib_delete')
     },
     _deleteMedia (localId) {
       console.log('delete ' + localId)

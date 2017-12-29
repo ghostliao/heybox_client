@@ -231,6 +231,9 @@ export default {
         })
       }
     }, 100)
+  },
+  activated () {
+    this.__REPORT('view_hardware_info')
   }
 }
 

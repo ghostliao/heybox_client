@@ -9,7 +9,7 @@
           </div>
           <div class="wrap options" v-show="!launching">
             <cpt-button label="启动" icon="start-fill" @click="launchGame" :param1="data.gameId" primary />
-            <cpt-button v-if="data.supportOptimize" label="优化" icon="optimization-fill" @click="openOptDialog" />
+            <!-- <cpt-button v-if="data.supportOptimize" label="优化" icon="optimization-fill" @click="openOptDialog" /> -->
           </div>
         </div>
         <div class="game-img">
@@ -188,6 +188,11 @@ export default {
       }, this.launchingTime)
       console.log(`launch game: ${gameId}`)
       maxjia.store.games.launchGame(gameId)
+      if (gameId === 10410005) {
+        this.__REPORT('view_game_launch_pubg')
+      } else {
+        this.__REPORT('view_game_launch_not_pubg')
+      }
     },
     // 游戏优化对话框
     openOptDialog () {

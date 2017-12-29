@@ -143,6 +143,9 @@ export default {
       this.closePreview()
     })
   },
+  activated () {
+    this.__REPORT('view_wallpaper_local')
+  },
   deactivated () {
     this.closePreview()
   }

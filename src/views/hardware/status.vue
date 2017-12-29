@@ -171,11 +171,12 @@ export default {
   },
   mounted () {
     this.init()
+    this.__REPORT('view_hardware_status')    
   },
-  // activated () {
-  //   console.log('activated')
-  //   this.init()
-  // },
+  activated () {
+    // this.init()
+    this.__REPORT('view_hardware_status')
+  },
   // deactivated () {
   //   console.log('deactivated')
   //   clearInterval(this.hardwarePerfInfoTimer)

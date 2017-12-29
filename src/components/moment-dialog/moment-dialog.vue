@@ -55,6 +55,7 @@ export default {
     // 本次游戏精彩时刻全部上传
     uploadAllMoment () {
       Bus.$emit('uploadAll')
+      this.__REPORT('view_moment_dialog_upload_all')
     },
     // 监听游戏Overlay注入
     gameOverlayListener () {
@@ -84,6 +85,7 @@ export default {
       this.openMomentDialog()
       maxjia.windows.activeWindow(this.$store.state.mainWindowId)
       console.log('active main window')
+      this.__REPORT('view_moment_dialog')
     },
     getCurrentOverlayGame () {
       maxjia.games.getCurrentOverlayGame(data => {

@@ -44,7 +44,7 @@
         </cpt-set-block>  -->
 
         <cpt-set-block title="录制设置">
-          <cpt-set-switch label="记录精彩时刻" :switch="isAutoStartCaptureInGame" @input="setIsAutoStartCaptureInGame">
+          <cpt-set-switch label="自动录屏" :switch="isAutoStartCaptureInGame" @input="setIsAutoStartCaptureInGame">
             <!-- <span slot="desc">desc</span> -->
           </cpt-set-switch>
           <cpt-set-slider label="精彩时刻时长" :initValue="captureMomentSeconds" :min="15" :max="30" :step="1" unit="s" @change="setCaptureMomentSeconds">
@@ -53,7 +53,7 @@
           <cpt-set-slider label="视频帧率" :initValue="videoFrameRate" :min="30" :max="60" :step="1" @change="setVideoFrameRate">
             <!-- <span slot="desc">desc</span> -->
           </cpt-set-slider>
-          <cpt-set-select label="视频质量" :selectList="videoQualitySelect" :currentSelectValue="videoQuality" @change="setVideoQuality">
+          <cpt-set-select label="视频质量" settingType="videoQuality" :selectList="videoQualitySelect" :currentSelectValue="videoQuality" @change="setVideoQuality">
             <!-- <span slot="desc">desc</span> -->
           </cpt-set-select>
         </cpt-set-block>
