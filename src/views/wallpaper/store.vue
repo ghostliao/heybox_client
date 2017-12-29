@@ -206,8 +206,10 @@ export default {
           }
           this.wallpaperFilterParams.tag = arr
         }
+        this.__REPORT('view_wallpaper_filter_tag')
       } else if (filterValue === 'sort') { // 排序
-        this.wallpaperFilterParams.sort = optionValue   
+        this.wallpaperFilterParams.sort = optionValue
+        this.__REPORT('view_wallpaper_filter_sort')
       }
       this.$nextTick(() => {
         this.updateStoreWallpaperList({
