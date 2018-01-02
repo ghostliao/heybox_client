@@ -29,7 +29,7 @@
         </transition>
         <transition name="fade" mode="out-in">
           <lazy :time="500">
-            <cpt-pagination v-show="!loading && firstLoadFinished && !getWallpaperListFailed" :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination>
+            <cpt-pagination v-if="!loading && firstLoadFinished && !getWallpaperListFailed" :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination>
           </lazy>
         </transition>
         <cpt-wallpaper-preview v-if="wallpaperPreview" :from="page" :previewStyle="previewStyle" :data="wallpaperList[currentWallpaper]" @close="closePreview"></cpt-wallpaper-preview>
@@ -116,7 +116,10 @@ export default {
         if (this.wallpaperFilterParams.tag === 0) {
           tag = 0
         } else {
-          tag = this.wallpaperFilterParams.tag.join('_')
+          // 复选逻辑
+          // tag = this.wallpaperFilterParams.tag.join('_')
+          // 单选逻辑
+          tag = this.wallpaperFilterParams.tag
           // console.log(tag)
         }
         const options = {
@@ -180,6 +183,7 @@ export default {
       })
     },
     pageChange (newIndex) {
+      this.current = newIndex
       this.updateStoreWallpaperList({
         offset: (newIndex - 1) * this.limit,
         limit: this.limit
@@ -187,25 +191,29 @@ export default {
     },
     getListByParam (filterValue, optionValue) {
       if (filterValue === 'tag') { // 标签
-        if (optionValue === 0) {
-          this.wallpaperFilterParams.tag = 0
-        } else {
-          let arr = this.wallpaperFilterParams.tag
-          if (arr === 0) {
-            arr = []
-            arr.push(optionValue)
-          } else {
-            if (arr.find(n => n === optionValue)) {
-              arr.splice(arr.findIndex(n => n === optionValue), 1)
-              if (arr.length < 1) {
-                arr = 0
-              }
-            } else {
-              arr.push(optionValue)
-            }
-          }
-          this.wallpaperFilterParams.tag = arr
-        }
+        // 复选逻辑
+        // if (optionValue === 0) {
+        //   this.wallpaperFilterParams.tag = 0
+        // } else {
+        //   let arr = this.wallpaperFilterParams.tag
+        //   if (arr === 0) {
+        //     arr = []
+        //     arr.push(optionValue)
+        //   } else {
+        //     if (arr.find(n => n === optionValue)) {
+        //       arr.splice(arr.findIndex(n => n === optionValue), 1)
+        //       if (arr.length < 1) {
+        //         arr = 0
+        //       }
+        //     } else {
+        //       arr.push(optionValue)
+        //     }
+        //   }
+        //   this.wallpaperFilterParams.tag = arr
+        // }
+
+        // 单选逻辑
+        this.wallpaperFilterParams.tag = optionValue
         this.__REPORT('view_wallpaper_filter_tag')
       } else if (filterValue === 'sort') { // 排序
         this.wallpaperFilterParams.sort = optionValue
@@ -221,12 +229,15 @@ export default {
     },
     filterActiveClass (i, j) {
       if (i.value === 'tag') {
-        const arr = this.wallpaperFilterParams.tag
-        if (arr === 0) {
-          return { 'active': j.value === 0 }
-        } else {
-          return { 'active': arr.find(n => n === j.value) }
-        }
+        // 复选逻辑
+        // const arr = this.wallpaperFilterParams.tag
+        // if (arr === 0) {
+        //   return { 'active': j.value === 0 }
+        // } else {
+        //   return { 'active': arr.find(n => n === j.value) }
+        // }
+        // 单选逻辑
+        return { 'active': j.value === this.wallpaperFilterParams[i.value] }
       } else if (i.value === 'sort') {
         return { 'active': j.value === this.wallpaperFilterParams[i.value] }
       }
