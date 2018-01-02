@@ -36,6 +36,9 @@
           <div v-show="!data.downloading && data.downloadFailed" class="status">
             <cpt-mark fail small></cpt-mark>
           </div>
+          <transition name="fade">
+            <div v-show="current === index" class="highlight"></div>
+          </transition>
         </div>
       </div>
     </div>
@@ -263,6 +266,15 @@ export default {
           z-index: 3;
           left: 8px;
           bottom: 8px;
+        }
+        .highlight {
+          position: absolute;
+          z-index: 3;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 2px;
+          background: @primaryColor;
         }
       }
       &:hover {
