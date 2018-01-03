@@ -24,6 +24,16 @@
               <cpt-button label="更改" secondary small @click="setImageDir"></cpt-button>
             </div>
           </div>
+          <div class="setting-row path">
+            <div class="label-wrap">
+              <span class="label">动态桌面文件</span>
+              <!-- <span class="desc">（可用磁盘空间5.60G）</span> -->
+            </div>
+            <div class="text-field-wrap">
+              <cpt-text-field :value="wallpaperDir" preIcon="search-file-fill" readonly></cpt-text-field>
+              <cpt-button label="更改" secondary small @click="setWallpaperDir"></cpt-button>
+            </div>
+          </div>
         </cpt-set-block>
 
         <cpt-set-block title="热键设置">
@@ -115,6 +125,7 @@ export default {
     return {
       videoDir: '',
       imageDir: '',
+      wallpaperDir: '',
       isVideoCaptureForMoment: false,
       isAutoStartCaptureInGame: false,
       gameOverlaySettings: [],
@@ -131,10 +142,10 @@ export default {
       videoFrameRate: 30,
       videoQualitySelect: {
         'Default': '默认',
-        'HD_Normal': '720P 普清',
-        'HD_High': '720P 高清',
-        'FHD_Normal': '1080P 普清',
-        'FHD_High': '1080P 高清'
+        'HD_Normal': '720P 中码率',
+        'HD_High': '720P 高码率',
+        'FHD_Normal': '1080P 中码率',
+        'FHD_High': '1080P 高码率'
       },
       videoQuality: 'Default',
       clientVersion: '999.0.0'
@@ -166,6 +177,20 @@ export default {
           const path = data.path
           maxjia.settings.setImageDir(path)
           this.imageDir = path
+        }
+      })
+    },
+    getWallpaperDir () {
+      maxjia.settings.getWallPaperDir((data) => {
+        this.wallpaperDir = data.wallPaperDir
+      })
+    },
+    setWallpaperDir () {
+      maxjia.store.selectDirectory('选择文件夹', (data) => {
+        if (data.result === 'selected') {
+          const path = data.path
+          maxjia.settings.setWallPaperDir(path)
+          this.wallpaperDir = path
         }
       })
     },
@@ -273,6 +298,7 @@ export default {
     settingsInit () {
       this.getVideoDir()
       this.getImageDir()
+      this.getWallpaperDir()
       // this.getIsVideoCaptureForMoment()
       this.getIsAutoStartCaptureInGame()
       this.getGameOverlaySettings()
