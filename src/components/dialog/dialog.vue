@@ -194,9 +194,18 @@ export default {
     }
   }
   &.image-checker {
-    width: auto;
+    width: 100%;
+    height: 100%;
     background: transparent;
     border: none;
+    .mu-dialog-close {
+      top: 60px;
+    }
+    .mu-dialog-body {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+    }
   }
   &.msg-dialog {
     width: 360px;

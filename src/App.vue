@@ -41,7 +41,7 @@
     <!-- E video player -->
 
     <!-- S image checker -->
-    <cpt-dialog :open="imageChecker" title="" @close="closeImageChecker" @hide="closeImageChecker" dialogClass="image-checker" :overlayOpacity="0.8">
+    <cpt-dialog :open="imageChecker" title="" @close="closeImageChecker" @hide="closeImageChecker" dialogClass="image-checker" :overlayOpacity="0.8" cornerClose>
       <cpt-image-checker></cpt-image-checker>
     </cpt-dialog>
     <!-- E image checker -->
@@ -207,7 +207,7 @@ export default {
           'time': time
         })
       }
-      console.log('report data:', JSON.stringify(reportDataPost))
+      // console.log('report data:', JSON.stringify(reportDataPost))
 
       const url = this.$store.state.config.env === 'prod' ? 'https://api.xiaoheihe.cn/pc/upload_user_click' : 'http://heybox.tt.maxjia.com:58888/pc/upload_user_click'
       const data = this.qs.stringify(reportDataPost)
