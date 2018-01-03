@@ -41,7 +41,7 @@ export default {
     onWallpaperFileDeleted (wallpaperItem) {
       // console.log('wallpaper file deleted')
       if (this.page === 'local') {
-        this.wallpaperControler = false
+        this.$store.state.wallpaperControler.enabled = false
         this.getLocalWallpaperList().then(data => {
           this.wallpaperList = data
         })
@@ -95,8 +95,8 @@ export default {
     onWallpaperChanged (wallpaperItem) {
       // console.log('wallpaper changed', wallpaperItem)
       if (this.page === 'local') {
-        this.playing = true
-        this.wallpaperControler = !(wallpaperItem.ID === '')
+        this.$store.state.wallpaperControler.playing = true
+        this.$store.state.wallpaperControler.enabled = !(wallpaperItem.ID === '')
         for (let i = 0, len = this.wallpaperList.length; i < len; i++) {
           let item = this.wallpaperList[i]
           if (item.ID === wallpaperItem.ID) {
@@ -120,7 +120,7 @@ export default {
             this.itemList = []
             for (let wallpaperItem of data['wallPapers']) {
               if (this.page === 'local' && wallpaperItem.isCurrent) {
-                this.wallpaperControler = true
+                this.$store.state.wallpaperControler.enabled = true
               }
               this.addWallpaperItem(wallpaperItem)
             }

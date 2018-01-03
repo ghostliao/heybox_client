@@ -16,19 +16,7 @@
       </div>
     </div>
 
-    <div v-show="wallpaperControler" class="wallpaper-controler">
-      <div class="wallpaper-controler-wrap">
-        <cpt-button label="还原壁纸" small primary @click="removeWallpaper" />
-        <cpt-button v-show="!playing" label="播放" icon="start-fill" small primary @click="_wallpaperPlayerSwitch(1)" />
-        <cpt-button v-show="playing" label="暂停" icon="pause-fill" small primary @click="_wallpaperPlayerSwitch(0)" />
-
-        <div class="wallpaper-volume">
-          <cpt-icon-button v-show="volumeSize !== 0" :icon="'volume'" @click="volumeMuted"></cpt-icon-button>
-          <cpt-icon-button v-show="volumeSize === 0" :icon="'volume-mute'" @click="resetVolumeSize"></cpt-icon-button>
-          <cpt-slider v-model="volumeSize" :step="1" @input="setVideoVolumeSize"></cpt-slider>
-        </div>
-      </div>
-    </div>
+    
   </div>
 </template>
 
@@ -59,11 +47,7 @@ export default {
       wallpaperPreview: false, // 壁纸预览开关
       previewStyle: {}, // wallpaper 位置信息
       previewHeight: 0, // 预览区域高度
-      wallpaperList: [],
-      wallpaperControler: false,
-      volumeSize: 100,
-      volumeSizeStore: 0,
-      playing: true // 播放、暂停
+      wallpaperList: []
     }
   },
   computed: {
@@ -95,17 +79,6 @@ export default {
         // this.wallpaperList[this.current].isCurrent = false
         this.$set(this.wallpaperList[this.current], 'isCurrent', false)
       }
-    },
-    _wallpaperPlayerSwitch (val) {
-      this.wallpaperPlayerSwitch(val)
-      this.playing = !this.playing
-    },
-    volumeMuted () {
-      this.volumeSizeStore = this.volumeSize
-      this.volumeSize = 0
-    },
-    resetVolumeSize () {
-      this.volumeSize = this.volumeSizeStore
     }
   },
   created () {
@@ -126,8 +99,6 @@ export default {
         this.$refs.scroller.scrollTop = data.position.top
       })
     })
-
-    
     
   },
   mounted () {
@@ -193,34 +164,4 @@ export default {
   }
 }
 
-.wallpaper-controler {
-  position: fixed;
-  z-index: 10;
-  left: 0;
-  right: 0;
-  bottom: 15px;
-  width: 340px;
-  margin: auto;
-}
-.wallpaper-controler-wrap {
-  display: flex;
-  align-items: center;
-  background: rgba(0,0,0,.75);
-  padding: 0 15px;
-  border-radius: 2px;
-  .cpt-button {
-    margin-right: 15px;
-  }
-}
-.wallpaper-volume {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  width: 150px;
-  padding: 15px 15px 15px 0;
-  .cpt-slider {
-    margin-left: 10px;
-  }
-}
 </style>

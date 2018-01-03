@@ -10,7 +10,7 @@ const v = Vue.prototype
 
 const state = {
   config: {
-    ver: 'Alpha 1.0.2',
+    ver: 'Alpha 1.0.5',
     env: 'test', // test | prod
     dev: true
   },
@@ -63,7 +63,13 @@ const state = {
   mediaListShowType: 'list',
   REPORTDATA: {},
   reportDataUpdate: false,
-  wallpaperFilter: [] // 壁纸过滤器数据
+  wallpaperFilter: [], // 壁纸过滤器数据
+  wallpaperControler: { // 壁纸控制栏
+    enabled: false,
+    volumeSize: 100,
+    volumeSizeStore: 0,
+    playing: true
+  }
 }
 
 const getters = {
