@@ -12,13 +12,13 @@
           </div>
           
         </div>
-        <transition name="fade" mode="out-in">
+        <transition-group name="fade" mode="out-in">
           <div v-if="loading" key="loading" class="loading">
             <cpt-circular-progress :size="40" />
           </div>
-          <div v-if="!loading && wallpaperList.length <= 0" key="notice" class="notice">暂无桌面文件</div>
-          <div v-if="!loading && getWallpaperListFailed" key="notice" class="notice">获取列表失败</div>
-          <div v-if="!loading && wallpaperList.length > 0" key="list" class="wp-list">
+          <div v-if="!loading && !getWallpaperListFailed && wallpaperList.length <= 0" key="noticeNoFile" class="notice">暂无桌面文件</div>
+          <div v-if="!loading && getWallpaperListFailed" key="noticeFailed" class="notice">获取列表失败，<span @click="updateStoreWallpaperList({ offset: 0, limit: limit }, true)">点击重试</span></div>
+          <div v-if="!loading && !getWallpaperListFailed && wallpaperList.length > 0" key="list" class="wp-list">
             <cpt-store-wallpaper-item v-for="(i, index) in wallpaperList" :key="index" :index="index" :data="i" :current="currentWallpaper" :margin="previewHeight" @closePreview="closePreview"></cpt-store-wallpaper-item>
           </div>
           <!-- <cpt-pagination v-show="firstLoadFinished && !getWallpaperListFailed" key="pagination" :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination> -->
@@ -26,12 +26,14 @@
           <!-- <div v-if="!loading && firstLoadFinished && !getWallpaperListFailed" class="pagination-wrap" key="pagination">
             <cpt-pagination :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination>
           </div> -->
-        </transition>
-        <transition name="fade" mode="out-in">
-          <lazy :time="500">
-            <cpt-pagination v-if="!loading && firstLoadFinished && !getWallpaperListFailed" :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination>
-          </lazy>
-        </transition>
+        </transition-group>
+        <lazy :time="600">
+          <div class="pagination">
+            <!-- <transition name="fade-in"> -->
+              <cpt-pagination v-show="!loading && firstLoadFinished && !getWallpaperListFailed && wallpaperList.length > 0" :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination>
+            <!-- </transition> -->
+          </div>
+        </lazy>
         <cpt-wallpaper-preview v-if="wallpaperPreview" :from="page" :previewStyle="previewStyle" :data="wallpaperList[currentWallpaper]" @close="closePreview"></cpt-wallpaper-preview>
       </div>
     </div>
@@ -133,16 +135,19 @@ export default {
           }
         }
         this.$ajax(url, options).then(res => {
+          console.log(res)
           const data = res.data.result
           this.wallpaperList = data.list
-          this.total = data.total
+          this.total = data.total === 0 ? 1 : data.total
+          this.getWallpaperListFailed = false
           this.loading = false
           resolve(data.list)
           // this.$nextTick(() => {
             this.$refs.scroller.scrollTop = 0
           // })
         }, res => {
-          console.log('getStoreWallpaperList failed')
+          console.log('getStoreWallpaperList failed 1')
+          this.getWallpaperListFailed = true
           this.loading = false
           
           reject(res)
@@ -158,8 +163,8 @@ export default {
         return
       }
       if (firstLoad) {
-        this.firstLoadFinished = false
         this.current = 1
+        this.firstLoadFinished = false
       }
       this.loading = true
       this.$nextTick(() => {
@@ -289,7 +294,7 @@ export default {
   .view-scroller;
   .content {
     width: 100%;
-    padding: 6px 40px 40px;
+    padding: 6px 40px 80px;
     > .body {
       position: relative;
       .loading {
@@ -313,12 +318,22 @@ export default {
         height: 400px;
         text-align: center;
         font-size: 14px;
+        font-weight: 400;
         color: @secondaryTextColor;
+        span {
+          color: @primaryColor;
+          // text-decoration: underline;
+          cursor: pointer;
+        }
       }
       .wp-list {
         display: flex;
         flex-wrap: wrap;
         margin-right: -20px;
+      }
+      .pagination {
+        display: flex;
+        justify-content: center;
       }
     }
   }
