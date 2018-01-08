@@ -1,11 +1,22 @@
 <template>
   <div class="view-game">
     <div class="content">
-      <template v-if="$store.state.config.dev">
-
       <div class="toolbar">
         <div class="wrap">
-          <cpt-block-button :text="'亚洲服务器'" ref="acceleratorMenuButton" @click="acceleratorMenuToggle">
+          <cpt-block-button :text="hostBtnText" :buttonClass="hostBtnClass" tooltipLabel="Steam社区无法打开解决方案" @click="addHost">
+            <div slot="icon" class="icon">
+              <img src="//cdn.max-c.com/@/heybox/imgs/940a59ca62065cec6d86281e9d6d78dc">
+            </div>
+          </cpt-block-button>
+          
+          <template v-if="$store.state.config.dev">
+          <!-- <cpt-block-button text="移除host" @click="removeHost">
+            <div slot="icon" class="icon">
+              <img src="max-file:\C:\Users\max\AppData\Local\Qingfeng\Heybox\game\icon\10400000.png">
+            </div>
+          </cpt-block-button> -->
+          
+          <!-- <cpt-block-button :text="'亚洲服务器'" ref="acceleratorMenuButton" @click="acceleratorMenuToggle">
             <div slot="icon" class="icon">
               <img src="max-file:\C:\Users\max\AppData\Local\Qingfeng\Heybox\game\icon\10400000.png" alt="">
             </div>
@@ -23,12 +34,11 @@
           </cpt-popover>
 
           <cpt-block-button icon="accelerator-fill" text="一键加速"></cpt-block-button>
-          <cpt-block-button buttonClass="set" icon="set-fill" @click="$router.push({ name: 'settings-accelerator' })"></cpt-block-button>
+          <cpt-block-button buttonClass="set" icon="set-fill" @click="$router.push({ name: 'settings-accelerator' })"></cpt-block-button> -->
+          </template>
 
         </div>
       </div>
-
-      </template>
       <div class="title-bar">
         <div class="title">游戏库</div>
         <!-- <cpt-button icon="add-fill" label="添加游戏" secondary small @click="manuallySelectGameDir"></cpt-button> -->
@@ -72,11 +82,25 @@ export default {
       acceleratorMenuOpen: false,
       acceleratorMenuTrigger: null,
       installedGames: [],
-      gameIds: ''
+      gameIds: '',
+      hostList: [],
+      hostState: 3 // 0 -> 未加速 1 -> 已加速 2 -> 加速中 3 -> 检查host更新中
     }
   },
   computed: {
-     
+    hostBtnText () {
+      if (this.hostState === 0) return '修复Steam社区连接'
+      if (this.hostState === 1) return 'Steam社区连接已修复'
+      if (this.hostState === 2) return '修复处理中...'
+      if (this.hostState === 3) return '正在检查host文件'
+    },
+    hostBtnClass () {
+      if (this.hostState !== 0) {
+        return ['disabled', 'host']
+      } else {
+        return ['host']
+      }
+    }
   },
   methods: {
     acceleratorMenuToggle () {
@@ -249,6 +273,73 @@ export default {
       })
       this.$set(item, 'recommandConfigLevel', '1')
       this.$set(item, 'supportLevels', supportLevels)
+    },
+    addHost () {
+      if (this.hostState !== 0) return
+      this.__REPORT('fn_add_host')
+      for (let i in this.hostList) {
+        this.hostState = 2
+        let domain = i
+        let ip = this.hostList[i]
+        maxjia.maxtool.addHostRecord(domain, ip, res => {
+          console.log(res)
+          if (res.result) {
+            // success
+            this.hostState = 1
+            this.__REPORT('fn_add_host_success')
+          } else {
+            // fail
+            this.hostState = 0
+          }
+        })
+      }
+      // const domain = 'steamcommunity.com'
+      // const ip = '23.52.74.146'
+    },
+    getHost () {
+      return new Promise((resolve, reject) => {
+        const url = '/pc/get_host_map/'
+        const options = {
+          params: {
+            'heybox_id': this.$store.state.accountInfo.uid,
+            'os_type': 'pc'
+          }
+        }
+        this.$ajax(url, options).then(res => {
+          const map = res.data.result.host
+          this.hostList = map
+          resolve(map)
+        }, res => {
+          reject()
+        })
+      })
+    },
+    checkHostUpdate () {
+      return new Promise((resolve, reject) => {
+        this.getHost().then(map => {
+          let domain, ip
+          for (let i in map) {
+            domain = i
+            ip = map[i]
+            if (domain === 'steamcommunity.com') break
+          }
+          maxjia.maxtool.getHostRecords(data => {
+            for (let i = 0, len = data.records.length; i < len; i++) {
+              const record = data.records[i]
+              if (record.domain === domain && record.ip === ip) {
+                reject()
+              }
+            }
+            resolve()
+          })
+        })
+      })
+    },
+    removeHost () {
+      let domain = 'steamcommunity.com'
+      maxjia.maxtool.removeHostRecord(domain, res => {
+        console.log(res)
+      })
     }
   },
   created () {
@@ -256,11 +347,20 @@ export default {
     this.getInstalledGames().then(() => {
       this.getGamesInfoList(this.gameIds)
     })
+    this.checkHostUpdate().then(res => {
+      // 有更新
+      console.log('发现host更新')
+      this.hostState = 0
+    }, res => {
+      // 没更新
+      this.hostState = 1
+    })
   },
   mounted () {
-    if (this.$store.state.config.dev) { // dev !!!!!!!!!!!!!!!
-      this.acceleratorMenuTrigger = this.$refs.acceleratorMenuButton.$el
-    }
+    this.__REPORT('view_game')
+    // if (this.$store.state.config.dev) { // dev !!!!!!!!!!!!!!!
+    //   this.acceleratorMenuTrigger = this.$refs.acceleratorMenuButton.$el
+    // }
   }
 }
 </script>
@@ -269,9 +369,9 @@ export default {
 .view-game {
   .view-scroller;
   > .content {
-    padding: 6px 40px 24px;
+    padding: 24px 40px;
     .toolbar {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       > .wrap {
         display: flex;
       }

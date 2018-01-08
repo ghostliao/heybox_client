@@ -19,7 +19,7 @@ Vue.use(VueLazyload, {
 })
 
 import axios from 'axios'
-axios.defaults.timeout = 2500
+axios.defaults.timeout = 10000
 axios.defaults.baseURL = (store.state.config.env === 'test')
   ? 'http://heybox.test.maxjia.com:58888'
   : 'https://api.xiaoheihe.cn'

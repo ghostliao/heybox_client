@@ -13,7 +13,7 @@ export default {
   name: 'cpt-block-button',
   props: {
     buttonClass: {
-      type: [String, Object]
+      type: [String, Object, Array]
     },
     icon: {
       type: String
@@ -30,6 +30,10 @@ export default {
     },
     tooltipLabel: {
       type: String
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -126,6 +130,16 @@ export default {
     &:hover {
       background-color: fade(@textColor, 20%);
     }
+  }
+  &.host {
+    width: 150px;
+  }
+  &.disabled {
+    color: fade(@textColor, 40%);
+    cursor: default;
+    &:hover {
+      background-color: fade(@textColor, 10%);      
+    }  
   }
 }
 
