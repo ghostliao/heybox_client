@@ -1,5 +1,5 @@
 <template>
-  <div class="view-game">
+  <div class="view-game" ref="scroller">
     <div class="content">
       <div class="toolbar">
         <div class="wrap">

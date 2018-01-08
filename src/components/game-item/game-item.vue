@@ -368,13 +368,15 @@ export default {
     },
     // 板块透视动效
     perspective () {
+      const vm = this
       const stage = this.$refs.stage
       const layer = this.$refs.layer
       layer.addEventListener('mousemove', function (e) {
         const centerX = layer.offsetWidth / 2
         const centerY = layer.offsetHeight / 2
+        const scrollTop = vm.$parent.$refs.scroller.scrollTop
         const x = e.pageX - layer.offsetLeft
-        const y = e.pageY - layer.offsetTop
+        const y = e.pageY - layer.offsetTop + scrollTop
         const deltaX = x - centerX
         const deltaY = y - centerY
         const percentageX = deltaX / centerX
