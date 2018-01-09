@@ -88,8 +88,8 @@ export default {
       background-color: @dangerColor;
     }
     &.large {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
     }
     &.small {
       width: 18px;

@@ -137,11 +137,11 @@ export default {
       }
     }
     &.secondary {
-      color: fade(@textColor, 40%);
+      color: #bec3c8;
       background: fade(@textColor, 10%);
       border-color: transparent;
       &:hover {
-        color: fade(@textColor, 40%);
+        color: #f1f2f3;
         background: fade(@textColor, 20%);
       }
       &:active {

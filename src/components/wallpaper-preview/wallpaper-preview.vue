@@ -129,6 +129,7 @@ export default {
           reject(res)
           this.$store.state.msgDialogOptions.markType = 'fail'
           this.$store.state.msgDialogOptions.msg = '下载失败'
+          this.$store.state.msgDialogOptions.desc = ''
           this.$store.state.msgDialog = true
         })
       })

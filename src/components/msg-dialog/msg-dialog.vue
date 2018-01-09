@@ -1,8 +1,10 @@
 <template>
   <div class="cpt-msg-dialog">
+    <div class="msg">{{ msg }}</div>
     <cpt-mark v-show="markType === 'success'" success large></cpt-mark>
     <cpt-mark v-show="markType === 'fail'" fail large></cpt-mark>
-    <div class="msg">{{ msg }}</div>
+    <div v-show="desc" class="desc">{{ desc }}</div>
+    <cpt-button label="知道了" secondary long @click="$emit('close')"></cpt-button>
   </div>
 </template>
 
@@ -15,6 +17,10 @@ export default {
       default: 'success'
     },
     msg: {
+      type: String,
+      default: ''
+    },
+    desc: {
       type: String,
       default: ''
     }
@@ -39,7 +45,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: @dialogHeight;
+  padding: 32px 0 24px;
   // border: 1px solid #000;
   // box-shadow: 0 0 0 1px @layoutBorderColor inset;
   
@@ -51,6 +57,14 @@ export default {
     font-size: 16px;
     line-height: 1;
     color: @textColor;
+    margin-bottom: 24px;
+  }
+  .desc {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1;
+    color: #82878c;
+    margin-bottom: 24px;
   }
 }
 

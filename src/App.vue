@@ -48,7 +48,7 @@
 
     <!-- S msg dialog -->
     <cpt-dialog :open="msgDialog" title="" @close="closeMsgDialog" @hide="closeMsgDialog" dialogClass="msg-dialog" :overlayOpacity="0.8" cornerClose>
-      <cpt-msg-dialog :markType="$store.state.msgDialogOptions.markType" :msg="$store.state.msgDialogOptions.msg">
+      <cpt-msg-dialog :markType="$store.state.msgDialogOptions.markType" :msg="$store.state.msgDialogOptions.msg" :desc="$store.state.msgDialogOptions.desc" @close="closeMsgDialog">
         
       </cpt-msg-dialog>
     </cpt-dialog>
@@ -72,7 +72,6 @@ import cptVideoPlayer from '@/components/video-player'
 import { videoPlayer } from 'vue-video-player'
 import hotkeys from '@/components/hotkeys'
 import cptImageChecker from '@/components/image-checker'
-import cptMsgDialog from '@/components/msg-dialog'
 import cptFeedback from '@/components/feedback'
 import Bus from '@/components/bus'
 import cptMomentDialog from '@/components/moment-dialog'
@@ -85,7 +84,6 @@ export default {
     'video-player': videoPlayer,
     'app-header': appHeader,
     'cpt-image-checker': cptImageChecker,
-    'cpt-msg-dialog': cptMsgDialog,
     'cpt-feedback': cptFeedback,
     'cpt-moment-dialog': cptMomentDialog
   },
