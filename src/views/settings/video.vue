@@ -66,6 +66,12 @@
           <cpt-set-select label="视频质量" settingType="videoQuality" :selectList="videoQualitySelect" :currentSelectValue="videoQuality" @change="setVideoQuality">
             <!-- <span slot="desc">desc</span> -->
           </cpt-set-select>
+          <cpt-set-select label="音频输出设备" :selectList="audioOutputSelect" :currentSelectValue="audioOutput" @change="setAudioOutput">
+            <!-- <span slot="desc">desc</span> -->
+          </cpt-set-select>
+          <cpt-set-select label="音频输入设备" :selectList="audioInputSelect" :currentSelectValue="audioInput" @change="setAudioInput">
+            <!-- <span slot="desc">desc</span> -->
+          </cpt-set-select>
         </cpt-set-block>
 
         <cpt-set-block title="游戏内浮窗设置">
@@ -84,6 +90,9 @@
         </cpt-set-block>
 
         <cpt-set-block title="关于小黑盒">
+          <cpt-set-switch label="开机自动启动" :switch="isAutoStart" @input="setIsAutoStart">
+            <!-- <span slot="desc">desc</span> -->
+          </cpt-set-switch>
           <div class="setting-row info">
             <div class="label-wrap">
               <span class="label">当前版本：Heybox v{{clientVersion}}</span>
@@ -148,6 +157,15 @@ export default {
         'FHD_High': '1080P 高码率'
       },
       videoQuality: 'Default',
+      isAutoStart: false,
+      audioOutputSelect: {
+        'Default': '默认'
+      },
+      audioOutput: '',
+      audioInputSelect: {
+        'Default': '默认'
+      },
+      audioInput: '',
       clientVersion: '999.0.0'
     }
   },
@@ -268,7 +286,7 @@ export default {
     // 设置视频帧率
     getVideoFrameRate () {
       maxjia.settings.getVideoFrameRate(data => {
-        console.log(data)
+        // console.log(data)
         this.videoFrameRate = data.videoFrameRate
       })
     },
@@ -284,7 +302,7 @@ export default {
     // 设置视频质量
     getVideoQuality () {
       maxjia.settings.getVideoQuality(data => {
-        console.log(data)
+        // console.log(data)
         this.videoQuality = data.videoQuality
       })
     },
@@ -294,6 +312,47 @@ export default {
     },
     videoQualityChanged () {
 
+    },
+    // 开机自动启动
+    getIsAutoStart () {
+      maxjia.settings.getIsAutoStart(data => {
+        console.log(data)
+        this.isAutoStart = data.IsAutoStart
+      })
+    },
+    setIsAutoStart (bool) {
+      maxjia.settings.setIsAutoStart(bool)
+    },
+    // 播放设备、录音设备选择
+    getAudioDeviceInfos () { // false -> 播放设备 true -> 录音设备
+      maxjia.settings.getAudioDeviceInfos(false, data => {
+        const array = data.devices
+        for (let i = 0, len = array.length; i < len; i++) {
+          this.audioOutputSelect[array[i].id] = array[i].name
+        }
+        maxjia.settings.getCaptureAudioDevice(false, data => {
+          console.log(data)
+          this.audioOutput = data.id
+        })
+      })
+      maxjia.settings.getAudioDeviceInfos(true, data => {
+        const array = data.devices
+        for (let i = 0, len = array.length; i < len; i++) {
+          this.audioInputSelect[array[i].id] = array[i].name
+        }
+        maxjia.settings.getCaptureAudioDevice(true, data => {
+          console.log(data)
+          this.audioInput = data.id
+        })
+      })
+    },
+    setAudioOutput (id) {
+      console.log(id)
+      maxjia.settings.setCaptureAudioDevice(false, id)
+    },
+    setAudioInput (id) {
+      console.log(id)
+      maxjia.settings.setCaptureAudioDevice(true, id)
     },
     settingsInit () {
       this.getVideoDir()
@@ -312,6 +371,8 @@ export default {
       // this.videoFrameRateChanged()
       this.getVideoQuality()
       // this.videoQualityChanged()
+      this.getIsAutoStart()
+      this.getAudioDeviceInfos()
     },
     getClientInfo () {
       this.clientVersion = maxjia.maxapi.version

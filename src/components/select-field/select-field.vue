@@ -1,7 +1,7 @@
 <template>
   <div class="cpt-select-field" :class="{ 'full-width': fullWidth }">
     <div class="select-field" :class="{ 'active': menuOpen }" :style="selectFieldStyle" ref="menuButton" @click="menuToggle">
-      <div>{{select}}</div>
+      <div class="select-label">{{select}}</div>
     </div>
     <cpt-popover :trigger="menuTrigger" :popoverClass="['left']" :open="menuOpen" @close="menuHandleClose">
       <slot></slot>
@@ -98,6 +98,9 @@ export default {
     }
     &.active {
       border-color: @primaryColor;
+    }
+    .select-label {
+      .ellipsis;
     }
   }
 }
