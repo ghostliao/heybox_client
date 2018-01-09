@@ -228,7 +228,9 @@ export default {
     }
   }
   &.moment-dialog {
-    width: 900px;
+    // width: 900px;
+    // height: 540px;
+    width: 80%;
     height: 80%;
     .mu-dialog-body {
       padding: 0;

@@ -3,24 +3,36 @@
     <div class="moment-dialog-wrap">
       <div class="moment-dialog-head">
         <div class="title">本次游戏精彩时刻</div>
+        <cpt-button label="全部上传" icon="upload-fill" small primary @click="uploadAllMoment" />
       </div>
       <div class="moment-dialog-body" ref="momentList">
         <div class="moment-dialog-body-container">
-          <cpt-moment-dialog-media-item v-for="(i, index) in mediaList" :key="index" :data="i" :index="index" :itemCount="mediaList.length"></cpt-moment-dialog-media-item>
+          <div class="moment-dialog-media-list">
+            <div class="index">{{currentMediaIndex + 1}} / {{mediaList.length}}</div>
+            <cpt-moment-dialog-media-item v-for="(i, index) in mediaList" :key="index" v-show="currentMediaIndex === index" :data="i" :index="index" :currentMediaIndex="currentMediaIndex"></cpt-moment-dialog-media-item>
+          </div>
+          <div class="moment-dialog-sidebar">
+            <!-- <div class="btn up" :class="{ 'disabled': scrollMin }" @click="moveTop">
+              <cpt-icon value="arrow-up"></cpt-icon>
+            </div> -->
+            <div class="moment-dialog-sidebar-list" ref="sidebar">
+              <div class="moment-dialog-sidebar-list-wrap" ref="wrap">
+                <cpt-moment-dialog-sidebar-media-item v-for="(i, index) in mediaList" :key="index" :data="i" :index="index" :currentMediaIndex="currentMediaIndex" @previewMedia="previewMedia"></cpt-moment-dialog-sidebar-media-item>
+              </div>
+            </div>
+            <!-- <div class="btn down" :class="{ 'disabled': scrollMax }" @click="moveBottom">
+              <cpt-icon value="arrow-down"></cpt-icon>              
+            </div> -->
+          </div>
         </div>
       </div>
-      <!-- <transition name="fade"> -->
-        <div class="moment-dialog-upload-all">
-          <!-- <div class="txt">精彩的游戏！赶快分享给大家吧~</div> -->
-          <cpt-button label="全部上传" icon="upload-fill" long primary @click="uploadAllMoment" />
-        </div>
-      <!-- </transition> -->
     </div>
   </cpt-dialog>
 </template>
 
 <script>
 import cptMomentDialogMediaItem from './moment-dialog-media-item'
+import cptMomentDialogSidebarMediaItem from './moment-dialog-sidebar-media-item'
 import Bus from '@/components/bus'
 import videoFile from '@/components/videoFile'
 import imageFile from '@/components/imageFile'
@@ -29,7 +41,8 @@ export default {
   name: 'cpt-moment-dialog',
   mixins: [videoFile, imageFile],
   components: {
-    'cpt-moment-dialog-media-item': cptMomentDialogMediaItem
+    'cpt-moment-dialog-media-item': cptMomentDialogMediaItem,
+    'cpt-moment-dialog-sidebar-media-item': cptMomentDialogSidebarMediaItem
   },
   props: {
     
@@ -39,7 +52,12 @@ export default {
       momentDialog: false,
       loading: true,
       mediaList: [],
-      currentOverlayGameId: 0
+      currentOverlayGameId: 0,
+      currentMediaIndex: 0,
+      scrollMin: true,
+      scrollMax: false,
+      // targety: 211,
+      // dx: 0
     }
   },
   computed: {
@@ -47,9 +65,12 @@ export default {
   },
   methods: {
     openMomentDialog () {
+      this.mousewheel()
       this.momentDialog = true
     },
     closeMomentDialog () {
+      console.log('sss')
+      document.removeEventListener('mousewheel', this.mousewheelHandler)
       this.momentDialog = false
     },
     // 本次游戏精彩时刻全部上传
@@ -94,6 +115,86 @@ export default {
     },
     getLastGameFpsStats () {
       maxjia.games.getLastGameFpsStats('gameId', data => {})
+    },
+    // sidebar scroll
+    moveTop () {
+      this.$refs.sidebar.scrollTop -= 68
+      this.offsetCalc()
+    },
+    moveBottom () {
+      this.$refs.sidebar.scrollTop += 68
+      this.offsetCalc()
+    },
+    offsetCalc () {
+      if (this.$refs.sidebar.scrollTop === 0) {
+        this.scrollMin = true
+      } else {
+        this.scrollMin = false
+      }
+      if (this.$refs.sidebar.scrollTop >= (this.$refs.wrap.offsetHeight - this.$refs.sidebar.offsetHeight)) {
+        this.scrollMax = true
+      } else {
+        this.scrollMax = false
+      }
+    },
+    // moveTop () {
+    //   const le = parseInt(this.$refs.sidebar.scrollTop)
+    //   if (le > 211) {
+    //     this.targety = parseInt(this.$refs.sidebar.scrollTop) - 211
+    //   } else {
+    //     this.targety = parseInt(this.$refs.sidebar.scrollTop) - le - 1
+    //   }
+    //   this.scTop()
+    // },
+    // scTop () {
+    //   this.dx = parseInt(this.$refs.sidebar.scrollTop) - this.targety
+    //   this.$refs.sidebar.scrollTop -= this.dx * .3
+    //   const clearScroll = setTimeout(this.scTop, 50)
+    //   if (this.dx * .3 < 1) {
+    //     clearTimeout(clearScroll)
+    //   }
+    // },
+    // moveBottom () {
+    //   const le = parseInt(this.$refs.sidebar.scrollTop) + 211
+    //   const maxHeight = 10 * 105
+    //   const maxL = maxHeight - 600
+    //   if (le < maxL) {
+    //     this.targety = parseInt(this.$refs.sidebar.scrollTop) + 211
+    //   } else {
+    //     this.targety = maxL
+    //   }
+    //   this.scBottom()
+    // },
+    // scBottom () {
+    //   this.dx = this.targety - parseInt(this.$refs.sidebar.scrollTop)
+    //   this.$refs.sidebar.scrollTop += this.dx * .3
+    //   const clearScroll = setTimeout(this.scBottom, 50)
+    //   if (this.dx * .3 < 1) {
+    //     clearTimeout(clearScroll)
+    //   }
+    // },
+    previewMedia (index) {
+      this.currentMediaIndex = index
+    },
+    mousewheel () {
+      document.addEventListener('mousewheel', this.mousewheelHandler)
+    },
+    mousewheelHandler (res) {
+      // console.log(res)
+      Bus.$emit('mousewheel')
+      if (res.wheelDelta > 0) { // 上滚
+        this.moveTop()
+        this.currentMediaIndex -= 1
+        if (this.currentMediaIndex < 0) {
+          this.currentMediaIndex = 0
+        }
+      } else if (res.wheelDelta < 0) { // 下滚
+        this.moveBottom()
+        this.currentMediaIndex += 1
+        if (this.currentMediaIndex > this.mediaList.length - 1) {
+          this.currentMediaIndex = this.mediaList.length - 1
+        }
+      }
     }
   },
   created () {
@@ -104,6 +205,10 @@ export default {
 
     Bus.$on('start', this.onOverlayStart)
     Bus.$on('stop', this.onOverlayStop)
+
+    // this.$nextTick(() => {
+    //   this.offsetCalc()
+    // })
   }
 }
 
@@ -124,36 +229,83 @@ export default {
   .title {
     font-size: 16px;
     color: @textColor;
+    margin-right: 20px;
   }
 }
 .moment-dialog-body {
   position: relative;
   height: calc(~"100% - 50px");
-  overflow-y: scroll;
+  background: rgba(0, 0, 0, 0.2);
+  // overflow-y: scroll;
 }
 .moment-dialog-body-container {
-  padding: 8px 16px 48px;
+  display: flex;
+  height: 100%;
+  // padding: 8px 16px 48px;
 }
-.moment-dialog-upload-all {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 20px;
-  margin: auto;
-  width: 134px;
-  // display: flex;
-  // flex-direction: column;
-  // justify-content: center;
-  // align-items: center;
-  // height: 120px;
-  // padding-bottom: 30px;
-  // .txt {
-  //   font-size: 12px;
-  //   font-weight: 400;
-  //   margin-bottom: 20px;
-  // }
-  .cpt-button {
-    .depth(1);
+.moment-dialog-media-list {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  .index {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #bec3c8;
+  }
+}
+.moment-dialog-sidebar {
+  position: relative;
+  width: 122px;
+  height: 100%;
+  background: #14191e;
+  .btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    z-index: 10;
+    left: 0;
+    right: 0;
+    height: 32px;
+    background: #14191e;
+    cursor: pointer;
+    .common-transition;
+    &:hover {
+      color: @primaryColor;
+      // background: rgba(0,0,0,.4);
+    }
+    &.up {
+      top: 0;
+	    // background-image: linear-gradient(to top, rgba(20, 25, 30, 0.0), #14191e 54%, #14191e);
+    }
+    &.down {
+      bottom: 0;
+	    // background-image: linear-gradient(to bottom, rgba(20, 25, 30, 0.0), #14191e 54%, #14191e);
+    }
+    &.disabled {
+      color: #555a5f !important;
+      background: #14191e !important;
+    }
+  }
+}
+.moment-dialog-sidebar-list {
+  height: 100%;
+  background: #14191e;
+  overflow: hidden;
+}
+.moment-dialog-sidebar-list-wrap {
+  padding: 4px 4px;
+}
+.moment-dialog-sidebar-item {
+  height: 64px;
+  background: #444444;
+  margin-bottom: 4px;
+  &:last-of-type {
+    margin-bottom: 0;
   }
 }
 

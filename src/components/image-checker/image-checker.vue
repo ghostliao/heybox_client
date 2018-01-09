@@ -47,6 +47,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  height: 100%;
   img {
     display: block;
     max-height: 600px;
