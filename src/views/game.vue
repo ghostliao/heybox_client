@@ -1,9 +1,14 @@
 <template>
   <div class="view-game" ref="scroller">
     <div class="content">
-      <div class="toolbar">
+      <div v-if="false" class="toolbar">
         <div class="wrap">
-          <cpt-block-button :text="hostBtnText" :buttonClass="hostBtnClass" tooltipLabel="Steam社区无法打开解决方案" @click="addHost">
+          <cpt-block-button v-show="hostState !== 1" :text="hostBtnText" :buttonClass="hostBtnClass" tooltipLabel="网页版Steam社区无法打开解决方案" @click="addHost">
+            <div slot="icon" class="icon">
+              <img src="//cdn.max-c.com/@/heybox/imgs/940a59ca62065cec6d86281e9d6d78dc">
+            </div>
+          </cpt-block-button>
+          <cpt-block-button v-show="hostState === 1" text="打开Steam社区" buttonClass="host" @click="openSteamCommunity">
             <div slot="icon" class="icon">
               <img src="//cdn.max-c.com/@/heybox/imgs/940a59ca62065cec6d86281e9d6d78dc">
             </div>
@@ -41,19 +46,10 @@
       </div>
       <div class="title-bar">
         <div class="title">游戏库</div>
-        <!-- <cpt-button icon="add-fill" label="添加游戏" secondary small @click="manuallySelectGameDir"></cpt-button> -->
+        <cpt-button icon="add-fill" label="添加游戏" secondary small @click="selectAddCustomGame"></cpt-button>
       </div>
       <div class="games-list">
-        <!-- <div class="add-game">
-          <div class="game-item add-game" @click="manuallySelectGameDir">
-            <div class="layer add-game">
-              <cpt-icon value="add-thin" :size="42"></cpt-icon>
-              <span>添加游戏</span>
-            </div>
-          </div>
-        </div> -->
-        <cpt-game-item v-for="i in installedGames" :data="i" :key="i.gameId"></cpt-game-item>
-        
+        <cpt-game-item v-for="i in installedGames" v-if="!i.removed" :data="i" :key="i.gameId"></cpt-game-item>
       </div>
     </div>
   </div>
@@ -181,6 +177,31 @@ export default {
           } else {
             this.$store.state.msgDialogOptions.markType = 'fail'
             this.$store.state.msgDialogOptions.msg = '未找到游戏'
+          }
+        }
+      })
+    },
+    // 添加自定义游戏
+    selectAddCustomGame () {
+      maxjia.store.games.selectAddCustomGame(res => {
+        console.log(res)
+        // if (res.result === 'canceled') {
+        //   this.$store.state.msgDialogOptions.markType = 'fail'
+        //   this.$store.state.msgDialogOptions.msg = '未选择游戏'
+        //   this.$store.state.msgDialogOptions.desc = ''
+        //   this.$store.state.msgDialog = true
+        // }
+        if (res.result === 'added') {
+          if (res.gameId === 0) {
+            this.$store.state.msgDialogOptions.markType = 'fail'
+            this.$store.state.msgDialogOptions.msg = '添加失败'
+            this.$store.state.msgDialogOptions.desc = '请选择.exe格式的文件'
+            this.$store.state.msgDialog = true
+          } else {
+            this.$store.state.msgDialogOptions.markType = 'success'
+            this.$store.state.msgDialogOptions.msg = '添加成功'
+            this.$store.state.msgDialogOptions.desc = ''
+            this.$store.state.msgDialog = true
           }
         }
       })
@@ -340,6 +361,9 @@ export default {
       maxjia.maxtool.removeHostRecord(domain, res => {
         console.log(res)
       })
+    },
+    openSteamCommunity () {
+      maxjia.maxapi.openUrlInSystemBrowser('https://steamcommunity.com')
     }
   },
   created () {
@@ -369,7 +393,7 @@ export default {
 .view-game {
   .view-scroller;
   > .content {
-    padding: 24px 40px;
+    padding: 6px 40px 24px;
     .toolbar {
       margin-bottom: 12px;
       > .wrap {
@@ -389,56 +413,6 @@ export default {
       display: flex;
       flex-wrap: wrap;
       margin-right: -20px;
-      // > .add-game {
-      //   width: 25%;
-      //   padding: 0 20px 20px 0;
-      //   .common-transition;
-      //   @media (max-width: 900px) {
-      //     width: 50%;
-      //   }
-      //   @media (max-width: 1200px) {
-      //     width: 33.333333%;
-      //   }
-      //   .game-item {
-      //     position: relative;
-      //     padding-top: 50%;
-      //     border-radius: 2px;
-      //     background-color: fade(@textColor, 10%);
-      //     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
-      //     &:hover {
-      //       background-color: fade(@textColor, 20%);
-      //     }
-      //     &.active {
-      //       background-color: fade(@textColor, 10%);
-      //     }
-      //     .layer {
-      //       position: absolute;
-      //       z-index: 1;
-      //       top: 0;
-      //       left: 0;
-      //       right: 0;
-      //       bottom: 0;
-      //       display: flex;
-      //       flex-direction: column;
-      //       justify-content: center;
-      //       align-items: center;
-      //       opacity: 1;
-      //       color: fade(@textColor, 20%);
-      //       cursor: pointer;
-      //       &:hover {
-      //         color: fade(@textColor, 60%);
-      //       }
-      //       &:active {
-      //         color: fade(@textColor, 20%);
-      //       }
-      //       span {
-      //         font-size: 12px;
-      //         line-height: 1;
-      //         margin-top: 8px;
-      //       }
-      //     }
-      //   }
-      // }
     }
   }
 }

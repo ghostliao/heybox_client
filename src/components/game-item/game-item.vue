@@ -10,6 +10,7 @@
           <div class="wrap options" v-show="!launching">
             <cpt-button label="启动" icon="start-fill" @click="launchGame" :param1="data.gameId" primary />
             <!-- <cpt-button v-if="data.supportOptimize" label="优化" icon="optimization-fill" @click="openOptDialog" /> -->
+            <cpt-button v-if="data.gameId >= 80000000 && data.gameId <= 90000000" label="移除" icon="delete-fill" @click="openDeleteDialog" :param1="data.gameId" danger />
           </div>
         </div>
         <div class="game-img">
@@ -102,6 +103,15 @@
         </div>
       </div>
     </cpt-dialog>
+
+    <!-- S delete confirm dialog -->
+    <cpt-dialog :open="deleteDialog" title="" @close="closeDeleteDialog" @hide="closeDeleteDialog" dialogClass="msg-dialog" :overlayOpacity="0.8" cornerClose>
+      <div slot="title" class="title">移除所选游戏</div>
+      <div class="content">该游戏将从游戏库中移除，不会影响您的本地文件</div>
+      <cpt-button slot="actions" label="取消" @click="closeDeleteDialog" secondary long />
+      <cpt-button slot="actions" label="移除" @click="removeCustomGame" :param1="data.gameId" danger long />
+    </cpt-dialog>
+    <!-- E delete confirm dialog -->
   </div>
 </template>
 
@@ -155,7 +165,8 @@ export default {
       currentOptLevel: 0, // 已优化的level
       currentOptRecommendLevel: false, // 已优化的是否为推荐level
       optState: 0, // opt state 0 -> 默认, 1 -> 优化中, 2 -> 优化结束, 3 -> 还原中， 4 -> 还原结束
-      optimizing: false
+      optimizing: false,
+      deleteDialog: false
     }
   },
   computed: {
@@ -388,6 +399,20 @@ export default {
       layer.addEventListener('mouseleave', function (e) {
         this.style.transform = ''
       })  
+    },
+    openDeleteDialog () {
+      this.deleteDialog = true
+    },
+    closeDeleteDialog () {
+      this.deleteDialog = false
+    },
+    // 移除自定义游戏
+    removeCustomGame (id) {
+      this.data.removed = true
+      maxjia.store.games.removeCustomGame(id, res => {
+        console.log(`game ${id} removed`)
+      })
+      this.closeDeleteDialog()
     }
   },
   created () {
