@@ -1,6 +1,5 @@
 <template>
   <div class="view-video-lib">
-    <media-file-man @updateVideoList="updateVideoList"></media-file-man>
     <div class="media-list" :class="filterClass">
       <transition name="fade" mode="out-in">
         <div v-if="loading" key="loading" class="progress">
@@ -25,7 +24,7 @@
       </div> -->
       <div class="content">
         <cpt-mark success large></cpt-mark>
-        <div class="desc">审核通过后将会同步至您的小黑盒账号中</div>        
+        <div class="desc">审核通过后将会同步至您的小黑盒账号中</div>
       </div>
       <cpt-button slot="actions" label="知道了" @click="closeFirstUploadNoticeDialog" secondary long />
       
@@ -42,7 +41,6 @@
 // video image 列表更新时
 
 import cptCircularProgress from '@/components/circularProgress'
-import mediaFileMan from '@/components/media-file-man'
 import {cptManageBar, cptMediaItem} from '@/components/media-item'
 import videoFile from '@/components/videoFile'
 import imageFile from '@/components/imageFile'
@@ -52,7 +50,6 @@ export default {
   mixins: [videoFile, imageFile],
   components: {
     'cpt-circular-progress': cptCircularProgress,
-    'media-file-man': mediaFileMan,
     'cpt-manage-bar': cptManageBar,
     'cpt-media-item': cptMediaItem
   },

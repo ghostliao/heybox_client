@@ -4,7 +4,7 @@ export default {
       videoList: [],
       videoFile: false,
       statusUpdateLock: false, // 视图更新锁
-      statusUpdateFrequency: 500 // 更新频率（ms）
+      statusUpdateFrequency: 1000 // 更新频率（ms）
     }
   },
   methods: {
