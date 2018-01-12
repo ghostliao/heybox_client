@@ -17,6 +17,7 @@
             <cpt-divider light />
             <cpt-menu-item title="设置" @click="mainGoToPage({ name: 'settings'});__REPORT('view_settings')" />
             <cpt-menu-item title="召唤浮窗" @click="showDock" />
+            <cpt-menu-item title="常见问题" @click="showFaq" />
             <!-- <cpt-menu-item title="关于小黑盒" /> -->
             <cpt-divider light />
             <cpt-menu-item title="切换用户" @click="switchUser" />
@@ -35,7 +36,6 @@
           </ul>
           <div class="drag" ref="drag"></div>
         </div>
-
         <div class="tab-btn">
           <div class="tab-btn-wrap">
             <div class="notify" v-show="$store.state.newMessage"></div>
@@ -130,7 +130,7 @@ export default {
         },
         {
           name: 'video',
-          label: '视频'
+          label: '精彩时刻'
         },
         {
           name: 'hardware',
@@ -207,6 +207,11 @@ export default {
       this.$router.push({ name: 'message'})
       this.$store.state.newMessage = false
       this.__REPORT('view_system_message')
+    },
+    showFaq () {
+      const faqUrl = 'https://api.xiaoheihe.cn/maxnews/app/detail/14943'
+      maxjia.maxapi.openUrlInSystemBrowser(faqUrl)
+      this.mainMenuToggle()      
     }
   },
   created () {
