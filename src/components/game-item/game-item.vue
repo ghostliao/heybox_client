@@ -562,6 +562,9 @@ export default {
           height: 16px;
           margin-right: 8px;
         }
+        span {
+          .ellipsis;
+        }
       }
       .duration {
         color: fade(@textColor, 60%);
