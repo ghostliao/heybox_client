@@ -9,8 +9,12 @@ export default {
   },
   PLAY_VIDEO_FILE (state, obj) {
     // console.log('playVideoFile: ' + obj.file)
-    state.videoPlayerOptions.sources[0].src = 'max-file://' + obj.file.replace(':', '')
-    // state.videoPlayerOptions.sources[0].src = 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm'
+    if (obj.local) {
+      state.videoPlayerOptions.sources[0].src = 'max-file://' + obj.file.replace(':', '')
+      // state.videoPlayerOptions.sources[0].src = 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm'
+    } else {
+      state.videoPlayerOptions.sources[0].src = obj.file
+    }      
     state.videoPlayer = true
   },
   CLOSE_VIDEO_PLAYER (state, obj) {

@@ -58,7 +58,7 @@ export default {
     .date {
       // font-family: 'DIN';
       // font-size: 20px;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 600;
     }
     .iconfont {

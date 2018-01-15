@@ -4,8 +4,8 @@ import Hello from '@/components/Hello'
 import mid from '@/views/mid'
 import viewGame from '@/views/game'
 import viewVideo from '@/views/video'
-import viewVideoLib from '@/views/video/lib'
-import viewVideoDesktop from '@/views/video/desktop'
+import viewVideoLocal from '@/views/video/local'
+import viewVideoCloud from '@/views/video/cloud'
 import viewVideoScreenshot from '@/views/video/screenshot'
 import viewHardware from '@/views/hardware'
 import viewHardwareInfo from '@/views/hardware/info'
@@ -57,29 +57,17 @@ export default new Router({
       component: viewVideo,
       children: [
         {
-          path: 'lib',
-          name: 'video-lib',
-          component: viewVideoLib,
+          path: 'local',
+          name: 'video-local',
+          component: viewVideoLocal,
           meta: {
             keepAlive: true
           }
         },
         {
-          path: 'desktop',
-          name: 'video-desktop',
-          component: viewVideoDesktop,
-          meta: {
-            keepAlive: true
-          },
-          // beforeEnter: (to, from, next) => {
-          //   store.state.routerVideoName = to.name
-          //   next()
-          // }
-        },
-        {
-          path: 'screenshot',
-          name: 'video-screenshot',
-          component: viewVideoScreenshot,
+          path: 'cloud',
+          name: 'video-cloud',
+          component: viewVideoCloud,
           meta: {
             keepAlive: true
           },
@@ -91,7 +79,7 @@ export default new Router({
       ],
       redirect: to => {
         let name = store.state.routerVideoName
-        if (!name) name = 'video-lib'
+        if (!name) name = 'video-local'
         return {
           name: name
         }

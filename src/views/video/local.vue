@@ -1,10 +1,27 @@
 <template>
-  <div class="view-video-lib">
+  <div class="view-video-local">
+    <div class="media-list-filter">
+      <div class="media-list-filter-item">
+        <cpt-select-field :select="mediaListFilter.fileType.select.value === 'all' ? '分类' : mediaListFilter.fileType.select.label">
+          <cpt-menu>
+            <cpt-menu-item v-for="(key, value) in mediaListFilter.fileType.filter" :key="key" :title="key" :selectActive="mediaListFilter.fileType.select.value === value" @click="filterSelectChanged('fileType', key, value)" />
+          </cpt-menu>
+        </cpt-select-field>
+      </div>
+      <div class="media-list-filter-item">
+        <cpt-select-field :select="mediaListFilter.moment.select.value === 'all' ? '时刻' : mediaListFilter.moment.select.label">
+          <cpt-menu>
+            <cpt-menu-item v-for="(key, value) in mediaListFilter.moment.filter" :key="key" :title="key" :selectActive="mediaListFilter.moment.select.value === value" @click="filterSelectChanged('moment', key, value)" />
+          </cpt-menu>
+        </cpt-select-field>
+      </div>
+    </div>
     <div class="media-list" :class="filterClass">
       <transition name="fade" mode="out-in">
         <div v-if="loading" key="loading" class="progress">
           <cpt-circular-progress :size="40" />
         </div>
+        
         <div v-if="!loading && mediaList.length <= 0" key="notice" class="notice">暂无媒体文件</div>
         <div v-if="!loading && mediaList.length > 0" key="list" class="media-list-wrap" :class="{ 'grid': $store.state.mediaListShowType === 'grid' }">
           <template v-for="(i, index) of mediaList">
@@ -13,6 +30,7 @@
           </template>
         </div>
       </transition>
+        
     </div>
     <!-- S first upload notice dialog -->
     <cpt-dialog :open="firstUploadNoticeDialog" title="" @close="closeFirstUploadNoticeDialog" @hide="closeFirstUploadNoticeDialog" dialogClass="msg-dialog" :overlayOpacity="0.8" cornerClose>
@@ -40,29 +58,50 @@
 // 按时间戳排序
 // video image 列表更新时
 
-import cptCircularProgress from '@/components/circularProgress'
 import {cptManageBar, cptMediaItem} from '@/components/media-item'
 import videoFile from '@/components/videoFile'
 import imageFile from '@/components/imageFile'
+import {menu, menuItem} from '@/components/menu'
+import Bus from '@/components/bus'
 
 export default {
-  name: "view-video-lib",
+  name: "view-video-local",
   mixins: [videoFile, imageFile],
   components: {
-    'cpt-circular-progress': cptCircularProgress,
     'cpt-manage-bar': cptManageBar,
-    'cpt-media-item': cptMediaItem
+    'cpt-media-item': cptMediaItem,
+    'cpt-menu': menu,
+    'cpt-menu-item': menuItem
   },
   data () {
     return {
       loading: true,
+      mediaListFilter: {
+        fileType: {
+          select: {
+            label: '全部',
+            value: 'all'
+          },
+          filter: {
+            'all': '全部',
+            'video': '视频',
+            'image': '截图'
+          }
+        },
+        moment:{
+          select: {
+            label: '全部',
+            value: 'all'
+          },
+          filter: {
+            'all': '全部',
+            'kill': '击杀',
+            'dead': '死亡'
+          }
+        }
+      },
       mediaList: [],
       firstUploadNoticeDialog: false
-    }
-  },
-  props: {
-    viewParams: {
-      type: Object
     }
   },
   computed: {
@@ -74,6 +113,12 @@ export default {
         'moment-all': this.viewParams.moment === 'all',
         'moment-kill': this.viewParams.moment === 'kill',
         'moment-dead': this.viewParams.moment === 'dead'
+      }
+    },
+    viewParams () {
+      return {
+        'fileType': this.mediaListFilter.fileType.select.value,
+        'moment': this.mediaListFilter.moment.select.value
       }
     }
   },
@@ -180,6 +225,17 @@ export default {
         momentShow = moment === 'all' ? true : false
       }
       return fileTypeShow && momentShow
+    },
+    // 媒体列表过滤器
+    filterSelectChanged (type, key, value) {
+      this.mediaListFilter[type].select.label = key
+      this.mediaListFilter[type].select.value = value
+      Bus.$emit('closeMenu')
+      if (type === 'fileType') {
+        this.__REPORT('view_video_lib_filter_type')
+      } else if (type === 'moment') {
+        this.__REPORT('view_video_lib_filter_moment')
+      }
     }
   },
   created () {
@@ -194,13 +250,22 @@ export default {
 
 <style lang="less">
 @import "../../styles/import.less";
-.view-video-lib {
+.view-video-local {
+  .media-list-filter {
+    display: flex;
+    align-items: center;
+    padding-top: 20px;
+  }
+  .media-list-filter-item {
+    margin-right: 12px;
+  }
   .media-list {
     position: relative;
     // max-width: 1072px;
     margin: auto;
     .progress {
       position: absolute;
+      z-index: 1;
       top: 0;
       left: 0;
       right: 0;

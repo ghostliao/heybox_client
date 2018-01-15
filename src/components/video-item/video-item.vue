@@ -96,6 +96,7 @@ export default {
       // console.log('play')
       const videoSource = url
       this.playVideoFile({
+        'local': true,
         'file': videoSource
       })
 

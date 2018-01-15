@@ -1,5 +1,5 @@
 <template>
-  <div class="view-video">
+  <div class="view-video" ref="scroller">
     <div class="content">
       <div class="toolbar">
         <!-- <div class="title">录制</div> -->
@@ -30,10 +30,27 @@
           <cpt-block-button v-if="$store.state.config.dev" :text="'stop'" icon="set-fill" @click="momentStop"></cpt-block-button>
           
         </div>
+        <!-- <div class="record">
+          <div class="recent-moment-record">
+            <div class="info">
+              <div class="row">
+                <span class="title">总结</span>
+                <span>上次游戏： 2017-08-17  绝地求生</span>
+              </div>
+              <div class="row">
+                <span class="label">游戏时长</span>
+                <span class="value">3:33:33</span>
+              </div>
+            </div>
+            <div class="btn">
+              <cpt-button label="查看详情" secondary small />
+            </div>
+          </div>
+        </div> -->
       </div>
       <div class="nav-bar">
         <ul class="nav-list">
-          <router-link v-for="(i, index) in navTabs" :to="{ name: i.name }" tag="li" :key="i.name">
+          <router-link v-for="(i, index) in navTabs" :to="{ name: i.name }" tag="li" :key="i.name" @click.native="saveRouter(i.name)">
             <span :ref="`tab${index}`">{{i.label}}</span>
           </router-link>
           <!-- <router-link :to="{ name: 'video-desktop' }" tag="li">
@@ -44,22 +61,7 @@
           </router-link> -->
           <span class="tab-link-highlight" ref="highlight"></span>
         </ul>
-        <div class="media-list-filter">
-          <div class="media-list-filter-item">
-            <cpt-select-field :select="mediaListFilter.fileType.select.value === 'all' ? '分类' : mediaListFilter.fileType.select.label">
-              <cpt-menu>
-                <cpt-menu-item v-for="(key, value) in mediaListFilter.fileType.filter" :key="key" :title="key" :selectActive="mediaListFilter.fileType.select.value === value" @click="filterSelectChanged('fileType', key, value)" />
-              </cpt-menu>
-            </cpt-select-field>
-          </div>
-          <div class="media-list-filter-item">
-            <cpt-select-field :select="mediaListFilter.moment.select.value === 'all' ? '时刻' : mediaListFilter.moment.select.label">
-              <cpt-menu>
-                <cpt-menu-item v-for="(key, value) in mediaListFilter.moment.filter" :key="key" :title="key" :selectActive="mediaListFilter.moment.select.value === value" @click="filterSelectChanged('moment', key, value)" />
-              </cpt-menu>
-            </cpt-select-field>
-          </div>
-        </div>
+        
         <div class="show-type">
           <div class="btn" :class="{ 'active': $store.state.mediaListShowType === 'list' }" @click.stop="changeShowType('list')">
             <cpt-icon value="list-fill" :size="16"></cpt-icon>          
@@ -72,7 +74,7 @@
       <div class="main">
         <lazy :time="300">
           <keep-alive>
-            <router-view :viewParams="viewParams"></router-view>
+            <router-view></router-view>
             <!-- <router-view v-if="$route.meta.keepAlive"></router-view> -->
           </keep-alive>
           <!-- <router-view v-if="!$route.meta.keepAlive"></router-view> -->
@@ -92,7 +94,6 @@ import cptBlockButton from '@/components/blockButton'
 import { mapState, mapActions } from 'vuex'
 import cptBackTop from '@/components/backTop'
 import tabHighlight from '@/components/tab-highlight'
-import {menu, menuItem} from '@/components/menu'
 import cptDivider from '@/components/divider'
 import Bus from '@/components/bus'
 
@@ -103,8 +104,6 @@ export default {
     'cpt-button': cptButton,
     'cpt-block-button': cptBlockButton,
     'cpt-back-top': cptBackTop,
-    'cpt-menu': menu,
-    'cpt-menu-item': menuItem,
     'cpt-divider': cptDivider
   },
   data () {
@@ -112,42 +111,14 @@ export default {
       routeDepth: 2,
       navTabs: [
         {
-          name: 'video-lib',
-          label: '精彩时刻'
+          name: 'video-local',
+          label: '本地'
         },
-        // {
-        //   name: 'video-desktop',
-        //   label: '录像'
-        // },
-        // {
-        //   name: 'video-screenshot',
-        //   label: '截屏'
-        // }
-      ],
-      mediaListFilter: {
-        fileType: {
-          select: {
-            label: '全部',
-            value: 'all'
-          },
-          filter: {
-            'all': '全部',
-            'video': '视频',
-            'image': '截图'
-          }
-        },
-        moment:{
-          select: {
-            label: '全部',
-            value: 'all'
-          },
-          filter: {
-            'all': '全部',
-            'kill': '击杀',
-            'dead': '死亡'
-          }
+        {
+          name: 'video-cloud',
+          label: '已上传'
         }
-      }
+      ]
     }
   },
   computed: {
@@ -168,12 +139,6 @@ export default {
     },
     recordButtonTextClass () {
       return this.$store.state.recordingState === 'RS_Recording' ? 'time' : ''
-    },
-    viewParams () {
-      return {
-        'fileType': this.mediaListFilter.fileType.select.value,
-        'moment': this.mediaListFilter.moment.select.value
-      }
     }
   },
   methods: {
@@ -214,17 +179,6 @@ export default {
         this.__REPORT('view_video_lib_show_type_grid')
       }
     },
-    // 媒体列表过滤器
-    filterSelectChanged (type, key, value) {
-      this.mediaListFilter[type].select.label = key
-      this.mediaListFilter[type].select.value = value
-      Bus.$emit('closeMenu')
-      if (type === 'fileType') {
-        this.__REPORT('view_video_lib_filter_type')
-      } else if (type === 'moment') {
-        this.__REPORT('view_video_lib_filter_moment')
-      }
-    },
     momentStart () {
       Bus.$emit('start')
     },
@@ -245,6 +199,7 @@ export default {
     padding: 24px 40px;
     .toolbar {
       position: relative;
+      display: flex;
       margin-bottom: 16px;
       .video-setting-btn {
         position: absolute;
@@ -258,7 +213,13 @@ export default {
         font-size: 16px;
       }
       > .wrap {
+        flex: 1;
+        min-width: 0;
         display: flex;
+        flex-wrap: wrap;
+      }
+      > .record {
+        width: 560px;
       }
     }
     .nav-bar {
@@ -266,21 +227,23 @@ export default {
       border-bottom: 1px solid @layoutBorderColor;
       margin-bottom: 2px;
       .nav-list {
+        flex: 1;
+        min-width: 0;
         position: relative;
         display: flex;
-        height: 54px;
+        height: 48px;
         > li {
           position: relative;
           top: 1px;
           display: flex;
           justify-content: center;
           align-items: center;
-          font-size: 18px;
+          font-size: 16px;
           font-weight: 300;
           color: fade(@textColor, 40%);
           border-bottom: 1px solid transparent;
           cursor: pointer;
-          margin-right: 24px;
+          margin-right: 20px;
           .common-transition;
           // &:after {
           //   content: '';
@@ -315,15 +278,7 @@ export default {
           backface-visibility: hidden;
         }
       }
-      .media-list-filter {
-        flex: 1;
-        min-width: 0;
-        display: flex;
-        align-items: center;
-      }
-      .media-list-filter-item {
-        margin-right: 12px;
-      }
+      
       .show-type {
         display: flex;
         justify-content: flex-end;
@@ -342,6 +297,55 @@ export default {
         }
       }
     }
+  }
+}
+
+.recent-moment-record {
+  display: flex;
+  align-items: center;
+  height: 76px;
+  border-radius: 2px;
+  background-image: linear-gradient(to right, rgba(20, 25, 30, 0.0), #14191e 16%, #14191e);
+  padding: 0 12px;
+  .info {
+    flex: 1;
+    min-width: 0;
+    color: #82878c;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14px;
+    > .row:first-child {
+      margin-bottom: 12px;
+    }
+    > .row {
+      .title {
+        color: @textColor;
+        font-size: 14px;
+        font-style: italic;
+        font-weight: 600;
+        margin-right: 12px;
+      }
+      .label {
+        margin-right: 8px;
+      }
+      .value {
+        color: @textColor;
+        font-size: 14px;
+        font-weight: 600;
+        margin-right: 20px;
+
+        height: 14px;
+        background-image: linear-gradient(to bottom, #ffffff, #afafaf);
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 1.0;
+        text-align: left;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+    
   }
 }
 </style>

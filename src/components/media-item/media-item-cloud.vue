@@ -1,12 +1,9 @@
 <template>
-  <div class="cpt-media-item" :class="mediaItemStyle" v-show="manageBarOpen && mediaItemShow">
+  <div class="cpt-media-item-cloud" :class="mediaItemStyle" v-show="manageBarOpen && mediaItemShow">
     <div class="media-item list" v-show="mediaItemStyle === 'list'" @click="mediaAction(data.file)">
       <div class="col col-1">
-        <!-- <div class="thumbnail" v-lazy:background-image="thumbnail"> -->
         <div class="thumbnail">
-          <!-- <img v-lazy="thumbnail"> -->
-          <img :src="thumbnail">
-          <!-- <div class="thumbnail" :style="{ backgroundImage: 'url(\'max-file://video/' + data.thumbnail + '\')' }"> -->
+          <img v-lazy="thumbnail">
         </div>
         <div class="layer">
           <div class="play">
@@ -16,7 +13,7 @@
         </div>
       </div>
       <div class="col col-2">
-        <span class="name">{{ data.file | fileName }}</span>
+        <span class="name">{{ data.id }}</span>
         <span v-if="data.fileType === 'video'" class="duration">{{ data.duration | duration }}</span>
       </div>
       <div class="col col-3">
@@ -36,16 +33,11 @@
       </div>
       <div class="col col-5">
         <div class="btn-group">
+          <div v-if="data.fileType === 'video'" class="btn">
+            <cpt-icon-button icon="link-fill" :tooltip="linkTooltip" @click.stop="copyLink(data.id)"></cpt-icon-button>
+          </div>
           <div class="btn">
             <cpt-icon-button icon="delete-fill" :iconSize="16" @click.stop="deleteMedia" danger></cpt-icon-button>
-          </div>
-          <div class="btn">
-            <cpt-icon-button v-if="data.uploadFinished" icon="check-fill" success></cpt-icon-button>
-            <!-- <cpt-mark v-if="data.uploadFinished" success small></cpt-mark> -->
-            <cpt-icon-button v-else icon="upload-fill" :disabled="uploadDisabled" @click.stop="uploadMedia(data.localId)"></cpt-icon-button>
-          </div>
-          <div class="btn">
-            <cpt-icon-button icon="search-file-fill" @click.stop="locateFileInExplorer({ url: data.file })"></cpt-icon-button>
           </div>
         </div>
       </div>
@@ -55,11 +47,10 @@
       <div class="media-item-wrap">
         <div class="row row-1">
           <div class="thumbnail">
-            <!-- <img v-lazy="thumbnail"> -->
-            <img :src="thumbnail">
+            <img v-lazy="thumbnail">
           </div>
           <div class="layer" :class="{ 'hover': data.uploading }">
-            <div class="name">{{ data.file | fileName }}</div>
+            <div class="name">{{ data.id }}</div>
             <div class="upload-status">
               <div class="icon-fail" v-show="data.uploadFailed">
                 <cpt-icon value="warning-fill" :size="12"></cpt-icon>
@@ -80,13 +71,8 @@
               <div class="btn">
                 <cpt-icon-button icon="delete-fill" :iconSize="16" @click.stop="deleteMedia" danger></cpt-icon-button>
               </div>
-              <div class="btn">
-                <cpt-icon-button v-if="data.uploadFinished" icon="check-fill" success></cpt-icon-button>
-                <!-- <cpt-mark v-if="data.uploadFinished" success small></cpt-mark> -->
-                <cpt-icon-button v-else icon="upload-fill" :disabled="uploadDisabled" @click.stop="uploadMedia(data.localId)"></cpt-icon-button>
-              </div>
-              <div class="btn">
-                <cpt-icon-button icon="search-file-fill" @click.stop="locateFileInExplorer({ url: data.file })"></cpt-icon-button>
+              <div v-if="data.fileType === 'video'" class="btn">
+                <cpt-icon-button icon="link-fill" :tooltip="linkTooltip" @click.stop="copyLink(data.id)"></cpt-icon-button>
               </div>
             </div>
           </div>
@@ -98,28 +84,16 @@
       </div>
     </div>
 
+    <input v-if="data.fileType === 'video'" type="text" :value="videoShareUrl" class="video-share-url" ref="videoShareUrl">
+
     <!-- S delete confirm dialog -->
     <cpt-dialog :open="deleteDialog" title="" @close="closeDeleteDialog" @hide="closeDeleteDialog" dialogClass="msg-dialog" :overlayOpacity="0.8" cornerClose>
-      <div slot="title" class="title">删除所选文件</div>
-      <div class="content">该项目将被立即删除，您不能撤销此操作</div>
+      <div slot="title" class="title">删除文件</div>
+      <div class="content">您确定从服务端删除该项目吗？</div>
       <cpt-button slot="actions" label="取消" @click="closeDeleteDialog" secondary long />
-      <cpt-button slot="actions" label="删除" @click="_deleteMedia" :param1="data.localId" danger long />
+      <cpt-button slot="actions" label="删除" @click="_deleteMedia" danger long />
     </cpt-dialog>
     <!-- E delete confirm dialog -->
-
-    <!-- S upload guide toast -->
-    <transition name="fade">
-      <div v-if="index === 0 && guideToast" class="guide-toast" :class="{ 'hide': mediaItemStyle !== 'list' }" ref="toast">
-        <div class="wrap">
-          <div class="msg">
-            <span>点击上传，同步精彩时刻至小黑盒APP~</span>
-            <span class="never" @click="closeGuideToast(true)">不再提示</span>
-          </div>
-          <cpt-icon-button icon="close" @click="closeGuideToast(false)"></cpt-icon-button>
-        </div>
-      </div>
-    </transition>
-    <!-- E upload guide toast -->
   </div>
 </template>
 
@@ -129,7 +103,7 @@ import Bus from '@/components/bus'
 import clickoutside from '@/components/internal/clickoutside'
 
 export default {
-  name: "cpt-media-item",
+  name: "cpt-media-item-cloud",
   components: {
   },
   directives: {
@@ -158,27 +132,33 @@ export default {
   data () {
     return {
       deleteDialog: false,
-      guideToast: false,
-      manageBarOpen: true
+      manageBarOpen: true,
+      linkState: 0
     }
   },
   computed: {
     thumbnail () {
-      return 'max-file://' + this.data.thumbnail.replace(':', '')
-    },
-    uploadDisabled () {
       if (this.data.fileType === 'video') {
-        return !(this.data.isMomentCapture && !this.data.uploadFinished && !this.data.uploading && this.data.fileSize < 100 * 1024 * 1024)
+        return this.data.thumbnail
       } else if (this.data.fileType === 'image') {
-        return !(!this.data.uploadFinished && !this.data.uploading)
+        return this.data.file
       }
+    },
+    linkTooltip () {
+      if (this.linkState === 0) {
+        return '复制链接到剪贴板'
+      } else if (this.linkState === 1) {
+        return '链接已复制到剪贴板'
+      }
+    },
+    videoShareUrl () {
+      return this.$store.state.origin[this.$store.state.config.env] + '/pc/media/share/?heybox_id=' + this.$store.state.accountInfo.uid + '&id=' + this.data.id
     }
   },
   methods: {
     ...mapActions([
       'playVideoFile',
-      'checkImageFile',
-      'locateFileInExplorer'
+      'checkImageFile'
     ]),
     openDeleteDialog () {
       this.deleteDialog = true
@@ -189,10 +169,12 @@ export default {
     // 播放视频
     playVideo (url) {
       // console.log('play')
-      const videoSource = url
-      this.playVideoFile({
-        'local': true,
-        'file': videoSource
+      this.$store.state.videoPlayer = true
+      this.getVideoSrc().then(res => {
+        this.playVideoFile({
+          'local': false,
+          'file': res
+        })
       })
 
       // var video = document.getElementById('single-play')
@@ -204,11 +186,9 @@ export default {
     },
     // 查看图片
     checkImage (url) {
-      // console.log('check')
-      const imageSource = url
       this.checkImageFile({
-        'local': true,
-        'file': imageSource
+        'local': false,
+        'file': url
       })
     },
     mediaAction (file) {
@@ -218,28 +198,32 @@ export default {
         this.checkImage(file)
       }
     },
-    uploadMedia (localId) {
-      // console.log('upload')
-      if (this.data.fileType === 'video') {
-        maxjia.media.file.uploadVideo(localId)
-      } else if (this.data.fileType === 'image') {
-        maxjia.media.file.uploadImage(localId)
-      }
-      this.firstUploadNotice()
-      this.__REPORT('view_video_lib_upload')
-    },
     deleteMedia () {
       this.openDeleteDialog()
-      this.__REPORT('view_video_lib_delete')
+      // this.__REPORT('view_video_lib_delete')
     },
-    _deleteMedia (localId) {
-      console.log('delete ' + localId)
-      if (this.data.fileType === 'video') {
-        maxjia.media.file.deleteVideo(localId)
-      } else if (this.data.fileType === 'image') {
-        maxjia.media.file.deleteImage(localId)
+    _deleteMedia () {
+      console.log('delete ' + this.data.id)
+      const url = '/pc/del_media/'
+      const options = {
+        params: {
+          'heybox_id': this.$store.state.accountInfo.uid,
+          'os_type': 'pc',
+          'id': this.data.id
+        }
       }
-      this.closeDeleteDialog()
+      this.$ajax(url, options).then(res => {
+        const data = res.data
+        this.$emit('deleteMedia', this.data.id)
+        this.closeDeleteDialog()
+        if (data.status === 'ok') {
+          
+        } else {
+
+        }
+      }).catch(error => {
+        console.log(error)
+      })
     },
     formDate (t) {
       const timeSpan = t * 1000
@@ -249,35 +233,47 @@ export default {
       const day = dateTime.getDate()
       return `${year}-${month}-${day}`
     },
-    firstUploadNotice () { // 首次上传成功后提示
-      if (localStorage.getItem('firstUpload') !== '1') {
-        this.$watch('data.uploadFinished', (newValue, oldValue) => {
-          if (localStorage.getItem('firstUpload') !== '1' && oldValue === false && newValue === true) {
-            localStorage.setItem('firstUpload', 1)
-            this.$emit('firstUpload')
+    // 一键复制资源链接
+    copyLink (id) {
+      Bus.$emit('copyLink')
+      this.$refs.videoShareUrl.select()
+      document.execCommand('copy')
+      this.linkState = 1
+    },
+    getVideoSrc () {
+      return new Promise((resolve, reject) => {
+        const url = '/pc/refresh_media/'
+        const options = {
+          params: {
+            'heybox_id': this.$store.state.accountInfo.uid,
+            'os_type': 'pc',
+            'id': this.data.id
           }
+        }
+        this.$ajax(url, options).then(res => {
+          const data = res.data
+          if (data.status === 'ok') {
+            resolve(data.result.url)
+          } else {
+
+          }
+        }).catch(error => {
+          console.log(error)
         })
-      }
+      })
     },
-    closeGuideToast (neverShow) {
-      this.guideToast = false
-      if (neverShow) {
-        localStorage.setItem('uploadGuide', 1)
-      }
-    },
-    uploadGuide () { // 上传引导
-      if (localStorage.getItem('uploadGuide') !== '1') {
-        this.guideToast = true
-      }
-    }
+    
   },
   created () {
-    this.uploadGuide()
     Bus.$on('toggleManageBar', data => {
       if (this.formDate(data[0]) === this.formDate(this.data.createTimeStamp)) {
         this.manageBarOpen = !this.manageBarOpen
       }
     })
+    Bus.$on('copyLink', data => {
+      this.linkState = 0
+    })
+    
   },
   mounted () {
     // console.log(this.data)
@@ -288,7 +284,7 @@ export default {
 </script>
 <style lang="less">
 @import "../../styles/import.less";
-.cpt-media-item {
+.cpt-media-item-cloud {
   position: relative;
   &.list {
     width: 100%;
@@ -694,5 +690,10 @@ export default {
       }
     }
   }
+}
+
+.video-share-url {
+  position: absolute;
+  left: -9999px;
 }
 </style>
