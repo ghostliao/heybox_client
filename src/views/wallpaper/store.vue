@@ -1,6 +1,10 @@
 <template>
   <div class="view-wallpaper-store" ref="scroller">
     <div class="content">
+      <div class="notice">
+        <span>请退出相关壁纸、桌面整理软件后再使用此功能</span>
+        <cpt-icon-button icon="explain-fill" tooltip="点击查看常见问题" @click.stop="showFaq"></cpt-icon-button>
+      </div>
       <cpt-set-block-head title="桌面商城"></cpt-set-block-head>
       <div class="body" ref="body">
         <div class="wp-filter" v-show="$store.state.wallpaperFilter.length > 0">
@@ -12,7 +16,7 @@
           </div>
           
         </div>
-        <transition-group name="fade" mode="out-in">
+        <!-- <transition-group name="fade" mode="out-in"> -->
           <div v-if="loading" key="loading" class="loading">
             <cpt-circular-progress :size="40" />
           </div>
@@ -26,7 +30,7 @@
           <!-- <div v-if="!loading && firstLoadFinished && !getWallpaperListFailed" class="pagination-wrap" key="pagination">
             <cpt-pagination :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination>
           </div> -->
-        </transition-group>
+        <!-- </transition-group> -->
         <lazy :time="600">
           <div class="pagination">
             <!-- <transition name="fade-in"> -->
@@ -135,7 +139,6 @@ export default {
           }
         }
         this.$ajax(url, options).then(res => {
-          console.log(res)
           const data = res.data.result
           this.wallpaperList = data.list
           this.total = data.total === 0 ? 1 : data.total
@@ -246,6 +249,10 @@ export default {
       } else if (i.value === 'sort') {
         return { 'active': j.value === this.wallpaperFilterParams[i.value] }
       }
+    },
+    showFaq () {
+      const faqUrl = 'https://api.xiaoheihe.cn/maxnews/app/detail/14943'
+      maxjia.maxapi.openUrlInSystemBrowser(faqUrl)
     }
   },
   created () {
@@ -267,10 +274,12 @@ export default {
     
   },
   mounted () {
-    this.updateStoreWallpaperList({
-      offset: 0,
-      limit: this.limit
-    }, true)
+    setTimeout(() => {
+      this.updateStoreWallpaperList({
+        offset: 0,
+        limit: this.limit
+      }, true)
+    }, 300);
 
     this.bodyWidthDetect()
 
@@ -293,8 +302,30 @@ export default {
 .view-wallpaper-store {
   .view-scroller;
   .content {
+    position: relative;
     width: 100%;
     padding: 6px 40px 80px;
+    > .notice {
+      position: absolute;
+      top: 20px;
+      right: 40px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 640px;
+      height: 28px;
+      padding-right: 12px;
+      border-radius: 2px;
+      background-image: linear-gradient(to right, rgba(20, 25, 30, 0.0), #14191e 16%, #14191e);
+      color: #555a5f;
+      font-size: 12px;
+      font-weight: 400;
+      .iconfont {
+        position: relative;
+        top: 1px;
+        margin-left: 6px;
+      }
+    }
     > .body {
       position: relative;
       .loading {
