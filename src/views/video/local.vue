@@ -17,10 +17,10 @@
       </div>
     </div>
     <div class="media-list" :class="filterClass">
-      <transition name="fade" mode="out-in">
-        <div v-if="loading" key="loading" class="progress">
+      <!-- <transition name="fade" mode="out-in"> -->
+        <!-- <div v-if="loading" key="loading" class="progress">
           <cpt-circular-progress :size="40" />
-        </div>
+        </div> -->
         
         <div v-if="!loading && mediaList.length <= 0" key="notice" class="notice">暂无媒体文件</div>
         <div v-if="!loading && mediaList.length > 0" key="list" class="media-list-wrap" :class="{ 'grid': $store.state.mediaListShowType === 'grid' }">
@@ -29,8 +29,13 @@
             <cpt-media-item :key="index" :data="i" :index="index" :mediaItemStyle="$store.state.mediaListShowType" @firstUpload="firstUpload" :mediaItemShow="mediaItemShow(i)"></cpt-media-item>
           </template>
         </div>
-      </transition>
+      <!-- </transition> -->
         
+      <div class="pagination">
+        <!-- <transition name="fade-in"> -->
+          <cpt-pagination v-show="!loading && firstLoadFinished && mediaList.length > 0" :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination>
+        <!-- </transition> -->
+      </div>
     </div>
     <!-- S first upload notice dialog -->
     <cpt-dialog :open="firstUploadNoticeDialog" title="" @close="closeFirstUploadNoticeDialog" @hide="closeFirstUploadNoticeDialog" dialogClass="msg-dialog" :overlayOpacity="0.8" cornerClose>
@@ -63,6 +68,7 @@ import videoFile from '@/components/videoFile'
 import imageFile from '@/components/imageFile'
 import {menu, menuItem} from '@/components/menu'
 import Bus from '@/components/bus'
+import cptPagination from '@/components/pagination'
 
 export default {
   name: "view-video-local",
@@ -71,11 +77,13 @@ export default {
     'cpt-manage-bar': cptManageBar,
     'cpt-media-item': cptMediaItem,
     'cpt-menu': menu,
-    'cpt-menu-item': menuItem
+    'cpt-menu-item': menuItem,
+    'cpt-pagination': cptPagination
   },
   data () {
     return {
       loading: true,
+      firstLoadFinished: false,
       mediaListFilter: {
         fileType: {
           select: {
@@ -101,7 +109,11 @@ export default {
         }
       },
       mediaList: [],
-      firstUploadNoticeDialog: false
+      firstUploadNoticeDialog: false,
+      offset: 0,
+      total: 500, // 总数
+      current: 1, // 当前页数
+      limit: 20 // 每页数
     }
   },
   computed: {
@@ -123,28 +135,48 @@ export default {
     }
   },
   methods: {
-    getMediaList () {
-      Promise.all([
+    getMediaList (firstLoad) {
+      if (firstLoad) {
+        this.current = 1
+        this.firstLoadFinished = false
+      }
+      return Promise.all([
         this.getVideoList(),
         this.getImageList()
       ]).then(array => {
         this.mergeMediaList(array[0], array[1])
         // this.videoList = null
         // this.imageList = null
-        console.log(this.mediaList)
+        // console.log(array[0], array[1])
+      })
+    },
+    getMediaListFromIndex (offset, firstLoad = false) {
+      this.getMediaList(firstLoad).then(res => {
+        if (offset >= this.mediaList.length) {
+          offset -= this.limit
+          this.current = Math.ceil(this.total / this.limit)
+        }
+        this.mediaList = this.mediaList.slice(offset, offset + this.limit)
+        console.log('offset ' + offset)
+        this.loading = false
+        this.firstLoadFinished = true
+        this.$parent.$parent.$refs.scroller.scrollTop = 0
+
       })
     },
     mergeMediaList (videoList, imageList) {
-      console.log('merge media list')
+      // console.log('merge media list')
       for (let i = 0, len = videoList.length; i < len; i++) {
         videoList[i].fileType = 'video'
       }
       for (let i = 0, len = imageList.length; i < len; i++) {
         imageList[i].fileType = 'image'
       }
+      this.total = videoList.length + imageList.length
+      // console.log('total ' + this.total)
       this.mediaList = videoList.concat(imageList)
       this.sortMediaList()
-      this.loading = false
+      // this.loading = false
     },
     sortMediaList () {
       this.mediaList.sort(sortBy('createTimeStamp'))
@@ -236,6 +268,11 @@ export default {
       } else if (type === 'moment') {
         this.__REPORT('view_video_lib_filter_moment')
       }
+    },
+    pageChange (newIndex) {
+      this.current = newIndex
+      this.offset = (newIndex - 1) * this.limit
+      this.getMediaListFromIndex(this.offset)
     }
   },
   created () {
@@ -243,7 +280,9 @@ export default {
     this.imageInitConnect()
   },
   mounted () {
-    this.getMediaList()
+    // this.getMediaList()
+    this.offset = 0
+    this.getMediaListFromIndex(this.offset, true)
   }
 }
 </script>
@@ -293,6 +332,11 @@ export default {
       &.grid {
         margin-right: -20px;
       }
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      padding-top: 20px;
     }
   }
 }

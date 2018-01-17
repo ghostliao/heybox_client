@@ -24,6 +24,9 @@ export default {
       maxjia.media.file.imageFileStatusChanged.addListener((data) => {
         if ((!data.uploading && data.uploadFailed) || (!data.uploading && data.uploadFinished)) {
           this.onImageFileStatusChanged(data)
+          if (!data.uploading && data.uploadFinished) {
+            this.$store.state.newFileUploadFinished = true
+          }
         } else {
           if (!this.statusUpdateLock) {
             this.onImageFileStatusChanged(data)
@@ -50,14 +53,18 @@ export default {
         this.addImageItemToMomentList(imageItem)
       } else {
         this.addImageItem(imageItem)
-        this.mergeMediaList(this.videoList, this.imageList)
+        this.getMediaListFromIndex(0, true)
+
+        // this.mergeMediaList(this.videoList, this.imageList)
       }
     },
     onImageFileDeleted () {
       // console.log('onImageFileDeleted')
-      this.getImageList().then(data => {
-        this.mergeMediaList(this.videoList, data)
-      })
+      this.getMediaListFromIndex(this.offset)
+
+      // this.getImageList().then(data => {
+      //   this.mergeMediaList(this.videoList, data)
+      // })
     },
     onImageFileStatusChanged (imageItem) {
       console.log('onImageFileStatusChanged')
@@ -78,7 +85,7 @@ export default {
       // })
     },
     getImageList () {
-      console.log('get image list')
+      // console.log('get image list')
       return new Promise((resolve, reject) => {
         maxjia.media.file.getImageList((data) => {
           // console.log(data)

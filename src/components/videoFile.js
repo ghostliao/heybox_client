@@ -24,6 +24,9 @@ export default {
       maxjia.media.file.videoFileStatusChanged.addListener((data) => {
         if ((!data.uploading && data.uploadFailed) || (!data.uploading && data.uploadFinished)) {
           this.onVideoFileStatusChanged(data)
+          if (!data.uploading && data.uploadFinished) {
+            this.$store.state.newFileUploadFinished = true
+          }
         } else {
           if (!this.statusUpdateLock) {
             this.onVideoFileStatusChanged(data)
@@ -52,17 +55,21 @@ export default {
         this.addVideoItemToMomentList(videoItem)
       } else {
         this.addVideoItem(videoItem)
+        this.getMediaListFromIndex(0, true)
+
         // BUG: 新增文件列表显示两个
-        this.getVideoList().then(data => {
-          this.mergeMediaList(this.videoList, this.imageList)
-        })
+        // this.getVideoList().then(data => {
+        //   this.mergeMediaList(this.videoList, this.imageList)
+        // })
       }
     },
     onVideoFileDeleted () {
       // console.log('onVideoFileDeleted')
-      this.getVideoList().then(data => {
-        this.mergeMediaList(data, this.imageList)
-      })
+      this.getMediaListFromIndex(this.offset)
+      
+      // this.getVideoList().then(data => {
+      //   this.mergeMediaList(data, this.imageList)
+      // })
     },
     onVideoFileStatusChanged (videoItem) {
       console.log('onVideoFileStatusChanged')
@@ -83,7 +90,7 @@ export default {
       // })
     },
     getVideoList () {
-      console.log('get video list')
+      // console.log('get video list')
       return new Promise((resolve, reject) => {
         maxjia.media.file.getVideoList((data) => {
           if (data && data['videos']) {
@@ -105,7 +112,7 @@ export default {
       })
     },
     uploadVideo (localId) {
-      maxjia.media.file.uploadVideo(localId);
+      maxjia.media.file.uploadVideo(localId)
     },
     getVideoItem (id) {
       for (let i of this.videoList) {

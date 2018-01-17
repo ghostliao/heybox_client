@@ -73,6 +73,19 @@ Vue.prototype.getParameterByName = function (name, url) {
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+// 记录子tab选项
+Vue.prototype.saveRouter = function (name) {
+  const viewType = name.split('-')[0]
+  if (viewType === 'settings') {
+    store.state.routerSettingsName = name
+  } else if (viewType === 'video') {
+    store.state.routerVideoName = name
+  } else if (viewType === 'hardware') {
+    store.state.routerHardwareName = name
+  } else if (viewType === 'wallpaper') {
+    store.state.routerWallpaperName = name
+  }
+}
 
 Vue.filter('fileSize', (t) => (t / 1024 /1024).toFixed(1) + 'M')
 Vue.filter('fileName', (t) => {
@@ -81,6 +94,7 @@ Vue.filter('fileName', (t) => {
   return fileName
 })
 Vue.filter('duration', (t) => {
+  t = parseInt(t)
   let timeStr, mid, h = 0, m = 0, s = 0
   if (t >= 3600) {
     h = parseInt(t / 3600)

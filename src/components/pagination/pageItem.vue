@@ -77,7 +77,7 @@ export default{
   cursor: pointer;
   border-radius: 2px;
   &.hover {
-    background-color: rgba(0, 0, 0, .1);
+    background-color: rgba(0, 0, 0, .5);
   }
   &.active {
     color: @white;

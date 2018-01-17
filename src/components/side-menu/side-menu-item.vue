@@ -33,16 +33,7 @@ export default {
     
   },
   methods: {
-    saveRouter (name) {
-      const viewType = name.split('-')[0]
-      if (viewType === 'settings') {
-        this.$store.state.routerSettingsName = name
-      } else if (viewType === 'hardware') {
-        this.$store.state.routerHardwareName = name
-      } else if (viewType === 'wallpaper') {
-        this.$store.state.routerWallpaperName = name
-      }
-    }
+    
   }
 }
 

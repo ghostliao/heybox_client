@@ -1,7 +1,7 @@
 <template>
   <div class="view-video-cloud">
     <div class="media-list">
-      <transition name="fade" mode="out-in">
+      <!-- <transition name="fade" mode="out-in"> -->
         <div v-if="loading" key="loading" class="progress">
           <cpt-circular-progress :size="40" />
         </div>
@@ -16,15 +16,15 @@
             <cpt-media-item-cloud :key="index" :data="i" :index="index" :mediaItemStyle="$store.state.mediaListShowType" @deleteMedia="deleteMedia"></cpt-media-item-cloud>
           </template>
         </div>
-      </transition>
+      <!-- </transition> -->
 
-      <lazy :time="600">
+      <!-- <lazy :time="600"> -->
         <div class="pagination">
           <!-- <transition name="fade-in"> -->
             <cpt-pagination v-show="!loading && firstLoadFinished && !loadingFailed && mediaList.length > 0" :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination>
           <!-- </transition> -->
         </div>
-      </lazy>
+      <!-- </lazy> -->
     </div>
 
   </div>
@@ -62,6 +62,7 @@ export default {
         this.current = 1
         this.firstLoadFinished = false
       }
+      this.$store.state.newFileUploadFinished = false
       // this.$parent.$parent.$refs.scroller.scrollTop = 0
       this.loading = true
       const url = '/pc/media/'
@@ -138,10 +139,20 @@ export default {
   created () {
   },
   mounted () {
+    this.__REPORT('view_media_cloud')
     this.getMediaList({
       offset: 0,
       limit: this.limit
     }, true)
+  },
+  activated () {
+    this.__REPORT('view_media_cloud')    
+    if (this.$store.state.newFileUploadFinished) {
+      this.getMediaList({
+        offset: 0,
+        limit: this.limit
+      }, true)
+    }
   }
 }
 </script>
