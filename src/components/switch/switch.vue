@@ -66,7 +66,7 @@ export default {
     handleMouseDown (event) {
       if (this.disabled) return
       if (event.button === 0) {
-        this.$children[0].start(event)
+        // this.$children[0].start(event)
       }
     },
     handleClick () {
@@ -74,19 +74,19 @@ export default {
     },
     handleMouseUp () {
       if (this.disabled) return
-      this.$children[0].end()
+      // this.$children[0].end()
     },
     handleMouseLeave () {
       if (this.disabled) return
-      this.$children[0].end()
+      // this.$children[0].end()
     },
     handleTouchStart (event) {
       if (this.disabled) return
-      this.$children[0].start(event)
+      // this.$children[0].start(event)
     },
     handleTouchEnd () {
       if (this.disabled) return
-      this.$children[0].end()
+      // this.$children[0].end()
     },
     handleChange () {
       this.$emit('change', this.inputValue)
