@@ -236,6 +236,26 @@ export default {
           this.$store.state.wallpaperFilter = res.data.result.filter
         }
       })
+    },
+    // preload
+    getPreviewHardwareInfo () {
+      maxjia.hardware.getPreviewHardwareInfo((data) => {
+        this.$store.state.dataPreload.hardwareInfo = data
+      })
+    },
+    getHardwareEvalInfo () {
+      const url = '/pc/hardware_info/web/'
+      const options = {
+        params: {
+          'heybox_id': this.$store.state.accountInfo.uid,
+          'os_type': 'pc'
+        }
+      }
+      this.$ajax.get(url, options).then(res => {
+        if (res.data.status === 'ok') {
+          this.$store.state.dataPreload.hardwareEvalInfo = res.data.result
+        }
+      }).catch(error => {})
     }
   },
   created () {
@@ -252,7 +272,9 @@ export default {
     this.getAccountInfo().then(() => {
       this.reportTimerInit()
       this.getWallpaperFilter()
+      this.getHardwareEvalInfo()
     })
+    this.getPreviewHardwareInfo()
 
 
     const routeName = this.$route.name.split('-')[0]

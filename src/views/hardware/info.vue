@@ -3,11 +3,11 @@
     <div class="content">
       <!-- <cpt-set-block-head title="电脑概览"></cpt-set-block-head> -->
       <div class="overview">
-        <transition name="fade" mode="out-in">
+        <!-- <transition name="fade" mode="out-in"> -->
           <div v-if="loading && !loadingFailed" key="loading" class="progress">
             <cpt-circular-progress :size="40" />
           </div>
-        </transition>
+        <!-- </transition> -->
 
         <div v-if="loadingFailed && !loading" class="notice">
           获取评分信息失败，<span @click="getHardwareEvalInfo">点击重试</span>
@@ -130,9 +130,9 @@ export default {
   },
   data () {
     return {
-      loading: true,
+      loading: false,
       loadingFailed: false,
-      hardwareInfo: {},
+      hardwareInfo: this.$store.state.dataPreload.hardwareInfo,
       hardwareEvalInfo: {
         cpu: {
           perf_level: '-'
@@ -179,26 +179,32 @@ export default {
         this.hardwareInfo = data
       })
     },
-    getHardwareEvalInfo () {
+    getHardwareEvalInfo (dataPreload) {
+      if (dataPreload) {
+        this.hardwareEvalInfo = dataPreload
+        return
+      }
       this.loadingFailed = false
       this.loading = true
-      const url = '/pc/hardware_info/web/'
-      const options = {
-        params: {
-          'heybox_id': this.$store.state.accountInfo.uid,
-          'os_type': 'pc'
+      maxjia.user.getCurrentUser(data => {
+        const url = '/pc/hardware_info/web/'
+        const options = {
+          params: {
+            'heybox_id': data.uid,
+            'os_type': 'pc'
+          }
         }
-      }
-      this.$ajax.get(url, options).then(res => {
-        this.loading = false
-        if (res.data.status === 'ok') {
-          this.hardwareEvalInfo = res.data.result
-          console.log(this.hardwareEvalInfo)
-        } else {
+        this.$ajax.get(url, options).then(res => {
+          if (res.data.status === 'ok') {
+            this.hardwareEvalInfo = res.data.result
+            console.log(this.hardwareEvalInfo)
+          } else {
+            this.getEvalInfoFailed()
+          }
+          this.loading = false
+        }).catch(error => {
           this.getEvalInfoFailed()
-        }
-      }, res => {
-        this.getEvalInfoFailed()
+        })
       })
     },
     getEvalInfoFailed () {
@@ -211,26 +217,26 @@ export default {
     }
   },
   created () {
-    this.getPreviewHardwareInfo()
-    
+    // this.getPreviewHardwareInfo()
   },
   mounted () {
-    let count = 0
-    let interval = setInterval(() => {
-      if (count <= 50) {
-        if (this.$store.state.accountInfo.uid !== 999999) {
-          this.getHardwareEvalInfo()
-          clearInterval(interval)
-        } else {
-          count ++
-        }
-      } else {
-        this.openMsgDialog({
-          msg: '请求账号信息失败',
-          markType: 'fail'
-        })
-      }
-    }, 100)
+    this.getHardwareEvalInfo(this.$store.state.dataPreload.hardwareEvalInfo)
+    // let count = 0
+    // let interval = setInterval(() => {
+    //   if (count <= 50) {
+    //     if (this.$store.state.accountInfo.uid !== 999999) {
+    //       this.getHardwareEvalInfo()
+    //       clearInterval(interval)
+    //     } else {
+    //       count ++
+    //     }
+    //   } else {
+    //     this.openMsgDialog({
+    //       msg: '请求账号信息失败',
+    //       markType: 'fail'
+    //     })
+    //   }
+    // }, 100)
   },
   activated () {
     this.__REPORT('view_hardware_info')
@@ -250,7 +256,7 @@ export default {
     .overview {
       position: relative;
       padding: 20px 0;
-      min-height: 121px;
+      min-height: 131px;
       .notice {
         position: absolute;
         top: 0;
@@ -304,6 +310,7 @@ export default {
           font-size: 54px;
           font-family: Arial, Helvetica, sans-serif;
           font-weight: 600;
+          padding-top: 10px;
         }
         &.row-3 {
           font-size: 14px;

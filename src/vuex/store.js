@@ -10,7 +10,7 @@ const v = Vue.prototype
 
 const state = {
   config: {
-    ver: 'Alpha 1.0.5',
+    ver: 'Alpha 1.0.10',
     env: 'test', // test | prod
     dev: true
   },
@@ -21,8 +21,8 @@ const state = {
 
   mainWindowId: -1, // 主窗体id
   routerName: 'game',
-  routerVideoName: '',
   routerSettingsName: '',
+  routerVideoName: '',
   routerHardwareName: '',
   routerWallpaperName: '',
   recordingState: 'RS_Stop',
@@ -69,7 +69,13 @@ const state = {
     volumeSize: 100,
     volumeSizeStore: 0,
     playing: true
-  }
+  },
+  momentDialog: false, // 本次游戏精彩时刻
+  dataPreload: {
+    hardwareEvalInfo: null,
+    hardwareInfo: null
+  },
+  newFileUploadFinished: false // 检测本地列表是否上传了新文件
 }
 
 const getters = {
