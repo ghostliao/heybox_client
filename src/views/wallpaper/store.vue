@@ -31,13 +31,13 @@
             <cpt-pagination :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination>
           </div> -->
         <!-- </transition-group> -->
-        <lazy :time="600">
+        <!-- <lazy :time="600"> -->
           <div class="pagination">
             <!-- <transition name="fade-in"> -->
               <cpt-pagination v-show="!loading && firstLoadFinished && !getWallpaperListFailed && wallpaperList.length > 0" :total="total" :pageSize="limit" :current="current" @pageChange="pageChange"></cpt-pagination>
             <!-- </transition> -->
           </div>
-        </lazy>
+        <!-- </lazy> -->
         <cpt-wallpaper-preview v-if="wallpaperPreview" :from="page" :previewStyle="previewStyle" :data="wallpaperList[currentWallpaper]" @close="closePreview"></cpt-wallpaper-preview>
       </div>
     </div>
@@ -77,7 +77,7 @@ export default {
       getWallpaperListFailed: false,
       wallpaperList: [],
       wallpaperFilterParams: {
-        tag: 0,
+        tag: 14,
         sort: 1
       },
       total: 500, // 壁纸总数
@@ -251,12 +251,14 @@ export default {
       }
     },
     showFaq () {
+      this.__REPORT('view_faq')
       const faqUrl = 'https://api.xiaoheihe.cn/maxnews/app/detail/14943'
       maxjia.maxapi.openUrlInSystemBrowser(faqUrl)
     }
   },
   created () {
     this.wallpaperInitConnect()
+    this.getLocalWallpaperList()
 
     Bus.$on('wallpaperPreview', data => {
       if (data.from !== 'store') return
