@@ -436,6 +436,8 @@ export default {
     left: 0;
     right: 0;
     height: 60px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     background: fade(@primaryColor, 80%);
     .depth(2);
   }
