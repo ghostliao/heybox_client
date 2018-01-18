@@ -5,7 +5,7 @@
         <cpt-circular-progress :size="40" />
       </div> -->
       <template v-if="data.fileType === 'video'">
-        <video :src="'max-file://' + data.file" preload="preload" autoplay="autoplay" loop ref="media" @canplay="mediaLoadFinished"></video>
+        <video :src="'max-file://' + data.file" preload="preload" loop ref="media" @canplay="mediaLoadFinished"></video>
       </template>
       <template v-if="data.fileType === 'image'">
         <img :src="'max-file://' + data.file" @load="mediaLoadFinished">
@@ -47,8 +47,8 @@ export default {
           // console.log('pause '+ this.index)
           this.$refs.media.pause()
         } else {
-          // console.log('play '+ newIndex)       
-          this.$refs.media.play()          
+          // console.log('play '+ newIndex)
+          this.$refs.media.play()
         }
       }
     }
@@ -57,7 +57,9 @@ export default {
     mediaLoadFinished () {
       this.mediaLoading = false
       if (this.data.fileType === 'video') {
-        this.$refs.media.play()
+        if (this.currentMediaIndex === this.index) {
+          this.$refs.media.play()
+        }
       }
       // console.log(this.mediaLoading)
     }
