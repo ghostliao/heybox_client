@@ -30,23 +30,29 @@
           <cpt-block-button v-if="$store.state.config.dev" :text="'stop'" icon="set-fill" @click="momentStop"></cpt-block-button>
           
         </div>
-        <!-- <div class="record">
+        <div v-if="$store.state.momentDialogEnter" class="record">
           <div class="recent-moment-record">
             <div class="info">
               <div class="row">
                 <span class="title">总结</span>
-                <span>上次游戏： 2017-08-17  绝地求生</span>
+                <span>上次游戏：{{$store.state.momentData.lastGameTime}} 绝地求生</span>
               </div>
               <div class="row">
                 <span class="label">游戏时长</span>
-                <span class="value">3:33:33</span>
+                <span class="value">{{$store.state.momentData.duration}}</span>
+                <span class="label">游戏局数</span>
+                <span class="value">{{$store.state.momentData.round}} 局</span>
+                <span class="label">击杀数</span>
+                <span class="value">{{$store.state.momentData.kill}} 次</span>
+                <span class="label">平均FPS</span>
+                <span class="value">{{$store.state.momentData.fpsAvg}}</span>
               </div>
             </div>
             <div class="btn">
-              <cpt-button label="查看详情" secondary small />
+              <cpt-button label="查看详情" secondary small @click.native="showMomentDialog" />
             </div>
           </div>
-        </div> -->
+        </div>
       </div>
       <div class="nav-bar">
         <ul class="nav-list">
@@ -184,11 +190,29 @@ export default {
     },
     momentStop () {
       Bus.$emit('stop')
+    },
+    getLastGameMomentData () {
+      if (!this.$store.state.momentDialogEnter || this.$store.state.lastGameId !== 10410005) return
+      maxjia.games.getLastGameFpsStats(10410005, data => {
+        this.$store.state.momentData.fpsAvg = data.fpsAvg
+        const startTs = data.fpsList[0].ts
+        const endTs = data.fpsList[data.fpsList.length - 1].ts
+        this.$store.state.momentData.duration = this.filterDuration(endTs - startTs)
+        this.$store.state.momentData.lastGameTime = this.filterFormDate(endTs, 4)
+      })
+    },
+    showMomentDialog () {
+      this.__REPORT('fn_moment_dialog_detail')
+      Bus.$emit('openMomentDialog')
     }
   },
   mounted () {
     this.init()
+    this.getLastGameMomentData()
   },
+  activated () {
+    this.getLastGameMomentData()    
+  }
 }
 </script>
 <style lang="less">
@@ -326,13 +350,13 @@ export default {
         margin-right: 12px;
       }
       .label {
-        margin-right: 8px;
+        margin-right: 6px;
       }
       .value {
         color: @textColor;
         font-size: 14px;
         font-weight: 600;
-        margin-right: 20px;
+        margin-right: 12px;
 
         height: 14px;
         background-image: linear-gradient(to bottom, #ffffff, #afafaf);

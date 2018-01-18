@@ -1,5 +1,5 @@
 <template>
-  <cpt-dialog :open="momentDialog" title="" @hide="closeMomentDialog" dialogClass="moment-dialog" :overlayOpacity="0.8" cornerClose>
+  <cpt-dialog :open="$store.state.momentDialog" title="" @hide="closeMomentDialog" dialogClass="moment-dialog" :overlayOpacity="0.8" cornerClose>
     <div class="moment-dialog-wrap">
       <div class="moment-dialog-head">
         <div class="title">本次游戏精彩时刻</div>
@@ -21,7 +21,7 @@
               </div>
             </div>
             <!-- <div class="btn down" :class="{ 'disabled': scrollMax }" @click="moveBottom">
-              <cpt-icon value="arrow-down"></cpt-icon>              
+              <cpt-icon value="arrow-down"></cpt-icon>
             </div> -->
           </div>
         </div>
@@ -49,7 +49,6 @@ export default {
   },
   data () {
     return {
-      momentDialog: false,
       loading: true,
       mediaList: [],
       currentOverlayGameId: 0,
@@ -57,7 +56,8 @@ export default {
       scrollMin: true,
       scrollMax: false,
       // targety: 211,
-      // dx: 0
+      // dx: 0,
+
     }
   },
   computed: {
@@ -66,12 +66,12 @@ export default {
   methods: {
     openMomentDialog () {
       this.mousewheel()
-      this.momentDialog = true
+      this.$store.state.momentDialog = true
     },
     closeMomentDialog () {
       console.log('sss')
       document.removeEventListener('mousewheel', this.mousewheelHandler)
-      this.momentDialog = false
+      this.$store.state.momentDialog = false
     },
     // 本次游戏精彩时刻全部上传
     uploadAllMoment () {
@@ -83,6 +83,7 @@ export default {
       maxjia.games.overlayStart.addListener(data => {
         console.log(data)
         this.currentOverlayGameId = data.gameId
+        this.$store.state.lastGameId = data.gameId
         console.log('game id: ' + data.gameId)
         this.onOverlayStart(data)
       })
@@ -97,10 +98,25 @@ export default {
     onOverlayStart () {
       console.log('overlay start')
       this.mediaList = []
+      this.$store.state.momentDialogEnter = false
     },
     onOverlayStop () {
       console.log('overlay stop')
-      this.mediaList.length > 0 && this.showGameMomentsList()
+      if (this.mediaList.length > 0) {
+        this.showGameMomentsList()
+        if (this.$store.state.lastGameId !== 10410005) return
+        let kill = 0, round = 0
+        for (let i = 0, len = this.mediaList.length; i < len; i++) {
+          const item = this.mediaList[i]
+          if (item.momentDescription) {
+            item.momentDescription.match(/Kill-CN|Kill-EN/) && (kill += 1)
+            item.momentDescription.match(/SoloDead-CN1/) && (round += 1)
+          }
+        }
+        this.$store.state.momentData.kill = kill
+        this.$store.state.momentData.round = round
+        this.$store.state.momentDialogEnter = true
+      }
     },
     showGameMomentsList () {
       this.openMomentDialog()
@@ -112,9 +128,6 @@ export default {
       maxjia.games.getCurrentOverlayGame(data => {
         return data
       })
-    },
-    getLastGameFpsStats () {
-      maxjia.games.getLastGameFpsStats('gameId', data => {})
     },
     // sidebar scroll
     moveTop () {
@@ -205,7 +218,7 @@ export default {
 
     Bus.$on('start', this.onOverlayStart)
     Bus.$on('stop', this.onOverlayStop)
-
+    Bus.$on('openMomentDialog', this.openMomentDialog)
     // this.$nextTick(() => {
     //   this.offsetCalc()
     // })
