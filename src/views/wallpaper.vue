@@ -7,11 +7,13 @@
       </cpt-side-menu>
     </div>
     <div class="view-wallpaper-content">
-      <keep-alive>
-        <!-- <router-view></router-view> -->
-        <router-view v-if="$route.meta.keepAlive"></router-view>
-      </keep-alive>
-      <router-view v-if="!$route.meta.keepAlive"></router-view>
+      <!-- <lazy :time="300"> -->
+        <keep-alive>
+          <!-- <router-view></router-view> -->
+          <router-view v-if="$route.meta.keepAlive"></router-view>
+        </keep-alive>
+        <router-view v-if="!$route.meta.keepAlive"></router-view>
+      <!-- </lazy> -->
     </div>
     <div v-show="$store.state.wallpaperControler.enabled" class="wallpaper-controler">
       <div class="wallpaper-controler-wrap">
@@ -20,8 +22,8 @@
         <cpt-button v-show="$store.state.wallpaperControler.playing" label="暂停" icon="pause-fill" small primary @click="_wallpaperPlayerSwitch(0)" />
 
         <div class="wallpaper-volume">
-          <cpt-icon-button v-show="$store.state.wallpaperControler.volumeSize !== 0" :icon="'volume'" @click="volumeMuted"></cpt-icon-button>
-          <cpt-icon-button v-show="$store.state.wallpaperControler.volumeSize === 0" :icon="'volume-mute'" @click="resetVolumeSize"></cpt-icon-button>
+          <cpt-icon-button v-show="$store.state.wallpaperControler.volumeSize !== 0" :icon="'volume-fill'" @click="volumeMuted"></cpt-icon-button>
+          <cpt-icon-button v-show="$store.state.wallpaperControler.volumeSize === 0" :icon="'volume-mute-fill'" @click="resetVolumeSize"></cpt-icon-button>
           <cpt-slider v-model="$store.state.wallpaperControler.volumeSize" :step="1" @input="setVideoVolumeSize"></cpt-slider>
         </div>
       </div>
@@ -96,7 +98,7 @@ export default {
 .wallpaper-controler {
   position: fixed;
   z-index: 10;
-  left: 0;
+  left: 160px;
   right: 0;
   bottom: 15px;
   width: 340px;

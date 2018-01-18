@@ -286,6 +286,12 @@ export default {
     if (mediaListShowType) {
       this.$store.state.mediaListShowType = mediaListShowType
     }
+    // 壁纸音量
+    const wv = localStorage.getItem('wallpaperVolume')
+    if (wv) {
+      maxjia.wallpaper.setVideoVolumeSize(Number(wv / 100))
+      this.$store.state.wallpaperControler.volumeSize = Number(wv)
+    }
   },
   mounted () {
     // console.log('this is current player instance object', this.player)

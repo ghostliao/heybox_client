@@ -94,9 +94,9 @@ export default {
     },
     onWallpaperChanged (wallpaperItem) {
       // console.log('wallpaper changed', wallpaperItem)
+      this.$store.state.wallpaperControler.enabled = !(wallpaperItem.ID === '')
       if (this.page === 'local') {
         this.$store.state.wallpaperControler.playing = true
-        this.$store.state.wallpaperControler.enabled = !(wallpaperItem.ID === '')
         for (let i = 0, len = this.wallpaperList.length; i < len; i++) {
           let item = this.wallpaperList[i]
           if (item.ID === wallpaperItem.ID) {
@@ -112,14 +112,14 @@ export default {
       // console.log(wallpaperItem.createTimeStamp)
     },
     getLocalWallpaperList () {
-      console.log('get wallpaper list')
+      // console.log('get wallpaper list')
       return new Promise((resolve, reject) => {
         maxjia.wallpaper.getWallPaperList((data) => {
           // console.log(data)
           if (data && data['wallPapers']) {
             this.itemList = []
             for (let wallpaperItem of data['wallPapers']) {
-              if (this.page === 'local' && wallpaperItem.isCurrent) {
+              if (wallpaperItem.isCurrent) {
                 this.$store.state.wallpaperControler.enabled = true
               }
               this.addWallpaperItem(wallpaperItem)
@@ -168,6 +168,7 @@ export default {
     setVideoVolumeSize (val) {
       maxjia.wallpaper.setVideoVolumeSize(Number(val / 100))
       console.log('volume size: ' + val)
+      localStorage.setItem('wallpaperVolume', val)
     }
   },
   created () {
