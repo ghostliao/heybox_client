@@ -10,7 +10,7 @@ const v = Vue.prototype
 
 const state = {
   config: {
-    ver: 'Alpha 1.0.10',
+    ver: 'Alpha 1.0.11',
     env: 'test', // test | prod
     dev: true
   },
@@ -71,6 +71,15 @@ const state = {
     playing: true
   },
   momentDialog: false, // 本次游戏精彩时刻
+  momentDialogEnter: false, // 本次游戏精彩时刻入口
+  momentData: {
+    lastGameTime: '',
+    duration: '-',
+    round: '-',
+    kill: '-',
+    fpsAvg: '-'
+  },
+  lastGameId: 0,
   dataPreload: {
     hardwareEvalInfo: null,
     hardwareInfo: null
