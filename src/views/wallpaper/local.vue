@@ -3,7 +3,7 @@
     <div class="content">
       <cpt-set-block-head title="本地桌面"></cpt-set-block-head>
       <div class="body" ref="body">
-        <transition name="fade" mode="out-in">
+        <!-- <transition name="fade" mode="out-in"> -->
           <div v-if="loading" key="loading" class="loading">
             <cpt-circular-progress :size="40" />
           </div>
@@ -11,7 +11,7 @@
           <div v-if="!loading && wallpaperList.length > 0" key="list" class="wp-list">
             <cpt-local-wallpaper-item v-for="(i, index) in wallpaperList" :key="index" :index="index" :data="i" :current="current" :margin="previewHeight"></cpt-local-wallpaper-item>
           </div>
-        </transition>
+        <!-- </transition> -->
         <cpt-wallpaper-preview v-if="wallpaperPreview" :from="page" :previewStyle="previewStyle" :data="wallpaperList[current]" @close="closePreview" @delete="closePreview" @setWallpaper="_setWallpaper"></cpt-wallpaper-preview>
       </div>
     </div>

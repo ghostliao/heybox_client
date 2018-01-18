@@ -200,7 +200,7 @@ export default {
     },
     deleteMedia () {
       this.openDeleteDialog()
-      // this.__REPORT('view_video_lib_delete')
+      this.__REPORT('view_media_cloud_delete')
     },
     _deleteMedia () {
       console.log('delete ' + this.data.id)
@@ -235,6 +235,7 @@ export default {
     },
     // 一键复制资源链接
     copyLink (id) {
+      this.__REPORT('view_media_cloud_copy_link')
       Bus.$emit('copyLink')
       this.$refs.videoShareUrl.select()
       document.execCommand('copy')

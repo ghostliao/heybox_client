@@ -209,9 +209,10 @@ export default {
       this.__REPORT('view_system_message')
     },
     showFaq () {
+      this.__REPORT('view_faq')
       const faqUrl = 'https://api.xiaoheihe.cn/maxnews/app/detail/14943'
       maxjia.maxapi.openUrlInSystemBrowser(faqUrl)
-      this.mainMenuToggle()      
+      this.mainMenuToggle()
     }
   },
   created () {

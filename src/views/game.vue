@@ -46,7 +46,7 @@
       </div>
       <div class="title-bar">
         <div class="title">游戏库</div>
-        <cpt-button icon="add-fill" label="添加游戏" secondary small @click="selectAddCustomGame"></cpt-button>
+        <cpt-button v-if="v10003" icon="add-fill" label="添加游戏" secondary small @click="selectAddCustomGame"></cpt-button>
       </div>
       <div class="games-list">
         <cpt-game-item v-for="i in installedGames" v-if="!i.removed" :data="i" :key="i.gameId"></cpt-game-item>
@@ -80,7 +80,8 @@ export default {
       installedGames: [],
       gameIds: '',
       hostList: [],
-      hostState: 3 // 0 -> 未加速 1 -> 已加速 2 -> 加速中 3 -> 检查host更新中
+      hostState: 3, // 0 -> 未加速 1 -> 已加速 2 -> 加速中 3 -> 检查host更新中
+      v10003: false
     }
   },
   computed: {
@@ -183,6 +184,7 @@ export default {
     },
     // 添加自定义游戏
     selectAddCustomGame () {
+      this.__REPORT('fn_add_custom_game')
       maxjia.store.games.selectAddCustomGame(res => {
         console.log(res)
         // if (res.result === 'canceled') {
@@ -202,6 +204,7 @@ export default {
             this.$store.state.msgDialogOptions.msg = '添加成功'
             this.$store.state.msgDialogOptions.desc = ''
             this.$store.state.msgDialog = true
+            this.__REPORT('fn_add_custom_game_success')
           }
         }
       })
@@ -379,6 +382,10 @@ export default {
       // 没更新
       this.hostState = 1
     })
+
+    if (this.compareVersion(maxjia.maxapi.version, '1.0.3')) {
+      this.v10003 = true
+    }
   },
   mounted () {
     this.__REPORT('view_game')
