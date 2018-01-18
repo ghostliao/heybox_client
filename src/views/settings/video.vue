@@ -57,21 +57,14 @@
           <cpt-set-switch label="自动录屏" :switch="isAutoStartCaptureInGame" @input="setIsAutoStartCaptureInGame">
             <!-- <span slot="desc">desc</span> -->
           </cpt-set-switch>
-          <cpt-set-slider label="精彩时刻时长" :initValue="captureMomentSeconds" :min="15" :max="30" :step="1" unit="s" @change="setCaptureMomentSeconds">
-            <!-- <span slot="desc">desc</span> -->
-          </cpt-set-slider>
-          <cpt-set-slider label="视频帧率" :initValue="videoFrameRate" :min="30" :max="60" :step="1" @change="setVideoFrameRate">
-            <!-- <span slot="desc">desc</span> -->
-          </cpt-set-slider>
-          <cpt-set-select label="视频质量" settingType="videoQuality" :selectList="videoQualitySelect" :currentSelectValue="videoQuality" @change="setVideoQuality">
-            <!-- <span slot="desc">desc</span> -->
-          </cpt-set-select>
-          <cpt-set-select label="音频输出设备" :selectList="audioOutputSelect" :currentSelectValue="audioOutput" @change="setAudioOutput">
-            <!-- <span slot="desc">desc</span> -->
-          </cpt-set-select>
-          <cpt-set-select label="音频输入设备" :selectList="audioInputSelect" :currentSelectValue="audioInput" @change="setAudioInput">
-            <!-- <span slot="desc">desc</span> -->
-          </cpt-set-select>
+          <cpt-set-slider label="精彩时刻时长" :initValue="captureMomentSeconds" :min="15" :max="30" :step="1" unit="s" @change="setCaptureMomentSeconds"></cpt-set-slider>
+          <cpt-set-slider label="视频帧率" :initValue="videoFrameRate" :min="30" :max="60" :step="1" @change="setVideoFrameRate"></cpt-set-slider>
+          <cpt-set-select label="视频质量" settingType="videoQuality" :selectList="videoQualitySelect" :currentSelectValue="videoQuality" @change="setVideoQuality"></cpt-set-select>
+          <template v-if="v10003">
+            <cpt-set-select label="音频输出设备" :selectList="audioOutputSelect" :currentSelectValue="audioOutput" @change="setAudioOutput"></cpt-set-select>
+            <cpt-set-select label="音频输入设备" :selectList="audioInputSelect" :currentSelectValue="audioInput" @change="setAudioInput"></cpt-set-select>
+            <cpt-set-switch label="麦克声音录制" :switch="captureAudioInput" @input="setCaptureAudioInput"></cpt-set-switch>
+          </template>
         </cpt-set-block>
 
         <cpt-set-block title="游戏内浮窗设置">
@@ -90,7 +83,7 @@
         </cpt-set-block>
 
         <cpt-set-block title="关于小黑盒">
-          <cpt-set-switch label="开机自动启动" :switch="isAutoStart" @input="setIsAutoStart">
+          <cpt-set-switch v-if="showAutoStartSetting" label="开机自动启动" :switch="isAutoStart" @input="setIsAutoStart">
             <!-- <span slot="desc">desc</span> -->
           </cpt-set-switch>
           <div class="setting-row info">
@@ -140,6 +133,8 @@ export default {
       gameOverlaySettings: [],
       showOverlayHeader: false,
       captureMomentSeconds: 15,
+      setCaptureMomentSecondsTimer: undefined,
+      setCaptureMomentSecondsLock: false,
       FPSPositionSelect: {
         'NoPosition': '隐藏',
         'TopLeft': '左上角',
@@ -166,7 +161,10 @@ export default {
         'Default': '默认'
       },
       audioInput: '',
-      clientVersion: '999.0.0'
+      captureAudioInput: true,
+      clientVersion: '999.0.0',
+      v10003: false,
+      showAutoStartSetting: false
     }
   },
   methods: {
@@ -264,7 +262,11 @@ export default {
       })
     },
     setCaptureMomentSeconds (s) {
-      maxjia.settings.setCaptureMomentSeconds(s)
+      clearTimeout(this.setCaptureMomentSecondsTimer)
+      this.setCaptureMomentSecondsTimer = setTimeout(() => {
+        maxjia.settings.setCaptureMomentSeconds(s)
+        this.__REPORT('view_settings_set_capture_moment_seconds')
+      }, 500)
     },
     captureMomentSecondsChanged () {
       maxjia.settings.captureMomentSecondsChanged.addListener(data => {
@@ -354,6 +356,17 @@ export default {
       console.log(id)
       maxjia.settings.setCaptureAudioDevice(true, id)
     },
+    // 麦克声音录制开关
+    getCaptureAudioInput () {
+      maxjia.settings.getCaptureAudioInput(data => {
+        console.log(data)
+        this.captureAudioInput = data.captureAudioInput
+      })
+    },
+    setCaptureAudioInput (bool) {
+      console.log(bool)
+      maxjia.settings.setCaptureAudioInput(bool)
+    },
     settingsInit () {
       this.getVideoDir()
       this.getImageDir()
@@ -372,7 +385,7 @@ export default {
       this.getVideoQuality()
       // this.videoQualityChanged()
       this.getIsAutoStart()
-      this.getAudioDeviceInfos()
+      this.getCaptureAudioInput()
     },
     getClientInfo () {
       this.clientVersion = maxjia.maxapi.version
@@ -380,6 +393,12 @@ export default {
   },
   created () {
     this.getClientInfo()
+
+    if (this.compareVersion(maxjia.maxapi.version, '1.0.3')) {
+      this.v10003 = true
+      this.getAudioDeviceInfos()
+    }
+
   },
   mounted () {
     this.settingsInit()
