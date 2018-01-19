@@ -115,6 +115,14 @@ export default {
         }
         this.$store.state.momentData.kill = kill
         this.$store.state.momentData.round = round
+
+        maxjia.games.getLastGameFpsStats(10410005, data => {
+          this.$store.state.momentData.fpsAvg = data.fpsAvg
+          const startTs = data.fpsList[0].ts
+          const endTs = data.fpsList[data.fpsList.length - 1].ts
+          this.$store.state.momentData.duration = this.filterDuration(endTs - startTs)
+          this.$store.state.momentData.lastGameTime = this.filterFormDate(endTs, 4)
+        })
         this.$store.state.momentDialogEnter = true
       }
     },

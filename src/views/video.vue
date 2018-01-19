@@ -191,16 +191,6 @@ export default {
     momentStop () {
       Bus.$emit('stop')
     },
-    getLastGameMomentData () {
-      if (!this.$store.state.momentDialogEnter || this.$store.state.lastGameId !== 10410005) return
-      maxjia.games.getLastGameFpsStats(10410005, data => {
-        this.$store.state.momentData.fpsAvg = data.fpsAvg
-        const startTs = data.fpsList[0].ts
-        const endTs = data.fpsList[data.fpsList.length - 1].ts
-        this.$store.state.momentData.duration = this.filterDuration(endTs - startTs)
-        this.$store.state.momentData.lastGameTime = this.filterFormDate(endTs, 4)
-      })
-    },
     showMomentDialog () {
       this.__REPORT('fn_moment_dialog_detail')
       Bus.$emit('openMomentDialog')
@@ -208,10 +198,6 @@ export default {
   },
   mounted () {
     this.init()
-    this.getLastGameMomentData()
-  },
-  activated () {
-    this.getLastGameMomentData()    
   }
 }
 </script>
