@@ -22,6 +22,10 @@
           <div class="fb-dialog-header">
             <div class="fb-dialog-header-wrap">
               <div class="fb-dialog-admin-info">
+                <div class="fb-dialog-faq-enter" @click="showFaq">
+                  <span>常见问题</span>
+                  <cpt-icon value="explain-fill"></cpt-icon>
+                </div>
                 <div class="fb-dialog-admin-avatar">
                   <div class="fb-dialog-admin-avatar-wrap">
                     <!-- <img :src="adminAvatar"> -->
@@ -144,7 +148,7 @@ export default {
           resolve(res)
 
           const data = res.data
-          // console.log(data)
+          console.log(data)
           if (data.status === 'ok') {
             this.adminAvatar = data.hey_mei.avartar
             this.conversationList = data.result.reverse()
@@ -200,11 +204,13 @@ export default {
       let data = ''
       if (imgUrl) {
         data = this.qs.stringify({
-          'img_str': imgUrl
+          'img_str': imgUrl,
+          'clientVersion': maxjia.maxapi.version
         })
       } else {
         data = this.qs.stringify({
           'text': this.postMsg,
+          'clientVersion': maxjia.maxapi.version,
           // 'send_timestamp': timeStamp
         })
       }
@@ -368,6 +374,11 @@ export default {
     },
     uploadImage () {
       this.uploader.chooseFile()
+    },
+    showFaq () {
+      this.__REPORT('view_faq')
+      const faqUrl = 'https://api.xiaoheihe.cn/maxnews/app/detail/14943'
+      maxjia.maxapi.openUrlInSystemBrowser(faqUrl)
     }
   },
   created () {
@@ -448,6 +459,24 @@ export default {
   .fb-dialog-admin-info {
     position: relative;
     padding-left: 48px;
+  }
+  .fb-dialog-faq-enter {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    height: 16px;
+    font-size: 12px;
+    font-weight: 400;
+    color: fade(#fff, 60%);
+    cursor: pointer;
+    &:hover {
+      color: #fff;
+    }
+    span {
+      margin-right: 5px;
+    }
   }
   .fb-dialog-admin-avatar {
     position: absolute;
