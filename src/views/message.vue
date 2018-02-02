@@ -14,7 +14,7 @@
             </div>
             <div class="view-msg-item-content">
               <div class="view-msg-item-content-wrap">
-                <span>{{i.msg_content}}</span><a :href="'//' + i.link" target="_blank" v-if="i.link">{{i.link}}</a>
+                <span>{{i.msg_content}}</span><span v-if="i.link" class="link" @click="openUrlInSystemBrowser(i.link)">{{i.link}}</span>
               </div>
             </div>
           </div>
@@ -55,6 +55,9 @@ export default {
       }, res => {
 
       })
+    },
+    openUrlInSystemBrowser (url) {
+      maxjia.maxapi.openUrlInSystemBrowser('//' + url)
     }
   },
   created () {
@@ -109,11 +112,12 @@ export default {
   font-size: 14px;
   color: fade(@textColor, 80%);
   line-height: 20px;
-  a {
+  .link {
     color: @primaryColor;
     font-weight: 400;
     text-decoration: underline;
     margin-left: 5px; 
+    cursor: pointer;
   }
 }
 </style>
