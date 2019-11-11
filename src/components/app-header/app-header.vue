@@ -81,7 +81,7 @@
       <cpt-linear-progress></cpt-linear-progress>
     </div> -->
   </div>
-  
+
 </template>
 
 <script>
@@ -135,6 +135,10 @@ export default {
         {
           name: 'hardware',
           label: '我的设备'
+        },
+        {
+          name: 'wallpaper',
+          label: '动态桌面'
         }
       ]
     }
@@ -182,7 +186,7 @@ export default {
     },
     quit () {
       maxjia.store.quit()
-      this.mainMenuToggle()      
+      this.mainMenuToggle()
     },
     switchUser () {
       maxjia.store.switchUser()
@@ -216,12 +220,12 @@ export default {
     }
   },
   created () {
-    if (this.compareVersion(maxjia.maxapi.version, '0.1.16')) {
-      this.navTabs.push({
-        name: 'wallpaper',
-        label: '动态桌面'
-      })
-    }
+    // if (this.compareVersion(maxjia.maxapi.version, '0.1.16')) {
+    //   this.navTabs.push({
+    //     name: 'wallpaper',
+    //     label: '动态桌面'
+    //   })
+    // }
   },
   mounted () {
     this.getCurrentWindow().then(id => {

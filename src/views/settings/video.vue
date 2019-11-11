@@ -43,8 +43,8 @@
           <cpt-set-shortcut label="召唤浮窗" name="Dock.Show" app="Dock" hotkeyKey="dockShow">
             <!-- <span slot="desc">是否在打开任何游戏时都启动精彩时刻？</span> -->
           </cpt-set-shortcut>
-          <cpt-set-shortcut label="游戏内浮窗控制" name="Overlay.Control" app="Overlay" hotkeyKey="overlayControl"></cpt-set-shortcut>
-          <cpt-set-shortcut label="游戏内浮窗显示/隐藏" name="Overlay.ShowHide" app="Overlay" hotkeyKey="overlayShowHide"></cpt-set-shortcut>
+          <cpt-set-shortcut label="游戏内浮窗显示/隐藏" name="Overlay.Control" app="Overlay" hotkeyKey="overlayControl"></cpt-set-shortcut>
+          <!-- <cpt-set-shortcut label="游戏内浮窗显示/隐藏" name="Overlay.ShowHide" app="Overlay" hotkeyKey="overlayShowHide"></cpt-set-shortcut> -->
         </cpt-set-block>
 
         <!-- <cpt-set-block title="启动设置">
@@ -83,7 +83,7 @@
         </cpt-set-block>
 
         <cpt-set-block title="关于小黑盒">
-          <cpt-set-switch v-if="showAutoStartSetting" label="开机自动启动" :switch="isAutoStart" @input="setIsAutoStart">
+          <cpt-set-switch label="开机自动启动" :switch="isAutoStart" @input="setIsAutoStart">
             <!-- <span slot="desc">desc</span> -->
           </cpt-set-switch>
           <div class="setting-row info">
@@ -163,8 +163,7 @@ export default {
       audioInput: '',
       captureAudioInput: true,
       clientVersion: '999.0.0',
-      v10003: false,
-      showAutoStartSetting: false
+      v10003: false
     }
   },
   methods: {

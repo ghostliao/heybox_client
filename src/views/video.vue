@@ -7,7 +7,7 @@
           <cpt-button label="录制设置" icon="set-video-thin" @click="$router.push({ name: 'settings-video' })" secondary small></cpt-button>
         </div> -->
         <div class="wrap">
-          <cpt-block-button icon="screenshot-fill" :text="'截屏'" :tooltipLabel="$store.state.hotkeys.captureImage" @click="startImageCapture"></cpt-block-button>
+          <cpt-block-button icon="screenshot-fill" :text="'截屏'" :tooltipLabel="$store.state.hotkeys.captureImage" @click="startImageCaptureBtn"></cpt-block-button>
           <cpt-block-button
             :buttonClass="recordButtonClass"
             icon="record-fill" 
@@ -15,7 +15,7 @@
             :textClass="recordButtonTextClass" 
             :tooltipLabel="$store.state.hotkeys.captureVideo" 
             @click="recordButtonClickEvent"></cpt-block-button>
-          <cpt-block-button buttonClass="set" icon="set-fill" @click="$router.push({ name: 'settings-video' })"></cpt-block-button>
+          <cpt-block-button buttonClass="set" icon="set-fill" @click="settingsBtn"></cpt-block-button>
           
           <!-- <div v-show="isAutoStartCaptureInGame" class="main-btn auto" @click="setIsAutoStartCaptureInGame(false)">
             <cpt-icon value="capture-fill" :size="24"></cpt-icon>
@@ -25,9 +25,11 @@
             <cpt-icon value="capture-fill" :size="24"></cpt-icon>
             <span class="txt">精彩时刻已关闭</span>
           </div> -->
-
-          <cpt-block-button v-if="$store.state.config.dev" :text="'start'" icon="set-fill" @click="momentStart"></cpt-block-button>
-          <cpt-block-button v-if="$store.state.config.dev" :text="'stop'" icon="set-fill" @click="momentStop"></cpt-block-button>
+          <template v-if="$store.state.config.dev">
+            <cpt-block-button :text="'start'" icon="set-fill" @click="momentStart"></cpt-block-button>
+            <cpt-block-button :text="'stop'" icon="set-fill" @click="momentStop"></cpt-block-button>
+            <cpt-block-button :text="'showMoment'" icon="set-fill" @click="showMomentDialog"></cpt-block-button>
+          </template>
           
         </div>
         <div v-if="$store.state.momentDialogEnter" class="record">
@@ -153,8 +155,21 @@ export default {
       'easyStartVideoCapture',
       'stopVideoCapture'
     ]),
+    startImageCaptureBtn () {
+      this.__REPORT('view_media_fn_screen_shot')
+      this.startImageCapture()
+    },
     recordButtonClickEvent () {
-      this.$store.state.recordingState === 'RS_Stop' ? this.easyStartVideoCapture() : this.stopVideoCapture()
+      if (this.$store.state.recordingState === 'RS_Stop') {
+        this.__REPORT('view_media_fn_screen_record')
+        this.easyStartVideoCapture()
+      } else {
+        this.stopVideoCapture()
+      }
+    },
+    settingsBtn () {
+      this.__REPORT('view_media_settings_enter')
+      this.$router.push({ name: 'settings-video' })
     },
     onRecordingSecondsChanged () {
       this.getRecordingSeconds()
